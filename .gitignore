@@ -1,0 +1,13 @@
+data/raw/*
+!data/raw/SOURCES.md
+!data/raw/md5.txt
+data/processed/
+__pycache__/
+manuscript/*.aux
+manuscript/*.bbl
+manuscript/*.blg
+manuscript/*.fdb_latexmk
+manuscript/*.fls
+manuscript/*.log
+manuscript/*.out
+manuscript/*.spl

@@ -1,0 +1,53 @@
+\documentclass[preprint,12pt,authoryear=false]{elsarticle}
+% Target journal: Computers & Security (Elsevier). Elsevier's elsarticle class, numeric citations.
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lineno}
+\usepackage{siunitx}
+\usepackage{pifont}
+\usepackage{adjustbox}
+\makeatletter\newcommand{\tabinput}[1]{\@@input #1 }\makeatother
+\journal{Computers \& Security}
+\biboptions{numbers,sort&compress}
+
+\begin{document}
+\begin{frontmatter}
+
+\title{Beyond benchmark accuracy: a joint evaluation of cross-dataset shift, unseen attack families and calibration for budget-constrained intrusion-detection triage}
+
+% TODO(author): add affiliations and e-mail addresses before submission.
+\author[aff1]{Osman Can Çetlenbik\corref{cor1}}
+\ead{[e-mail]}
+\author[aff2]{Ahmet Ali Süzen}
+\cortext[cor1]{Corresponding author.}
+\affiliation[aff1]{organization={[Department, University]},
+            city={[City]},
+            country={Türkiye}}
+\affiliation[aff2]{organization={[Department, University]},
+            city={[City]},
+            country={Türkiye}}
+
+\input{sections/abstract}
+
+\begin{keyword}
+Network intrusion detection \sep Machine learning \sep Distribution shift \sep Calibration \sep Conformal prediction \sep Zero-day attacks \sep Alert triage
+\end{keyword}
+
+\end{frontmatter}
+
+\input{sections/intro}
+\input{sections/related}
+\input{sections/method}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/conclusion}
+\input{sections/declarations}
+
+\bibliographystyle{elsarticle-num}
+\bibliography{refs}
+
+\end{document}

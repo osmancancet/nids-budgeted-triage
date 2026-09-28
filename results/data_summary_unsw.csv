@@ -1,0 +1,13 @@
+dataset,family,group,n_final
+UNSW-NB15,Normal,Normal,85722
+UNSW-NB15,Exploits,Exploits,27215
+UNSW-NB15,Fuzzers,Fuzzers,20741
+UNSW-NB15,Reconnaissance,Reconnaissance,9786
+UNSW-NB15,Generic,Generic,7580
+UNSW-NB15,DoS,DoS,5281
+UNSW-NB15,Analysis,Analysis,1813
+UNSW-NB15,Backdoor,Backdoor,1713
+UNSW-NB15,Shellcode,Shellcode,1456
+UNSW-NB15,Worms,Worms,171
+UNSW-NB15,__rows_raw__,,257673
+UNSW-NB15,__rows_dedup__,,161478

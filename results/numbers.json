@@ -1,0 +1,2020 @@
+{
+ "data": [
+  [
+   "CIC-IDS2017",
+   1113088,
+   822880,
+   26.072332106715734,
+   200000,
+   95606,
+   14
+  ],
+  [
+   "CSE-CIC-IDS2018",
+   3423289,
+   1867592,
+   45.444512572558146,
+   200000,
+   222416,
+   14
+  ],
+  [
+   "ACI-IoT-2023",
+   1231411,
+   760253,
+   38.26163644794468,
+   200000,
+   181415,
+   11
+  ],
+  [
+   "UNSW-NB15",
+   257673,
+   161478,
+   37.3322001140981,
+   85722,
+   75756,
+   9
+  ],
+  [
+   "ToN-IoT",
+   211043,
+   93658,
+   55.621366261851854,
+   23671,
+   69987,
+   9
+  ]
+ ],
+ "xd_LGBM_in-domain": {
+  "auroc": 0.9930751519028487,
+  "ap": 0.9949025018954428,
+  "ece_raw": 0.002282351898077927,
+  "brier_raw": 0.017249881033817385,
+  "ece_platt": 0.001604367581352653,
+  "brier_platt": 0.017217346095795887,
+  "ece_iso": 0.0009373438118889134,
+  "brier_iso": 0.017202134404010146,
+  "tpr_at_alpha": 0.9643188338034845,
+  "fpr_at_alpha": 0.010091111111111082,
+  "fpr_inflation": 1.009111111111111,
+  "prec_at_pi0.1": 0.9137882320814159,
+  "prec_at_pi0.01": 0.49106129809154087,
+  "prec_at_pi0.001": 0.08737615417508753,
+  "fit_s": 10.246469100316366,
+  "score_us_per_flow": 41.462468552534865,
+  "group_recall": NaN,
+  "group_n": NaN
+ },
+ "xd_LGBM_cross-dataset": {
+  "auroc": 0.6016332610217546,
+  "ap": 0.5537616812742759,
+  "ece_raw": 0.3777447520106848,
+  "brier_raw": 0.3896261617720239,
+  "ece_platt": 0.3824171812004353,
+  "brier_platt": 0.39229964986077476,
+  "ece_iso": 0.3785745489697211,
+  "brier_iso": 0.3896784489288491,
+  "tpr_at_alpha": 0.22793569848217327,
+  "fpr_at_alpha": 0.13749111111111106,
+  "fpr_inflation": 13.74911111111111,
+  "prec_at_pi0.1": 0.1926757632804724,
+  "prec_at_pi0.01": 0.02401945876128172,
+  "prec_at_pi0.001": 0.00247280937576085,
+  "fit_s": 10.246469100316366,
+  "score_us_per_flow": 40.06672514867381,
+  "group_recall": NaN,
+  "group_n": NaN
+ },
+ "xd_RF_in-domain": {
+  "auroc": 0.991641431147043,
+  "ap": 0.9939527442042471,
+  "ece_raw": 0.0083450384085782,
+  "brier_raw": 0.01962936679139268,
+  "ece_platt": 0.005306302757544373,
+  "brier_platt": 0.01931840182917287,
+  "ece_iso": 0.00118616249115568,
+  "brier_iso": 0.019114079384980387,
+  "tpr_at_alpha": 0.9608616410979524,
+  "fpr_at_alpha": 0.010172222222222185,
+  "fpr_inflation": 1.017222222222222,
+  "prec_at_pi0.1": 0.9127622119752001,
+  "prec_at_pi0.01": 0.488384673475753,
+  "prec_at_pi0.001": 0.0866854766561722,
+  "fit_s": 19.80795882542928,
+  "score_us_per_flow": 40.499023574783656,
+  "group_recall": NaN,
+  "group_n": NaN
+ },
+ "xd_RF_cross-dataset": {
+  "auroc": 0.622968991759202,
+  "ap": 0.5646395145050137,
+  "ece_raw": 0.24004974678087657,
+  "brier_raw": 0.2951181418483113,
+  "ece_platt": 0.26706559222857124,
+  "brier_platt": 0.3112305897410227,
+  "ece_iso": 0.2797947212421493,
+  "brier_iso": 0.3206380525945436,
+  "tpr_at_alpha": 0.26213085301542033,
+  "fpr_at_alpha": 0.1605122222222222,
+  "fpr_inflation": 16.051222222222222,
+  "prec_at_pi0.1": 0.19634081392975922,
+  "prec_at_pi0.01": 0.02392548581062615,
+  "prec_at_pi0.001": 0.0024515062541784964,
+  "fit_s": 19.80795882542928,
+  "score_us_per_flow": 39.95487874563804,
+  "group_recall": NaN,
+  "group_n": NaN
+ },
+ "xd_MLP_in-domain": {
+  "auroc": 0.9883423718201716,
+  "ap": 0.9913279226393469,
+  "ece_raw": 0.00409697964933666,
+  "brier_raw": 0.024784904086476493,
+  "ece_platt": 0.003991473200580719,
+  "brier_platt": 0.024742917064176088,
+  "ece_iso": 0.0012559010853233333,
+  "brier_iso": 0.02398229451880455,
+  "tpr_at_alpha": 0.941536421808683,
+  "fpr_at_alpha": 0.01019777777777774,
+  "fpr_inflation": 1.019777777777778,
+  "prec_at_pi0.1": 0.9109977579174171,
+  "prec_at_pi0.01": 0.4824309339235645,
+  "prec_at_pi0.001": 0.08468251338827854,
+  "fit_s": 30.84115360577901,
+  "score_us_per_flow": 36.61455834004808,
+  "group_recall": NaN,
+  "group_n": NaN
+ },
+ "xd_MLP_cross-dataset": {
+  "auroc": 0.5770088775531061,
+  "ap": 0.5560064552479183,
+  "ece_raw": 0.3896800442104137,
+  "brier_raw": 0.38930583397585405,
+  "ece_platt": 0.3901050192830954,
+  "brier_platt": 0.3895695954265571,
+  "ece_iso": 0.39003239112145793,
+  "brier_iso": 0.39159804842353274,
+  "tpr_at_alpha": 0.2783492045112921,
+  "fpr_at_alpha": 0.17411833333333332,
+  "fpr_inflation": 17.41183333333333,
+  "prec_at_pi0.1": 0.2259205840841529,
+  "prec_at_pi0.01": 0.034207851737873,
+  "prec_at_pi0.001": 0.0036910246945334466,
+  "fit_s": 30.84115360577901,
+  "score_us_per_flow": 36.3914942623743,
+  "group_recall": NaN,
+  "group_n": NaN
+ },
+ "xd_LR_in-domain": {
+  "auroc": 0.9638112537765394,
+  "ap": 0.9591056208840317,
+  "ece_raw": 0.03619693253993157,
+  "brier_raw": 0.059796370111225586,
+  "ece_platt": 0.0338698374768137,
+  "brier_platt": 0.05962863242636853,
+  "ece_iso": 0.0022991828737120934,
+  "brier_iso": 0.05415356282455282,
+  "tpr_at_alpha": 0.6451630396474866,
+  "fpr_at_alpha": 0.010098888888888853,
+  "fpr_inflation": 1.009888888888889,
+  "prec_at_pi0.1": 0.8728132949567836,
+  "prec_at_pi0.01": 0.3899285232544261,
+  "prec_at_pi0.001": 0.06055357498671713,
+  "fit_s": 18.283411502838135,
+  "score_us_per_flow": 35.80266311967711,
+  "group_recall": NaN,
+  "group_n": NaN
+ },
+ "xd_LR_cross-dataset": {
+  "auroc": 0.4961504401674056,
+  "ap": 0.4782145105629148,
+  "ece_raw": 0.4517933706872664,
+  "brier_raw": 0.45524622158287986,
+  "ece_platt": 0.45281151945151404,
+  "brier_platt": 0.4563053192203375,
+  "ece_iso": 0.4544923000845357,
+  "brier_iso": 0.4583201052283039,
+  "tpr_at_alpha": 0.23667222369708812,
+  "fpr_at_alpha": 0.24972222222222223,
+  "fpr_inflation": 24.97222222222222,
+  "prec_at_pi0.1": 0.19339630902468424,
+  "prec_at_pi0.01": 0.026475728618711523,
+  "prec_at_pi0.001": 0.002770403863758425,
+  "fit_s": 18.283411502838135,
+  "score_us_per_flow": 35.623816759333614,
+  "group_recall": NaN,
+  "group_n": NaN
+ },
+ "id_other": [
+  {
+   "source": "ToN-IoT",
+   "model": "LGBM",
+   "auroc": 0.9999,
+   "ece_iso": 0.0011,
+   "fpr_inflation": 0.89,
+   "tpr_at_alpha": 0.9985
+  },
+  {
+   "source": "ToN-IoT",
+   "model": "LR",
+   "auroc": 0.9897,
+   "ece_iso": 0.003,
+   "fpr_inflation": 0.9576,
+   "tpr_at_alpha": 0.798
+  },
+  {
+   "source": "ToN-IoT",
+   "model": "MLP",
+   "auroc": 0.9978,
+   "ece_iso": 0.0015,
+   "fpr_inflation": 1.0646,
+   "tpr_at_alpha": 0.9783
+  },
+  {
+   "source": "ToN-IoT",
+   "model": "RF",
+   "auroc": 0.9997,
+   "ece_iso": 0.0012,
+   "fpr_inflation": 0.8759,
+   "tpr_at_alpha": 0.9971
+  },
+  {
+   "source": "UNSW-NB15",
+   "model": "LGBM",
+   "auroc": 0.9833,
+   "ece_iso": 0.0043,
+   "fpr_inflation": 0.9745,
+   "tpr_at_alpha": 0.7955
+  },
+  {
+   "source": "UNSW-NB15",
+   "model": "LR",
+   "auroc": 0.964,
+   "ece_iso": 0.0045,
+   "fpr_inflation": 1.0024,
+   "tpr_at_alpha": 0.5537
+  },
+  {
+   "source": "UNSW-NB15",
+   "model": "MLP",
+   "auroc": 0.977,
+   "ece_iso": 0.005,
+   "fpr_inflation": 0.9916,
+   "tpr_at_alpha": 0.7271
+  },
+  {
+   "source": "UNSW-NB15",
+   "model": "RF",
+   "auroc": 0.9815,
+   "ece_iso": 0.0042,
+   "fpr_inflation": 1.0172,
+   "tpr_at_alpha": 0.776
+  }
+ ],
+ "xd_lgbm_pairs": [
+  {
+   "source": "ACI-IoT-2023",
+   "target": "ACI-IoT-2023",
+   "auroc": 0.9998,
+   "ap": 0.9997,
+   "ece_raw": 0.0009,
+   "ece_iso": 0.0007,
+   "fpr_inflation": 1.0277,
+   "tpr_at_alpha": 0.9995,
+   "prec_at_pi0.01": 0.4956
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CIC-IDS2017",
+   "auroc": 0.447,
+   "ap": 0.3285,
+   "ece_raw": 0.3169,
+   "ece_iso": 0.319,
+   "fpr_inflation": 1.1577,
+   "tpr_at_alpha": 0.0231,
+   "prec_at_pi0.01": 0.0211
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CSE-CIC-IDS2018",
+   "auroc": 0.5955,
+   "ap": 0.5946,
+   "ece_raw": 0.5179,
+   "ece_iso": 0.5194,
+   "fpr_inflation": 1.183,
+   "tpr_at_alpha": 0.0251,
+   "prec_at_pi0.01": 0.0241
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "ACI-IoT-2023",
+   "auroc": 0.6465,
+   "ap": 0.6334,
+   "ece_raw": 0.3922,
+   "ece_iso": 0.3824,
+   "fpr_inflation": 22.287,
+   "tpr_at_alpha": 0.3496,
+   "prec_at_pi0.01": 0.0155
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CIC-IDS2017",
+   "auroc": 1.0,
+   "ap": 0.9999,
+   "ece_raw": 0.0007,
+   "ece_iso": 0.0003,
+   "fpr_inflation": 1.0107,
+   "tpr_at_alpha": 0.9997,
+   "prec_at_pi0.01": 0.5001
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CSE-CIC-IDS2018",
+   "auroc": 0.7819,
+   "ap": 0.8044,
+   "ece_raw": 0.4736,
+   "ece_iso": 0.4638,
+   "fpr_inflation": 4.8907,
+   "tpr_at_alpha": 0.3005,
+   "prec_at_pi0.01": 0.0593
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "ACI-IoT-2023",
+   "auroc": 0.5586,
+   "ap": 0.5012,
+   "ece_raw": 0.3052,
+   "ece_iso": 0.3142,
+   "fpr_inflation": 20.7757,
+   "tpr_at_alpha": 0.2108,
+   "prec_at_pi0.01": 0.0099
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CIC-IDS2017",
+   "auroc": 0.5803,
+   "ap": 0.4605,
+   "ece_raw": 0.2607,
+   "ece_iso": 0.2727,
+   "fpr_inflation": 32.2007,
+   "tpr_at_alpha": 0.4584,
+   "prec_at_pi0.01": 0.0142
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CSE-CIC-IDS2018",
+   "auroc": 0.9795,
+   "ap": 0.9851,
+   "ece_raw": 0.0053,
+   "ece_iso": 0.0018,
+   "fpr_inflation": 0.989,
+   "tpr_at_alpha": 0.8937,
+   "prec_at_pi0.01": 0.4774
+  }
+ ],
+ "xd_group_recall_lgbm": [
+  {
+   "source": "ACI-IoT-2023",
+   "target": "ACI-IoT-2023",
+   "group": "BruteForce",
+   "rec": 0.999,
+   "n": 1905.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "ACI-IoT-2023",
+   "group": "DoS",
+   "rec": 1.0,
+   "n": 27729.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "ACI-IoT-2023",
+   "group": "Other",
+   "rec": 0.0,
+   "n": 2.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "ACI-IoT-2023",
+   "group": "Scan",
+   "rec": 1.0,
+   "n": 24790.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CIC-IDS2017",
+   "group": "Botnet",
+   "rec": 0.0,
+   "n": 432.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CIC-IDS2017",
+   "group": "BruteForce",
+   "rec": 0.149,
+   "n": 2744.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CIC-IDS2017",
+   "group": "DDoS",
+   "rec": 0.0,
+   "n": 9000.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CIC-IDS2017",
+   "group": "DoS",
+   "rec": 0.003,
+   "n": 15265.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CIC-IDS2017",
+   "group": "Infiltration",
+   "rec": 0.0,
+   "n": 11.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CIC-IDS2017",
+   "group": "Other",
+   "rec": 0.0,
+   "n": 3.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CIC-IDS2017",
+   "group": "Scan",
+   "rec": 0.17,
+   "n": 587.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CIC-IDS2017",
+   "group": "WebAttack",
+   "rec": 0.178,
+   "n": 642.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CSE-CIC-IDS2018",
+   "group": "Botnet",
+   "rec": 0.003,
+   "n": 9000.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CSE-CIC-IDS2018",
+   "group": "BruteForce",
+   "rec": 0.001,
+   "n": 9016.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CSE-CIC-IDS2018",
+   "group": "DDoS",
+   "rec": 0.071,
+   "n": 18519.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CSE-CIC-IDS2018",
+   "group": "DoS",
+   "rec": 0.001,
+   "n": 20930.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CSE-CIC-IDS2018",
+   "group": "Infiltration",
+   "rec": 0.035,
+   "n": 9000.0
+  },
+  {
+   "source": "ACI-IoT-2023",
+   "target": "CSE-CIC-IDS2018",
+   "group": "WebAttack",
+   "rec": 0.008,
+   "n": 259.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "ACI-IoT-2023",
+   "group": "BruteForce",
+   "rec": 0.128,
+   "n": 1905.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "ACI-IoT-2023",
+   "group": "DoS",
+   "rec": 0.538,
+   "n": 27729.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "ACI-IoT-2023",
+   "group": "Other",
+   "rec": 1.0,
+   "n": 2.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "ACI-IoT-2023",
+   "group": "Scan",
+   "rec": 0.156,
+   "n": 24790.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CIC-IDS2017",
+   "group": "Botnet",
+   "rec": 0.995,
+   "n": 432.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CIC-IDS2017",
+   "group": "BruteForce",
+   "rec": 1.0,
+   "n": 2744.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CIC-IDS2017",
+   "group": "DDoS",
+   "rec": 1.0,
+   "n": 9000.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CIC-IDS2017",
+   "group": "DoS",
+   "rec": 1.0,
+   "n": 15265.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CIC-IDS2017",
+   "group": "Infiltration",
+   "rec": 0.855,
+   "n": 11.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CIC-IDS2017",
+   "group": "Other",
+   "rec": 1.0,
+   "n": 3.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CIC-IDS2017",
+   "group": "Scan",
+   "rec": 0.999,
+   "n": 587.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CIC-IDS2017",
+   "group": "WebAttack",
+   "rec": 0.998,
+   "n": 642.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CSE-CIC-IDS2018",
+   "group": "Botnet",
+   "rec": 0.006,
+   "n": 9000.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CSE-CIC-IDS2018",
+   "group": "BruteForce",
+   "rec": 0.116,
+   "n": 9016.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CSE-CIC-IDS2018",
+   "group": "DDoS",
+   "rec": 0.2,
+   "n": 18519.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CSE-CIC-IDS2018",
+   "group": "DoS",
+   "rec": 0.701,
+   "n": 20930.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CSE-CIC-IDS2018",
+   "group": "Infiltration",
+   "rec": 0.052,
+   "n": 9000.0
+  },
+  {
+   "source": "CIC-IDS2017",
+   "target": "CSE-CIC-IDS2018",
+   "group": "WebAttack",
+   "rec": 0.401,
+   "n": 259.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "ACI-IoT-2023",
+   "group": "BruteForce",
+   "rec": 0.119,
+   "n": 1905.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "ACI-IoT-2023",
+   "group": "DoS",
+   "rec": 0.05,
+   "n": 27729.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "ACI-IoT-2023",
+   "group": "Other",
+   "rec": 0.0,
+   "n": 2.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "ACI-IoT-2023",
+   "group": "Scan",
+   "rec": 0.397,
+   "n": 24790.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CIC-IDS2017",
+   "group": "Botnet",
+   "rec": 0.0,
+   "n": 432.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CIC-IDS2017",
+   "group": "BruteForce",
+   "rec": 0.515,
+   "n": 2744.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CIC-IDS2017",
+   "group": "DDoS",
+   "rec": 0.002,
+   "n": 9000.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CIC-IDS2017",
+   "group": "DoS",
+   "rec": 0.755,
+   "n": 15265.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CIC-IDS2017",
+   "group": "Infiltration",
+   "rec": 0.455,
+   "n": 11.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CIC-IDS2017",
+   "group": "Other",
+   "rec": 0.0,
+   "n": 3.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CIC-IDS2017",
+   "group": "Scan",
+   "rec": 0.228,
+   "n": 587.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CIC-IDS2017",
+   "group": "WebAttack",
+   "rec": 0.081,
+   "n": 642.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CSE-CIC-IDS2018",
+   "group": "Botnet",
+   "rec": 0.996,
+   "n": 9000.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CSE-CIC-IDS2018",
+   "group": "BruteForce",
+   "rec": 1.0,
+   "n": 9016.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CSE-CIC-IDS2018",
+   "group": "DDoS",
+   "rec": 1.0,
+   "n": 18519.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CSE-CIC-IDS2018",
+   "group": "DoS",
+   "rec": 1.0,
+   "n": 20930.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CSE-CIC-IDS2018",
+   "group": "Infiltration",
+   "rec": 0.22,
+   "n": 9000.0
+  },
+  {
+   "source": "CSE-CIC-IDS2018",
+   "target": "CSE-CIC-IDS2018",
+   "group": "WebAttack",
+   "rec": 0.928,
+   "n": 259.0
+  },
+  {
+   "source": "ToN-IoT",
+   "target": "ToN-IoT",
+   "group": "backdoor",
+   "rec": 0.997,
+   "n": 590.0
+  },
+  {
+   "source": "ToN-IoT",
+   "target": "ToN-IoT",
+   "group": "ddos",
+   "rec": 0.999,
+   "n": 3584.0
+  },
+  {
+   "source": "ToN-IoT",
+   "target": "ToN-IoT",
+   "group": "dos",
+   "rec": 0.998,
+   "n": 1934.0
+  },
+  {
+   "source": "ToN-IoT",
+   "target": "ToN-IoT",
+   "group": "injection",
+   "rec": 0.999,
+   "n": 5955.0
+  },
+  {
+   "source": "ToN-IoT",
+   "target": "ToN-IoT",
+   "group": "mitm",
+   "rec": 0.97,
+   "n": 311.0
+  },
+  {
+   "source": "ToN-IoT",
+   "target": "ToN-IoT",
+   "group": "password",
+   "rec": 1.0,
+   "n": 4574.0
+  },
+  {
+   "source": "ToN-IoT",
+   "target": "ToN-IoT",
+   "group": "ransomware",
+   "rec": 0.982,
+   "n": 78.0
+  },
+  {
+   "source": "ToN-IoT",
+   "target": "ToN-IoT",
+   "group": "scanning",
+   "rec": 1.0,
+   "n": 1348.0
+  },
+  {
+   "source": "ToN-IoT",
+   "target": "ToN-IoT",
+   "group": "xss",
+   "rec": 0.999,
+   "n": 2622.0
+  },
+  {
+   "source": "UNSW-NB15",
+   "target": "UNSW-NB15",
+   "group": "Analysis",
+   "rec": 0.788,
+   "n": 544.0
+  },
+  {
+   "source": "UNSW-NB15",
+   "target": "UNSW-NB15",
+   "group": "Backdoor",
+   "rec": 0.989,
+   "n": 514.0
+  },
+  {
+   "source": "UNSW-NB15",
+   "target": "UNSW-NB15",
+   "group": "DoS",
+   "rec": 0.946,
+   "n": 1585.0
+  },
+  {
+   "source": "UNSW-NB15",
+   "target": "UNSW-NB15",
+   "group": "Exploits",
+   "rec": 0.948,
+   "n": 8164.0
+  },
+  {
+   "source": "UNSW-NB15",
+   "target": "UNSW-NB15",
+   "group": "Fuzzers",
+   "rec": 0.374,
+   "n": 6223.0
+  },
+  {
+   "source": "UNSW-NB15",
+   "target": "UNSW-NB15",
+   "group": "Generic",
+   "rec": 0.992,
+   "n": 2274.0
+  },
+  {
+   "source": "UNSW-NB15",
+   "target": "UNSW-NB15",
+   "group": "Reconnaissance",
+   "rec": 0.989,
+   "n": 2936.0
+  },
+  {
+   "source": "UNSW-NB15",
+   "target": "UNSW-NB15",
+   "group": "Shellcode",
+   "rec": 0.838,
+   "n": 437.0
+  },
+  {
+   "source": "UNSW-NB15",
+   "target": "UNSW-NB15",
+   "group": "Worms",
+   "rec": 0.98,
+   "n": 51.0
+  }
+ ],
+ "score_us_per_flow": {
+  "LGBM": 39.62,
+  "LR": 35.47,
+  "MLP": 35.72,
+  "RF": 39.26
+ },
+ "os_per_family": [
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "DNS Flood",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.2,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.819,
+   "mean_p_iso_unseen": 0.13,
+   "ece_iso_stream": 0.014,
+   "auroc_unseen_vs_benign": 0.967,
+   "auroc_nov_unseen_vs_benign": 0.77
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "Dictionary Attack",
+   "seed": 1.0,
+   "n_unseen": 1905.0,
+   "recall_unseen_at_alpha": 0.0,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 1.0,
+   "mean_p_iso_unseen": 0.0,
+   "ece_iso_stream": 0.016,
+   "auroc_unseen_vs_benign": 0.499,
+   "auroc_nov_unseen_vs_benign": 0.915
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "ICMP Flood",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.0,
+   "recall_seen_at_alpha": 0.999,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 1.0,
+   "mean_p_iso_unseen": 0.0,
+   "ece_iso_stream": 0.016,
+   "auroc_unseen_vs_benign": 0.789,
+   "auroc_nov_unseen_vs_benign": 0.819
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "OS Scan",
+   "seed": 1.0,
+   "n_unseen": 5422.0,
+   "recall_unseen_at_alpha": 0.98,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.02,
+   "mean_p_iso_unseen": 0.824,
+   "ece_iso_stream": 0.005,
+   "auroc_unseen_vs_benign": 0.996,
+   "auroc_nov_unseen_vs_benign": 0.432
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "Ping Sweep",
+   "seed": 1.0,
+   "n_unseen": 5199.0,
+   "recall_unseen_at_alpha": 0.001,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.999,
+   "mean_p_iso_unseen": 0.0,
+   "ece_iso_stream": 0.011,
+   "auroc_unseen_vs_benign": 0.801,
+   "auroc_nov_unseen_vs_benign": 0.316
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "Port Scan",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.769,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.405,
+   "mean_p_iso_unseen": 0.1,
+   "ece_iso_stream": 0.014,
+   "auroc_unseen_vs_benign": 0.983,
+   "auroc_nov_unseen_vs_benign": 0.542
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "SYN Flood",
+   "seed": 1.0,
+   "n_unseen": 4156.0,
+   "recall_unseen_at_alpha": 0.0,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 1.0,
+   "mean_p_iso_unseen": 0.0,
+   "ece_iso_stream": 0.016,
+   "auroc_unseen_vs_benign": 0.625,
+   "auroc_nov_unseen_vs_benign": 0.069
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "Slowloris",
+   "seed": 1.0,
+   "n_unseen": 5336.0,
+   "recall_unseen_at_alpha": 0.036,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.968,
+   "mean_p_iso_unseen": 0.019,
+   "ece_iso_stream": 0.016,
+   "auroc_unseen_vs_benign": 0.961,
+   "auroc_nov_unseen_vs_benign": 0.983
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "UDP Flood",
+   "seed": 1.0,
+   "n_unseen": 237.0,
+   "recall_unseen_at_alpha": 0.031,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.959,
+   "mean_p_iso_unseen": 0.008,
+   "ece_iso_stream": 0.01,
+   "auroc_unseen_vs_benign": 0.838,
+   "auroc_nov_unseen_vs_benign": 0.644
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "held_out": "Vulnerability Scan",
+   "seed": 1.0,
+   "n_unseen": 5169.0,
+   "recall_unseen_at_alpha": 0.915,
+   "recall_seen_at_alpha": 0.999,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.078,
+   "mean_p_iso_unseen": 0.857,
+   "ece_iso_stream": 0.007,
+   "auroc_unseen_vs_benign": 0.996,
+   "auroc_nov_unseen_vs_benign": 0.903
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "Bot",
+   "seed": 1.0,
+   "n_unseen": 432.0,
+   "recall_unseen_at_alpha": 0.002,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.011,
+   "confident_miss_iso": 0.998,
+   "mean_p_iso_unseen": 0.001,
+   "ece_iso_stream": 0.008,
+   "auroc_unseen_vs_benign": 0.865,
+   "auroc_nov_unseen_vs_benign": 0.692
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "DDoS",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.633,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.37,
+   "mean_p_iso_unseen": 0.621,
+   "ece_iso_stream": 0.005,
+   "auroc_unseen_vs_benign": 0.968,
+   "auroc_nov_unseen_vs_benign": 0.989
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "DoS GoldenEye",
+   "seed": 1.0,
+   "n_unseen": 3085.0,
+   "recall_unseen_at_alpha": 0.976,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.067,
+   "mean_p_iso_unseen": 0.718,
+   "ece_iso_stream": 0.003,
+   "auroc_unseen_vs_benign": 0.998,
+   "auroc_nov_unseen_vs_benign": 0.979
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "DoS Hulk",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.942,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.224,
+   "mean_p_iso_unseen": 0.635,
+   "ece_iso_stream": 0.004,
+   "auroc_unseen_vs_benign": 0.996,
+   "auroc_nov_unseen_vs_benign": 0.978
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "DoS Slowhttptest",
+   "seed": 1.0,
+   "n_unseen": 1568.0,
+   "recall_unseen_at_alpha": 0.927,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.321,
+   "mean_p_iso_unseen": 0.477,
+   "ece_iso_stream": 0.005,
+   "auroc_unseen_vs_benign": 0.996,
+   "auroc_nov_unseen_vs_benign": 0.458
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "DoS slowloris",
+   "seed": 1.0,
+   "n_unseen": 1612.0,
+   "recall_unseen_at_alpha": 0.999,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.001,
+   "mean_p_iso_unseen": 0.951,
+   "ece_iso_stream": 0.001,
+   "auroc_unseen_vs_benign": 1.0,
+   "auroc_nov_unseen_vs_benign": 0.995
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "FTP-Patator",
+   "seed": 1.0,
+   "n_unseen": 1779.0,
+   "recall_unseen_at_alpha": 0.902,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.554,
+   "mean_p_iso_unseen": 0.279,
+   "ece_iso_stream": 0.007,
+   "auroc_unseen_vs_benign": 0.995,
+   "auroc_nov_unseen_vs_benign": 0.965
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "PortScan",
+   "seed": 1.0,
+   "n_unseen": 587.0,
+   "recall_unseen_at_alpha": 0.518,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.483,
+   "mean_p_iso_unseen": 0.399,
+   "ece_iso_stream": 0.006,
+   "auroc_unseen_vs_benign": 0.957,
+   "auroc_nov_unseen_vs_benign": 0.972
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "SSH-Patator",
+   "seed": 1.0,
+   "n_unseen": 965.0,
+   "recall_unseen_at_alpha": 0.091,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.977,
+   "mean_p_iso_unseen": 0.013,
+   "ece_iso_stream": 0.011,
+   "auroc_unseen_vs_benign": 0.977,
+   "auroc_nov_unseen_vs_benign": 0.887
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "Web Attack - Brute Force",
+   "seed": 1.0,
+   "n_unseen": 440.0,
+   "recall_unseen_at_alpha": 0.965,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.036,
+   "mean_p_iso_unseen": 0.924,
+   "ece_iso_stream": 0.002,
+   "auroc_unseen_vs_benign": 0.998,
+   "auroc_nov_unseen_vs_benign": 0.743
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "held_out": "Web Attack - XSS",
+   "seed": 1.0,
+   "n_unseen": 196.0,
+   "recall_unseen_at_alpha": 0.966,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.037,
+   "mean_p_iso_unseen": 0.947,
+   "ece_iso_stream": 0.002,
+   "auroc_unseen_vs_benign": 0.999,
+   "auroc_nov_unseen_vs_benign": 0.747
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "Bot",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.933,
+   "recall_seen_at_alpha": 0.878,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.028,
+   "mean_p_iso_unseen": 0.718,
+   "ece_iso_stream": 0.094,
+   "auroc_unseen_vs_benign": 0.975,
+   "auroc_nov_unseen_vs_benign": 0.976
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "Brute Force -Web",
+   "seed": 1.0,
+   "n_unseen": 166.0,
+   "recall_unseen_at_alpha": 0.566,
+   "recall_seen_at_alpha": 0.894,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.257,
+   "mean_p_iso_unseen": 0.511,
+   "ece_iso_stream": 0.096,
+   "auroc_unseen_vs_benign": 0.831,
+   "auroc_nov_unseen_vs_benign": 0.662
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "DDOS attack-HOIC",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.302,
+   "recall_seen_at_alpha": 0.878,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.0,
+   "mean_p_iso_unseen": 0.425,
+   "ece_iso_stream": 0.092,
+   "auroc_unseen_vs_benign": 0.926,
+   "auroc_nov_unseen_vs_benign": 0.917
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "DDOS attack-LOIC-UDP",
+   "seed": 1.0,
+   "n_unseen": 519.0,
+   "recall_unseen_at_alpha": 1.0,
+   "recall_seen_at_alpha": 0.893,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.0,
+   "mean_p_iso_unseen": 0.998,
+   "ece_iso_stream": 0.098,
+   "auroc_unseen_vs_benign": 1.0,
+   "auroc_nov_unseen_vs_benign": 1.0
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "DDoS attacks-LOIC-HTTP",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.028,
+   "recall_seen_at_alpha": 0.877,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.057,
+   "mean_p_iso_unseen": 0.23,
+   "ece_iso_stream": 0.09,
+   "auroc_unseen_vs_benign": 0.787,
+   "auroc_nov_unseen_vs_benign": 0.947
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "DoS attacks-GoldenEye",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.852,
+   "recall_seen_at_alpha": 0.877,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.002,
+   "mean_p_iso_unseen": 0.862,
+   "ece_iso_stream": 0.096,
+   "auroc_unseen_vs_benign": 0.99,
+   "auroc_nov_unseen_vs_benign": 0.97
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "DoS attacks-Hulk",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.406,
+   "recall_seen_at_alpha": 0.877,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.008,
+   "mean_p_iso_unseen": 0.585,
+   "ece_iso_stream": 0.093,
+   "auroc_unseen_vs_benign": 0.977,
+   "auroc_nov_unseen_vs_benign": 0.935
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "DoS attacks-Slowloris",
+   "seed": 1.0,
+   "n_unseen": 2914.0,
+   "recall_unseen_at_alpha": 0.709,
+   "recall_seen_at_alpha": 0.889,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.247,
+   "mean_p_iso_unseen": 0.698,
+   "ece_iso_stream": 0.094,
+   "auroc_unseen_vs_benign": 0.837,
+   "auroc_nov_unseen_vs_benign": 0.776
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "Infilteration",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.034,
+   "recall_seen_at_alpha": 1.0,
+   "fpr_at_alpha": 0.011,
+   "confident_miss_iso": 0.992,
+   "mean_p_iso_unseen": 0.003,
+   "ece_iso_stream": 0.011,
+   "auroc_unseen_vs_benign": 0.48,
+   "auroc_nov_unseen_vs_benign": 0.545
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "held_out": "SSH-Bruteforce",
+   "seed": 1.0,
+   "n_unseen": 9000.0,
+   "recall_unseen_at_alpha": 0.998,
+   "recall_seen_at_alpha": 0.878,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.001,
+   "mean_p_iso_unseen": 0.921,
+   "ece_iso_stream": 0.097,
+   "auroc_unseen_vs_benign": 0.999,
+   "auroc_nov_unseen_vs_benign": 0.987
+  },
+  {
+   "dataset": "ToN-IoT",
+   "held_out": "backdoor",
+   "seed": 1.0,
+   "n_unseen": 590.0,
+   "recall_unseen_at_alpha": 0.994,
+   "recall_seen_at_alpha": 0.999,
+   "fpr_at_alpha": 0.009,
+   "confident_miss_iso": 0.002,
+   "mean_p_iso_unseen": 0.99,
+   "ece_iso_stream": 0.009,
+   "auroc_unseen_vs_benign": 1.0,
+   "auroc_nov_unseen_vs_benign": 0.982
+  },
+  {
+   "dataset": "ToN-IoT",
+   "held_out": "ddos",
+   "seed": 1.0,
+   "n_unseen": 3584.0,
+   "recall_unseen_at_alpha": 0.972,
+   "recall_seen_at_alpha": 0.999,
+   "fpr_at_alpha": 0.009,
+   "confident_miss_iso": 0.007,
+   "mean_p_iso_unseen": 0.843,
+   "ece_iso_stream": 0.008,
+   "auroc_unseen_vs_benign": 0.998,
+   "auroc_nov_unseen_vs_benign": 0.99
+  },
+  {
+   "dataset": "ToN-IoT",
+   "held_out": "dos",
+   "seed": 1.0,
+   "n_unseen": 1934.0,
+   "recall_unseen_at_alpha": 0.847,
+   "recall_seen_at_alpha": 0.999,
+   "fpr_at_alpha": 0.009,
+   "confident_miss_iso": 0.136,
+   "mean_p_iso_unseen": 0.802,
+   "ece_iso_stream": 0.008,
+   "auroc_unseen_vs_benign": 0.975,
+   "auroc_nov_unseen_vs_benign": 0.966
+  },
+  {
+   "dataset": "ToN-IoT",
+   "held_out": "injection",
+   "seed": 1.0,
+   "n_unseen": 5955.0,
+   "recall_unseen_at_alpha": 0.917,
+   "recall_seen_at_alpha": 0.998,
+   "fpr_at_alpha": 0.009,
+   "confident_miss_iso": 0.0,
+   "mean_p_iso_unseen": 0.812,
+   "ece_iso_stream": 0.008,
+   "auroc_unseen_vs_benign": 0.996,
+   "auroc_nov_unseen_vs_benign": 0.965
+  },
+  {
+   "dataset": "ToN-IoT",
+   "held_out": "mitm",
+   "seed": 1.0,
+   "n_unseen": 311.0,
+   "recall_unseen_at_alpha": 0.889,
+   "recall_seen_at_alpha": 0.999,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.04,
+   "mean_p_iso_unseen": 0.801,
+   "ece_iso_stream": 0.007,
+   "auroc_unseen_vs_benign": 0.994,
+   "auroc_nov_unseen_vs_benign": 0.967
+  },
+  {
+   "dataset": "ToN-IoT",
+   "held_out": "password",
+   "seed": 1.0,
+   "n_unseen": 4574.0,
+   "recall_unseen_at_alpha": 0.789,
+   "recall_seen_at_alpha": 0.998,
+   "fpr_at_alpha": 0.009,
+   "confident_miss_iso": 0.06,
+   "mean_p_iso_unseen": 0.702,
+   "ece_iso_stream": 0.008,
+   "auroc_unseen_vs_benign": 0.993,
+   "auroc_nov_unseen_vs_benign": 0.952
+  },
+  {
+   "dataset": "ToN-IoT",
+   "held_out": "scanning",
+   "seed": 1.0,
+   "n_unseen": 1348.0,
+   "recall_unseen_at_alpha": 0.999,
+   "recall_seen_at_alpha": 0.998,
+   "fpr_at_alpha": 0.009,
+   "confident_miss_iso": 0.0,
+   "mean_p_iso_unseen": 0.996,
+   "ece_iso_stream": 0.01,
+   "auroc_unseen_vs_benign": 1.0,
+   "auroc_nov_unseen_vs_benign": 0.986
+  },
+  {
+   "dataset": "ToN-IoT",
+   "held_out": "xss",
+   "seed": 1.0,
+   "n_unseen": 2622.0,
+   "recall_unseen_at_alpha": 0.948,
+   "recall_seen_at_alpha": 0.998,
+   "fpr_at_alpha": 0.009,
+   "confident_miss_iso": 0.007,
+   "mean_p_iso_unseen": 0.771,
+   "ece_iso_stream": 0.008,
+   "auroc_unseen_vs_benign": 0.996,
+   "auroc_nov_unseen_vs_benign": 0.983
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "held_out": "Analysis",
+   "seed": 1.0,
+   "n_unseen": 544.0,
+   "recall_unseen_at_alpha": 0.774,
+   "recall_seen_at_alpha": 0.801,
+   "fpr_at_alpha": 0.011,
+   "confident_miss_iso": 0.135,
+   "mean_p_iso_unseen": 0.806,
+   "ece_iso_stream": 0.092,
+   "auroc_unseen_vs_benign": 0.952,
+   "auroc_nov_unseen_vs_benign": 0.911
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "held_out": "Backdoor",
+   "seed": 1.0,
+   "n_unseen": 514.0,
+   "recall_unseen_at_alpha": 0.984,
+   "recall_seen_at_alpha": 0.793,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.0,
+   "mean_p_iso_unseen": 0.99,
+   "ece_iso_stream": 0.097,
+   "auroc_unseen_vs_benign": 0.999,
+   "auroc_nov_unseen_vs_benign": 0.965
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "held_out": "DoS",
+   "seed": 1.0,
+   "n_unseen": 1585.0,
+   "recall_unseen_at_alpha": 0.93,
+   "recall_seen_at_alpha": 0.786,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.0,
+   "mean_p_iso_unseen": 0.96,
+   "ece_iso_stream": 0.096,
+   "auroc_unseen_vs_benign": 0.995,
+   "auroc_nov_unseen_vs_benign": 0.907
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "held_out": "Exploits",
+   "seed": 1.0,
+   "n_unseen": 8164.0,
+   "recall_unseen_at_alpha": 0.888,
+   "recall_seen_at_alpha": 0.716,
+   "fpr_at_alpha": 0.011,
+   "confident_miss_iso": 0.008,
+   "mean_p_iso_unseen": 0.927,
+   "ece_iso_stream": 0.089,
+   "auroc_unseen_vs_benign": 0.99,
+   "auroc_nov_unseen_vs_benign": 0.937
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "held_out": "Fuzzers",
+   "seed": 1.0,
+   "n_unseen": 6223.0,
+   "recall_unseen_at_alpha": 0.163,
+   "recall_seen_at_alpha": 0.973,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.584,
+   "mean_p_iso_unseen": 0.199,
+   "ece_iso_stream": 0.021,
+   "auroc_unseen_vs_benign": 0.895,
+   "auroc_nov_unseen_vs_benign": 0.714
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "held_out": "Generic",
+   "seed": 1.0,
+   "n_unseen": 2274.0,
+   "recall_unseen_at_alpha": 0.984,
+   "recall_seen_at_alpha": 0.778,
+   "fpr_at_alpha": 0.011,
+   "confident_miss_iso": 0.0,
+   "mean_p_iso_unseen": 0.977,
+   "ece_iso_stream": 0.096,
+   "auroc_unseen_vs_benign": 0.998,
+   "auroc_nov_unseen_vs_benign": 0.976
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "held_out": "Reconnaissance",
+   "seed": 1.0,
+   "n_unseen": 2936.0,
+   "recall_unseen_at_alpha": 0.615,
+   "recall_seen_at_alpha": 0.772,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.0,
+   "mean_p_iso_unseen": 0.832,
+   "ece_iso_stream": 0.094,
+   "auroc_unseen_vs_benign": 0.982,
+   "auroc_nov_unseen_vs_benign": 0.776
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "held_out": "Shellcode",
+   "seed": 1.0,
+   "n_unseen": 437.0,
+   "recall_unseen_at_alpha": 0.763,
+   "recall_seen_at_alpha": 0.799,
+   "fpr_at_alpha": 0.01,
+   "confident_miss_iso": 0.0,
+   "mean_p_iso_unseen": 0.866,
+   "ece_iso_stream": 0.095,
+   "auroc_unseen_vs_benign": 0.985,
+   "auroc_nov_unseen_vs_benign": 0.701
+  }
+ ],
+ "os_summary": [
+  {
+   "ds": "CIC-IDS2017",
+   "nf": 11,
+   "rec": 0.9270833333333334,
+   "rec_seen": 0.9996915447675315,
+   "low": 2.0,
+   "cm": 0.320578231292517,
+   "cm_max": 0.9984567901234568,
+   "auc": 0.9957567840117344,
+   "aucn": 0.9651922625595892
+  },
+  {
+   "ds": "CSE-CIC-IDS2018",
+   "nf": 10,
+   "rec": 0.6377996543483474,
+   "rec_seen": 0.8778555424664495,
+   "low": 4.0,
+   "cm": 0.018037037037037,
+   "cm_max": 0.992074074074074,
+   "auc": 0.9506488861386139,
+   "aucn": 0.9409400623395674
+  },
+  {
+   "ds": "ACI-IoT-2023",
+   "nf": 10,
+   "rec": 0.0335558750160784,
+   "rec_seen": 0.9995751991119273,
+   "low": 7.0,
+   "cm": 0.9637078876173727,
+   "cm_max": 1.0,
+   "auc": 0.8996004631950537,
+   "aucn": 0.7072671776724087
+  },
+  {
+   "ds": "UNSW-NB15",
+   "nf": 8,
+   "rec": 0.8307260894313631,
+   "rec_seen": 0.7896116389957346,
+   "low": 1.0,
+   "cm": 0.0,
+   "cm_max": 0.5839627189458461,
+   "auc": 0.9877393906853992,
+   "aucn": 0.909356028088773
+  },
+  {
+   "ds": "ToN-IoT",
+   "nf": 8,
+   "rec": 0.9322088304029522,
+   "rec_seen": 0.9984740760456241,
+   "low": 0.0,
+   "cm": 0.007081470376575484,
+   "cm_max": 0.13615994484660462,
+   "auc": 0.9959889256599226,
+   "aucn": 0.9749236544670286
+  }
+ ],
+ "os_gain_by_weakness": [
+  {
+   "weak": false,
+   "budget": 0.01,
+   "n": 99,
+   "gain": -0.0191,
+   "det": 0.7069,
+   "fis": 0.6877,
+   "bon": 0.6467
+  },
+  {
+   "weak": false,
+   "budget": 0.02,
+   "n": 99,
+   "gain": -0.0629,
+   "det": 0.8847,
+   "fis": 0.8218,
+   "bon": 0.82
+  },
+  {
+   "weak": false,
+   "budget": 0.05,
+   "n": 99,
+   "gain": 0.0051,
+   "det": 0.9326,
+   "fis": 0.9378,
+   "bon": 0.938
+  },
+  {
+   "weak": true,
+   "budget": 0.01,
+   "n": 42,
+   "gain": 0.0797,
+   "det": 0.0724,
+   "fis": 0.1521,
+   "bon": 0.0757
+  },
+  {
+   "weak": true,
+   "budget": 0.02,
+   "n": 42,
+   "gain": 0.1035,
+   "det": 0.164,
+   "fis": 0.2675,
+   "bon": 0.156
+  },
+  {
+   "weak": true,
+   "budget": 0.05,
+   "n": 42,
+   "gain": 0.0976,
+   "det": 0.3572,
+   "fis": 0.4548,
+   "bon": 0.3567
+  }
+ ],
+ "os_overall": {
+  "n_families": 47,
+  "n_below_half": 14,
+  "n_confmiss_over_half": 12,
+  "median_recall": 0.8466046190968631,
+  "median_recall_seen": 0.9986278545525825
+ },
+ "triage_recall": [
+  {
+   "regime": "In-domain",
+   "priority": "detector",
+   "budget": 0.01,
+   "recall": 0.888
+  },
+  {
+   "regime": "In-domain",
+   "priority": "detector",
+   "budget": 0.02,
+   "recall": 0.9413
+  },
+  {
+   "regime": "In-domain",
+   "priority": "detector",
+   "budget": 0.05,
+   "recall": 0.9584
+  },
+  {
+   "regime": "In-domain",
+   "priority": "fisher",
+   "budget": 0.01,
+   "recall": 0.8424
+  },
+  {
+   "regime": "In-domain",
+   "priority": "fisher",
+   "budget": 0.02,
+   "recall": 0.9199
+  },
+  {
+   "regime": "In-domain",
+   "priority": "fisher",
+   "budget": 0.05,
+   "recall": 0.9507
+  },
+  {
+   "regime": "In-domain",
+   "priority": "combined",
+   "budget": 0.01,
+   "recall": 0.871
+  },
+  {
+   "regime": "In-domain",
+   "priority": "combined",
+   "budget": 0.02,
+   "recall": 0.9299
+  },
+  {
+   "regime": "In-domain",
+   "priority": "combined",
+   "budget": 0.05,
+   "recall": 0.9509
+  },
+  {
+   "regime": "In-domain",
+   "priority": "novelty",
+   "budget": 0.01,
+   "recall": 0.2081
+  },
+  {
+   "regime": "In-domain",
+   "priority": "novelty",
+   "budget": 0.02,
+   "recall": 0.3928
+  },
+  {
+   "regime": "In-domain",
+   "priority": "novelty",
+   "budget": 0.05,
+   "recall": 0.5694
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "detector",
+   "budget": 0.01,
+   "recall": 0.0507
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "detector",
+   "budget": 0.02,
+   "recall": 0.0849
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "detector",
+   "budget": 0.05,
+   "recall": 0.1299
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "fisher",
+   "budget": 0.01,
+   "recall": 0.058
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "fisher",
+   "budget": 0.02,
+   "recall": 0.0863
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "fisher",
+   "budget": 0.05,
+   "recall": 0.1498
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "combined",
+   "budget": 0.01,
+   "recall": 0.0518
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "combined",
+   "budget": 0.02,
+   "recall": 0.0822
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "combined",
+   "budget": 0.05,
+   "recall": 0.1488
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "novelty",
+   "budget": 0.01,
+   "recall": 0.0245
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "novelty",
+   "budget": 0.02,
+   "recall": 0.0536
+  },
+  {
+   "regime": "Cross-dataset",
+   "priority": "novelty",
+   "budget": 0.05,
+   "recall": 0.1264
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "detector",
+   "budget": 0.01,
+   "recall": 0.5179
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "detector",
+   "budget": 0.02,
+   "recall": 0.67
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "detector",
+   "budget": 0.05,
+   "recall": 0.7612
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "fisher",
+   "budget": 0.01,
+   "recall": 0.5282
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "fisher",
+   "budget": 0.02,
+   "recall": 0.6567
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "fisher",
+   "budget": 0.05,
+   "recall": 0.7939
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "combined",
+   "budget": 0.01,
+   "recall": 0.4766
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "combined",
+   "budget": 0.02,
+   "recall": 0.6222
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "combined",
+   "budget": 0.05,
+   "recall": 0.7648
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "novelty",
+   "budget": 0.01,
+   "recall": 0.1985
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "novelty",
+   "budget": 0.02,
+   "recall": 0.3611
+  },
+  {
+   "regime": "Unseen family",
+   "priority": "novelty",
+   "budget": 0.05,
+   "recall": 0.5557
+  }
+ ],
+ "budget_adherence_fisher": [
+  {
+   "regime": "In-domain",
+   "budget": 0.01,
+   "src_med": 1.028,
+   "src_q10": 0.961,
+   "src_q90": 1.097,
+   "tgt_med": 1.049,
+   "tgt_q10": 0.959,
+   "tgt_q90": 1.341,
+   "rec_src": 0.85,
+   "rec_tgt": 0.857
+  },
+  {
+   "regime": "In-domain",
+   "budget": 0.02,
+   "src_med": 1.005,
+   "src_q10": 0.951,
+   "src_q90": 1.056,
+   "tgt_med": 1.035,
+   "tgt_q10": 0.951,
+   "tgt_q90": 1.227,
+   "rec_src": 0.921,
+   "rec_tgt": 0.922
+  },
+  {
+   "regime": "In-domain",
+   "budget": 0.05,
+   "src_med": 0.996,
+   "src_q10": 0.942,
+   "src_q90": 1.035,
+   "tgt_med": 1.004,
+   "tgt_q10": 0.95,
+   "tgt_q90": 1.08,
+   "rec_src": 0.952,
+   "rec_tgt": 0.952
+  },
+  {
+   "regime": "Cross-dataset",
+   "budget": 0.01,
+   "src_med": 54.401,
+   "src_q10": 3.047,
+   "src_q90": 100.0,
+   "tgt_med": 0.978,
+   "tgt_q10": 0.841,
+   "tgt_q90": 1.135,
+   "rec_src": 0.689,
+   "rec_tgt": 0.059
+  },
+  {
+   "regime": "Cross-dataset",
+   "budget": 0.02,
+   "src_med": 49.994,
+   "src_q10": 15.329,
+   "src_q90": 50.0,
+   "tgt_med": 0.98,
+   "tgt_q10": 0.935,
+   "tgt_q90": 1.04,
+   "rec_src": 0.881,
+   "rec_tgt": 0.087
+  },
+  {
+   "regime": "Cross-dataset",
+   "budget": 0.05,
+   "src_med": 20.0,
+   "src_q10": 11.71,
+   "src_q90": 20.0,
+   "tgt_med": 0.992,
+   "tgt_q10": 0.956,
+   "tgt_q90": 1.081,
+   "rec_src": 0.968,
+   "rec_tgt": 0.151
+  },
+  {
+   "regime": "Unseen family",
+   "budget": 0.01,
+   "src_med": 0.384,
+   "src_q10": 0.089,
+   "src_q90": 1.193,
+   "tgt_med": 1.025,
+   "tgt_q10": 0.874,
+   "tgt_q90": 1.179,
+   "rec_src": 0.41,
+   "rec_tgt": 0.53
+  },
+  {
+   "regime": "Unseen family",
+   "budget": 0.02,
+   "src_med": 0.886,
+   "src_q10": 0.554,
+   "src_q90": 1.061,
+   "tgt_med": 0.987,
+   "tgt_q10": 0.895,
+   "tgt_q90": 1.109,
+   "rec_src": 0.619,
+   "rec_tgt": 0.656
+  },
+  {
+   "regime": "Unseen family",
+   "budget": 0.05,
+   "src_med": 0.974,
+   "src_q10": 0.841,
+   "src_q90": 1.033,
+   "tgt_med": 1.0,
+   "tgt_q10": 0.926,
+   "tgt_q90": 1.143,
+   "rec_src": 0.789,
+   "rec_tgt": 0.794
+  }
+ ],
+ "fisher_vs_det_In-domain": {
+  "n": 75,
+  "mean_diff": -0.024871625624100883,
+  "median_diff": -0.01320132013201325,
+  "win": 0.02666666666666667,
+  "loss": 0.7733333333333333,
+  "p": 5.376393047436602e-11
+ },
+ "fisher_vs_det_Cross-dataset": {
+  "n": 90,
+  "mean_diff": 0.00955262192885955,
+  "median_diff": 0.0,
+  "win": 0.35555555555555557,
+  "loss": 0.25555555555555554,
+  "p": 0.24753542785628457
+ },
+ "fisher_vs_det_Unseen family": {
+  "n": 423,
+  "mean_diff": 0.009885882424908949,
+  "median_diff": 0.0,
+  "win": 0.44208037825059104,
+  "loss": 0.3829787234042553,
+  "p": 0.28849745038953045
+ }
+}

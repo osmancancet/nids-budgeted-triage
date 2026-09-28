@@ -1,0 +1,18 @@
+dataset,family,group,n_final
+CIC-IDS2017,BENIGN,Benign,200000
+CIC-IDS2017,DoS Hulk,DoS,30000
+CIC-IDS2017,DDoS,DDoS,30000
+CIC-IDS2017,DoS GoldenEye,DoS,10281
+CIC-IDS2017,FTP-Patator,BruteForce,5929
+CIC-IDS2017,DoS slowloris,DoS,5374
+CIC-IDS2017,DoS Slowhttptest,DoS,5226
+CIC-IDS2017,SSH-Patator,BruteForce,3218
+CIC-IDS2017,PortScan,Scan,1956
+CIC-IDS2017,Web Attack - Brute Force,WebAttack,1468
+CIC-IDS2017,Bot,Botnet,1437
+CIC-IDS2017,Web Attack - XSS,WebAttack,652
+CIC-IDS2017,Infiltration,Infiltration,36
+CIC-IDS2017,Web Attack - Sql Injection,WebAttack,20
+CIC-IDS2017,Heartbleed,Other,9
+CIC-IDS2017,__rows_raw__,,1113088
+CIC-IDS2017,__rows_dedup__,,822880

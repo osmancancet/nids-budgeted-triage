@@ -1,0 +1,13 @@
+dataset,family,group,n_final
+ToN-IoT,normal,normal,23671
+ToN-IoT,injection,injection,19849
+ToN-IoT,password,password,15248
+ToN-IoT,ddos,ddos,11945
+ToN-IoT,xss,xss,8740
+ToN-IoT,dos,dos,6447
+ToN-IoT,scanning,scanning,4493
+ToN-IoT,backdoor,backdoor,1966
+ToN-IoT,mitm,mitm,1039
+ToN-IoT,ransomware,ransomware,260
+ToN-IoT,__rows_raw__,,211043
+ToN-IoT,__rows_dedup__,,93658

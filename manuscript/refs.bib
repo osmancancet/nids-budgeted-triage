@@ -1,0 +1,550 @@
+% refs.bib -- verified bibliography (see refs_verification.md for sources)
+% Generated 2026-09-27. Every entry was checked against a fetched page or a search result.
+
+% ---------------- Foundations / critiques of ML-NIDS ----------------
+@article{axelsson2000base,
+  author    = {Axelsson, Stefan},
+  title     = {The Base-Rate Fallacy and the Difficulty of Intrusion Detection},
+  journal   = {ACM Transactions on Information and System Security},
+  volume    = {3},
+  number    = {3},
+  pages     = {186--205},
+  year      = {2000},
+  doi       = {10.1145/357830.357849}
+}
+
+@inproceedings{sommer2010outside,
+  author    = {Sommer, Robin and Paxson, Vern},
+  title     = {Outside the Closed World: On Using Machine Learning for Network Intrusion Detection},
+  booktitle = {2010 IEEE Symposium on Security and Privacy},
+  pages     = {305--316},
+  year      = {2010},
+  doi       = {10.1109/SP.2010.25}
+}
+
+@inproceedings{arp2022dos,
+  author    = {Arp, Daniel and Quiring, Erwin and Pendlebury, Feargus and Warnecke, Alexander and Pierazzi, Fabio and Wressnegger, Christian and Cavallaro, Lorenzo and Rieck, Konrad},
+  title     = {Dos and Don'ts of Machine Learning in Computer Security},
+  booktitle = {31st USENIX Security Symposium (USENIX Security 22)},
+  pages     = {3971--3988},
+  year      = {2022},
+  publisher = {USENIX Association},
+  url       = {https://www.usenix.org/conference/usenixsecurity22/presentation/arp},
+  note      = {arXiv:2010.09470}
+}
+
+@inproceedings{apruzzese2023sok,
+  author    = {Apruzzese, Giovanni and Laskov, Pavel and Schneider, Johannes},
+  title     = {{SoK}: Pragmatic Assessment of Machine Learning for Network Intrusion Detection},
+  booktitle = {2023 IEEE 8th European Symposium on Security and Privacy (EuroS\&P)},
+  pages     = {592--614},
+  year      = {2023},
+  doi       = {10.1109/EuroSP57164.2023.00042}
+}
+
+@inproceedings{alahmadi2022falsepositives,
+  author    = {Alahmadi, Bushra A. and Axon, Louise and Martinovic, Ivan},
+  title     = {99\% False Positives: A Qualitative Study of {SOC} Analysts' Perspectives on Security Alarms},
+  booktitle = {31st USENIX Security Symposium (USENIX Security 22)},
+  pages     = {2783--2800},
+  year      = {2022},
+  publisher = {USENIX Association},
+  url       = {https://www.usenix.org/conference/usenixsecurity22/presentation/alahmadi}
+}
+
+% ---------------- Datasets and dataset quality ----------------
+@inproceedings{sharafaldin2018toward,
+  author    = {Sharafaldin, Iman and Lashkari, Arash Habibi and Ghorbani, Ali A.},
+  title     = {Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization},
+  booktitle = {Proceedings of the 4th International Conference on Information Systems Security and Privacy (ICISSP)},
+  pages     = {108--116},
+  year      = {2018},
+  doi       = {10.5220/0006639801080116}
+}
+
+@inproceedings{moustafa2015unsw,
+  author    = {Moustafa, Nour and Slay, Jill},
+  title     = {{UNSW-NB15}: A Comprehensive Data Set for Network Intrusion Detection Systems ({UNSW-NB15} Network Data Set)},
+  booktitle = {2015 Military Communications and Information Systems Conference (MilCIS)},
+  pages     = {1--6},
+  year      = {2015},
+  doi       = {10.1109/MilCIS.2015.7348942}
+}
+
+@inproceedings{sarhan2021netflow,
+  author    = {Sarhan, Mohanad and Layeghy, Siamak and Moustafa, Nour and Portmann, Marius},
+  title     = {{NetFlow} Datasets for Machine Learning-Based Network Intrusion Detection Systems},
+  booktitle = {Big Data Technologies and Applications (BDTA 2020)},
+  series    = {Lecture Notes of the Institute for Computer Sciences, Social Informatics and Telecommunications Engineering},
+  volume    = {371},
+  pages     = {117--135},
+  publisher = {Springer},
+  year      = {2021},
+  doi       = {10.1007/978-3-030-72802-1_9},
+  note      = {arXiv:2011.09144}
+}
+
+@article{sarhan2022standard,
+  author    = {Sarhan, Mohanad and Layeghy, Siamak and Portmann, Marius},
+  title     = {Towards a Standard Feature Set for Network Intrusion Detection System Datasets},
+  journal   = {Mobile Networks and Applications},
+  volume    = {27},
+  number    = {1},
+  pages     = {357--370},
+  year      = {2022},
+  doi       = {10.1007/s11036-021-01843-0}
+}
+
+@article{sarhan2022evaluating,
+  author    = {Sarhan, Mohanad and Layeghy, Siamak and Portmann, Marius},
+  title     = {Evaluating Standard Feature Sets Towards Increased Generalisability and Explainability of {ML}-Based Network Intrusion Detection},
+  journal   = {Big Data Research},
+  volume    = {30},
+  pages     = {100359},
+  year      = {2022},
+  doi       = {10.1016/j.bdr.2022.100359}
+}
+
+@misc{luay2025temporal,
+  author        = {Luay, Majed and Layeghy, Siamak and Hosseininoorbin, Seyedehfaezeh and Sarhan, Mohanad and Moustafa, Nour and Portmann, Marius},
+  title         = {Temporal Analysis of {NetFlow} Datasets for Network Intrusion Detection Systems},
+  year          = {2025},
+  eprint        = {2503.04404},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+  doi           = {10.48550/arXiv.2503.04404},
+  note          = {Introduces the NetFlow v3 datasets}
+}
+
+@inproceedings{engelen2021troubleshooting,
+  author    = {Engelen, Gints and Rimmer, Vera and Joosen, Wouter},
+  title     = {Troubleshooting an Intrusion Detection Dataset: the {CICIDS2017} Case Study},
+  booktitle = {2021 IEEE Security and Privacy Workshops (SPW)},
+  pages     = {7--12},
+  year      = {2021},
+  doi       = {10.1109/SPW53761.2021.00009}
+}
+
+@inproceedings{lanvin2023errors,
+  author    = {Lanvin, Maxime and Gimenez, Pierre-Fran{\c{c}}ois and Han, Yufei and Majorczyk, Fr{\'e}d{\'e}ric and M{\'e}, Ludovic and Totel, {\'E}ric},
+  title     = {Errors in the {CICIDS2017} Dataset and the Significant Differences in Detection Performances It Makes},
+  booktitle = {Risks and Security of Internet and Systems (CRiSIS 2022)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {13857},
+  pages     = {18--33},
+  publisher = {Springer},
+  year      = {2023},
+  doi       = {10.1007/978-3-031-31108-6_2}
+}
+
+@inproceedings{flood2024bad,
+  author    = {Flood, Robert and Engelen, Gints and Aspinall, David and Desmet, Lieven},
+  title     = {Bad Design Smells in Benchmark {NIDS} Datasets},
+  booktitle = {2024 IEEE 9th European Symposium on Security and Privacy (EuroS\&P)},
+  pages     = {658--675},
+  year      = {2024},
+  doi       = {10.1109/EuroSP60621.2024.00042}
+}
+
+% ---------------- Cross-dataset / reliability of ML-NIDS ----------------
+@article{layeghy2023explainable,
+  author    = {Layeghy, Siamak and Portmann, Marius},
+  title     = {Explainable Cross-Domain Evaluation of {ML}-Based Network Intrusion Detection Systems},
+  journal   = {Computers \& Electrical Engineering},
+  volume    = {108},
+  pages     = {108692},
+  year      = {2023},
+  doi       = {10.1016/j.compeleceng.2023.108692}
+}
+
+@article{cantone2024cross,
+  author    = {Cantone, Marco and Marrocco, Claudio and Bria, Alessandro},
+  title     = {On the Cross-Dataset Generalization of Machine Learning for Network Intrusion Detection},
+  journal   = {IEEE Access},
+  volume    = {12},
+  pages     = {144489--144508},
+  year      = {2024},
+  doi       = {10.1109/ACCESS.2024.3472907}
+}
+
+@article{talpini2024enhancing,
+  author    = {Talpini, Jacopo and Sartori, Fabio and Savi, Marco},
+  title     = {Enhancing Trustworthiness in {ML}-Based Network Intrusion Detection with Uncertainty Quantification},
+  journal   = {Journal of Reliable Intelligent Environments},
+  volume    = {10},
+  number    = {4},
+  pages     = {501--520},
+  year      = {2024},
+  doi       = {10.1007/s40860-024-00238-8},
+  note      = {arXiv:2310.10655}
+}
+
+@article{jin2026benchmark,
+  author    = {Jin, Hyejin and Lee, Hongchul},
+  title     = {Benchmark-Shift-Aware Intrusion Detection for Evolving Network Traffic: Cross-Dataset Generalization, Calibrated Alerting, and Score-Orientation Diagnostics},
+  journal   = {Electronics},
+  volume    = {15},
+  number    = {17},
+  pages     = {3761},
+  year      = {2026},
+  doi       = {10.3390/electronics15173761}
+}
+
+@article{lew2026deployment,
+  author    = {Lew, Kai Liang and Sim, Kok Swee and Cheong, Hao Xian},
+  title     = {Deployment-Oriented Evaluation of Deep Learning Network Intrusion Detection Systems},
+  journal   = {Frontiers in Communications and Networks},
+  volume    = {7},
+  year      = {2026},
+  doi       = {10.3389/frcmn.2026.1863367}
+}
+
+@article{xin2025crossdataset,
+  author    = {Xin, Chaonan and Xu, Keqing},
+  title     = {Cross-Dataset Transformer-{IDS} with Calibration and {AUC} Optimization (Evaluated on {NSL-KDD}, {UNSW-NB15}, {CIC-IDS2017})},
+  journal   = {Journal of Cyber Security},
+  volume    = {7},
+  number    = {1},
+  pages     = {483--503},
+  year      = {2025},
+  doi       = {10.32604/jcs.2025.071627}
+}
+
+@article{pal2025calibrated,
+  author    = {Pal, Biprodip and Islam, Md. Saiful and Liew, Alan Wee-Chung},
+  title     = {Calibrated Uncertainty Estimation for Trustworthy Deep {IoT} Attack Detection},
+  journal   = {IEEE Transactions on Dependable and Secure Computing},
+  volume    = {22},
+  number    = {6},
+  pages     = {7571--7584},
+  year      = {2025},
+  doi       = {10.1109/TDSC.2025.3598350}
+}
+
+@misc{li2026robust,
+  author        = {Li, Zhenpeng},
+  title         = {Robust Conformal Intrusion Detection via Traffic-Aware Calibration and Attack-Orbit Invariance},
+  year          = {2026},
+  eprint        = {2609.19241},
+  archivePrefix = {arXiv},
+  doi           = {10.48550/arXiv.2609.19241}
+}
+
+@inproceedings{farrukh2023detecting,
+  author    = {Farrukh, Yasir Ali and Wali, Syed and Khan, Irfan and Bastian, Nathaniel D.},
+  title     = {Detecting Unknown Attacks in {IoT} Environments: An Open Set Classifier for Enhanced Network Intrusion Detection},
+  booktitle = {IEEE Military Communications Conference (MILCOM 2023)},
+  pages     = {121--126},
+  publisher = {IEEE},
+  year      = {2023},
+  doi       = {10.1109/MILCOM58377.2023.10356319},
+  note      = {arXiv:2309.07461}
+}
+
+@article{yu2025industrial,
+  author    = {Yu, Wei and Chen, Zhixiang and Wang, Hui and Miao, Zeyu and Zhong, Dake},
+  title     = {Industrial Network Intrusion Detection in Open-Set Scenarios},
+  journal   = {International Journal of Information Security},
+  volume    = {24},
+  pages     = {39},
+  year      = {2025},
+  doi       = {10.1007/s10207-024-00949-2}
+}
+
+@inproceedings{apruzzese2024adversarial,
+  author    = {Apruzzese, Giovanni and Fass, Aurore and Pierazzi, Fabio},
+  title     = {When Adversarial Perturbations meet Concept Drift: An Exploratory Analysis on {ML-NIDS}},
+  booktitle = {Proceedings of the 2024 Workshop on Artificial Intelligence and Security (AISec '24)},
+  publisher = {ACM},
+  year      = {2024},
+  doi       = {10.1145/3689932.3694757}
+}
+
+@article{yumlembam2024comprehensive,
+  author    = {Yumlembam, Rahul and Issac, Biju and Jacob, Seibu Mary and Yang, Longzhi},
+  title     = {Comprehensive Botnet Detection by Mitigating Adversarial Attacks, Navigating the Subtleties of Perturbation Distances and Fortifying Predictions with Conformal Layers},
+  journal   = {Information Fusion},
+  volume    = {111},
+  pages     = {102529},
+  year      = {2024},
+  doi       = {10.1016/j.inffus.2024.102529}
+}
+
+% ---------------- Concept drift in security ML ----------------
+@inproceedings{jordaney2017transcend,
+  author    = {Jordaney, Roberto and Sharad, Kumar and Dash, Santanu K. and Wang, Zhi and Papini, Davide and Nouretdinov, Ilia and Cavallaro, Lorenzo},
+  title     = {Transcend: Detecting Concept Drift in Malware Classification Models},
+  booktitle = {26th USENIX Security Symposium (USENIX Security 17)},
+  pages     = {625--642},
+  year      = {2017},
+  publisher = {USENIX Association},
+  url       = {https://www.usenix.org/conference/usenixsecurity17/technical-sessions/presentation/jordaney}
+}
+
+@inproceedings{barbero2022transcending,
+  author    = {Barbero, Federico and Pendlebury, Feargus and Pierazzi, Fabio and Cavallaro, Lorenzo},
+  title     = {Transcending {TRANSCEND}: Revisiting Malware Classification in the Presence of Concept Drift},
+  booktitle = {2022 IEEE Symposium on Security and Privacy (SP)},
+  year      = {2022},
+  doi       = {10.1109/SP46214.2022.9833659}
+}
+
+@inproceedings{yang2021cade,
+  author    = {Yang, Limin and Guo, Wenbo and Hao, Qingying and Ciptadi, Arridhana and Ahmadzadeh, Ali and Xing, Xinyu and Wang, Gang},
+  title     = {{CADE}: Detecting and Explaining Concept Drift Samples for Security Applications},
+  booktitle = {30th USENIX Security Symposium (USENIX Security 21)},
+  pages     = {2327--2344},
+  year      = {2021},
+  publisher = {USENIX Association},
+  url       = {https://www.usenix.org/conference/usenixsecurity21/presentation/yang-limin}
+}
+
+@inproceedings{pendlebury2019tesseract,
+  author    = {Pendlebury, Feargus and Pierazzi, Fabio and Jordaney, Roberto and Kinder, Johannes and Cavallaro, Lorenzo},
+  title     = {{TESSERACT}: Eliminating Experimental Bias in Malware Classification across Space and Time},
+  booktitle = {28th USENIX Security Symposium (USENIX Security 19)},
+  pages     = {729--746},
+  year      = {2019},
+  publisher = {USENIX Association},
+  url       = {https://www.usenix.org/conference/usenixsecurity19/presentation/pendlebury}
+}
+
+% ---------------- Calibration ----------------
+@inproceedings{guo2017calibration,
+  author    = {Guo, Chuan and Pleiss, Geoff and Sun, Yu and Weinberger, Kilian Q.},
+  title     = {On Calibration of Modern Neural Networks},
+  booktitle = {Proceedings of the 34th International Conference on Machine Learning},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {70},
+  pages     = {1321--1330},
+  year      = {2017},
+  url       = {https://proceedings.mlr.press/v70/guo17a.html}
+}
+
+@incollection{platt1999probabilistic,
+  author    = {Platt, John C.},
+  title     = {Probabilistic Outputs for Support Vector Machines and Comparisons to Regularized Likelihood Methods},
+  booktitle = {Advances in Large Margin Classifiers},
+  pages     = {61--74},
+  year      = {1999}
+}
+
+@inproceedings{zadrozny2002transforming,
+  author    = {Zadrozny, Bianca and Elkan, Charles},
+  title     = {Transforming Classifier Scores into Accurate Multiclass Probability Estimates},
+  booktitle = {Proceedings of the Eighth ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  pages     = {694--699},
+  publisher = {ACM},
+  year      = {2002},
+  doi       = {10.1145/775047.775151}
+}
+
+@inproceedings{niculescu2005predicting,
+  author    = {Niculescu-Mizil, Alexandru and Caruana, Rich},
+  title     = {Predicting Good Probabilities with Supervised Learning},
+  booktitle = {Proceedings of the 22nd International Conference on Machine Learning (ICML)},
+  pages     = {625--632},
+  publisher = {ACM},
+  year      = {2005},
+  doi       = {10.1145/1102351.1102430}
+}
+
+@inproceedings{naeini2015obtaining,
+  author    = {Naeini, Mahdi Pakdaman and Cooper, Gregory and Hauskrecht, Milos},
+  title     = {Obtaining Well Calibrated Probabilities Using {Bayesian} Binning},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume    = {29},
+  number    = {1},
+  year      = {2015},
+  doi       = {10.1609/aaai.v29i1.9602}
+}
+
+% ---------------- Uncertainty, OOD, selective classification ----------------
+@inproceedings{hendrycks2017baseline,
+  author    = {Hendrycks, Dan and Gimpel, Kevin},
+  title     = {A Baseline for Detecting Misclassified and Out-of-Distribution Examples in Neural Networks},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2017},
+  note      = {arXiv:1610.02136}
+}
+
+@inproceedings{liu2020energy,
+  author    = {Liu, Weitang and Wang, Xiaoyun and Owens, John and Li, Yixuan},
+  title     = {Energy-Based Out-of-Distribution Detection},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {33},
+  pages     = {21464--21475},
+  year      = {2020}
+}
+
+@inproceedings{ovadia2019trust,
+  author    = {Ovadia, Yaniv and Fertig, Emily and Ren, Jie and Nado, Zachary and Sculley, D. and Nowozin, Sebastian and Dillon, Joshua and Lakshminarayanan, Balaji and Snoek, Jasper},
+  title     = {Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  year      = {2019}
+}
+
+@inproceedings{lakshminarayanan2017simple,
+  author    = {Lakshminarayanan, Balaji and Pritzel, Alexander and Blundell, Charles},
+  title     = {Simple and Scalable Predictive Uncertainty Estimation Using Deep Ensembles},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017}
+}
+
+@inproceedings{geifman2017selective,
+  author    = {Geifman, Yonatan and El-Yaniv, Ran},
+  title     = {Selective Classification for Deep Neural Networks},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017}
+}
+
+% ---------------- Conformal prediction ----------------
+@book{vovk2022algorithmic,
+  author    = {Vovk, Vladimir and Gammerman, Alexander and Shafer, Glenn},
+  title     = {Algorithmic Learning in a Random World},
+  edition   = {2},
+  publisher = {Springer},
+  address   = {Cham},
+  year      = {2022},
+  doi       = {10.1007/978-3-031-06649-8}
+}
+
+@article{angelopoulos2023conformal,
+  author    = {Angelopoulos, Anastasios N. and Bates, Stephen},
+  title     = {Conformal Prediction: A Gentle Introduction},
+  journal   = {Foundations and Trends in Machine Learning},
+  volume    = {16},
+  number    = {4},
+  pages     = {494--591},
+  year      = {2023},
+  doi       = {10.1561/2200000101},
+  note      = {Extended version: arXiv:2107.07511, ``A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification''}
+}
+
+@article{lei2018distribution,
+  author    = {Lei, Jing and G'Sell, Max and Rinaldo, Alessandro and Tibshirani, Ryan J. and Wasserman, Larry},
+  title     = {Distribution-Free Predictive Inference for Regression},
+  journal   = {Journal of the American Statistical Association},
+  volume    = {113},
+  number    = {523},
+  pages     = {1094--1111},
+  year      = {2018},
+  doi       = {10.1080/01621459.2017.1307116}
+}
+
+@inproceedings{tibshirani2019conformal,
+  author    = {Tibshirani, Ryan J. and Barber, Rina Foygel and Cand{\`e}s, Emmanuel and Ramdas, Aaditya},
+  title     = {Conformal Prediction Under Covariate Shift},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  year      = {2019}
+}
+
+@inproceedings{gibbs2021adaptive,
+  author    = {Gibbs, Isaac and Cand{\`e}s, Emmanuel},
+  title     = {Adaptive Conformal Inference Under Distribution Shift},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {34},
+  pages     = {1660--1672},
+  year      = {2021}
+}
+
+@article{barber2023conformal,
+  author    = {Barber, Rina Foygel and Cand{\`e}s, Emmanuel J. and Ramdas, Aaditya and Tibshirani, Ryan J.},
+  title     = {Conformal Prediction Beyond Exchangeability},
+  journal   = {The Annals of Statistics},
+  volume    = {51},
+  number    = {2},
+  pages     = {816--845},
+  year      = {2023},
+  doi       = {10.1214/23-AOS2276}
+}
+
+@inproceedings{angelopoulos2024conformal,
+  author    = {Angelopoulos, Anastasios N. and Bates, Stephen and Fisch, Adam and Lei, Lihua and Schuster, Tal},
+  title     = {Conformal Risk Control},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2024},
+  note      = {arXiv:2208.02814}
+}
+
+@article{bates2023testing,
+  author    = {Bates, Stephen and Cand{\`e}s, Emmanuel and Lei, Lihua and Romano, Yaniv and Sesia, Matteo},
+  title     = {Testing for Outliers with Conformal p-Values},
+  journal   = {The Annals of Statistics},
+  volume    = {51},
+  number    = {1},
+  pages     = {149--178},
+  year      = {2023},
+  doi       = {10.1214/22-AOS2244}
+}
+
+% ---------------- Models and tooling ----------------
+@article{breiman2001random,
+  author    = {Breiman, Leo},
+  title     = {Random Forests},
+  journal   = {Machine Learning},
+  volume    = {45},
+  number    = {1},
+  pages     = {5--32},
+  year      = {2001},
+  doi       = {10.1023/A:1010933404324}
+}
+
+@inproceedings{chen2016xgboost,
+  author    = {Chen, Tianqi and Guestrin, Carlos},
+  title     = {{XGBoost}: A Scalable Tree Boosting System},
+  booktitle = {Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  pages     = {785--794},
+  publisher = {ACM},
+  year      = {2016},
+  doi       = {10.1145/2939672.2939785}
+}
+
+@inproceedings{ke2017lightgbm,
+  author    = {Ke, Guolin and Meng, Qi and Finley, Thomas and Wang, Taifeng and Chen, Wei and Ma, Weidong and Ye, Qiwei and Liu, Tie-Yan},
+  title     = {{LightGBM}: A Highly Efficient Gradient Boosting Decision Tree},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017}
+}
+
+@inproceedings{grinsztajn2022tree,
+  author    = {Grinsztajn, L{\'e}o and Oyallon, Edouard and Varoquaux, Ga{\"e}l},
+  title     = {Why Do Tree-Based Models Still Outperform Deep Learning on Typical Tabular Data?},
+  booktitle = {Advances in Neural Information Processing Systems (Datasets and Benchmarks Track)},
+  volume    = {35},
+  pages     = {507--520},
+  year      = {2022}
+}
+
+@article{pedregosa2011scikit,
+  author    = {Pedregosa, Fabian and Varoquaux, Ga{\"e}l and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron and Dubourg, Vincent and Vanderplas, Jake and Passos, Alexandre and Cournapeau, David and Brucher, Matthieu and Perrot, Matthieu and Duchesnay, {\'E}douard},
+  title     = {Scikit-learn: Machine Learning in {P}ython},
+  journal   = {Journal of Machine Learning Research},
+  volume    = {12},
+  number    = {85},
+  pages     = {2825--2830},
+  year      = {2011}
+}
+
+@misc{bastian2023aci,
+  author       = {Bastian, Nathaniel and Bierbrauer, David and McKenzie, Morgan and Nack, Emily},
+  title        = {{ACI} {IoT} Network Traffic Dataset 2023},
+  howpublished = {IEEE Dataport},
+  year         = {2023},
+  doi          = {10.21227/qacj-3x32}
+}
+
+@article{moustafa2021new,
+  author  = {Moustafa, Nour},
+  title   = {A new distributed architecture for evaluating {AI}-based security systems at the edge: Network {TON\_IoT} datasets},
+  journal = {Sustainable Cities and Society},
+  volume  = {72},
+  pages   = {102994},
+  year    = {2021},
+  doi     = {10.1016/j.scs.2021.102994}
+}

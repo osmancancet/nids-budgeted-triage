@@ -1,0 +1,15 @@
+dataset,family,group,n_final
+ACI-IoT-2023,Benign,Benign,200000
+ACI-IoT-2023,ICMP Flood,DoS,30000
+ACI-IoT-2023,DNS Flood,DoS,30000
+ACI-IoT-2023,Port Scan,Scan,30000
+ACI-IoT-2023,OS Scan,Scan,18075
+ACI-IoT-2023,Slowloris,DoS,17785
+ACI-IoT-2023,Ping Sweep,Scan,17330
+ACI-IoT-2023,Vulnerability Scan,Scan,17230
+ACI-IoT-2023,SYN Flood,DoS,13852
+ACI-IoT-2023,Dictionary Attack,BruteForce,6349
+ACI-IoT-2023,UDP Flood,DoS,789
+ACI-IoT-2023,ARP Spoofing,Other,5
+ACI-IoT-2023,__rows_raw__,,1231411
+ACI-IoT-2023,__rows_dedup__,,760253

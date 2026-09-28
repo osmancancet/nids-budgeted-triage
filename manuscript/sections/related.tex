@@ -1,0 +1,33 @@
+\section{Related work}\label{sec:related}
+
+\paragraph{Evaluation pitfalls in ML-based NIDS} Sommer and Paxson~\cite{sommer2010outside} argued early that anomaly detection in networks differs fundamentally from typical ML settings: errors are expensive, the base rate of attacks is low~\cite{axelsson2000base}, and there is a semantic gap between alerts and actionable incidents. Arp et al.~\cite{arp2022dos} systematised pitfalls such as sampling bias, data snooping and inappropriate baselines, and Apruzzese et al.~\cite{apruzzese2023sok} called for assessments that reflect operational constraints. Several works document quality problems in the benchmarks themselves: labelling and feature-extraction errors in CIC-IDS2017~\cite{engelen2021troubleshooting,lanvin2023errors}, and ``design smells'' such as poor diversity and ill-defined generalisation criteria across seven datasets~\cite{flood2024bad}. Standardised NetFlow feature sets were proposed to enable comparison across datasets~\cite{sarhan2021netflow,sarhan2022standard,sarhan2022evaluating}, and temporal re-analyses of those datasets have recently been released~\cite{luay2025temporal}. In malware detection, TESSERACT~\cite{pendlebury2019tesseract} showed how spatial and temporal bias inflates results, and Apruzzese et al.~\cite{apruzzese2024adversarial} examined how drift interacts with adversarial perturbation in NIDS.
+
+\paragraph{Cross-dataset generalisation} Layeghy and Portmann~\cite{layeghy2023explainable} and Cantone et al.~\cite{cantone2024cross} report near-perfect in-dataset performance that drops to near chance across datasets. Xin and Xu~\cite{xin2025crossdataset} add Platt-scaled calibration and AUC-oriented training to a transformer and evaluate across NSL-KDD, UNSW-NB15 and CIC-IDS2017. Jin and Lee~\cite{jin2026benchmark} harmonise features across HIKARI-2021, CIC-IDS2017 and CICIoT2023 and show that a 5\% false-positive-rate threshold chosen in-domain does not hold after transfer, even when ranking metrics look good. These studies treat detection as binary and do not examine unseen attack families or selective or conformal alerting.
+
+\paragraph{Unseen attacks and uncertainty} Open-set NIDS approaches reject unknown attacks with clustering~\cite{farrukh2023detecting} or prototype learning with extreme-value thresholds~\cite{yu2025industrial}. Talpini et al.~\cite{talpini2024enhancing} compare uncertainty-quantification methods, including Bayesian neural networks, for detecting held-out attack classes, and Pal et al.~\cite{pal2025calibrated} study calibration and uncertainty for IoT attack detection under within-dataset shift. General-purpose baselines for misclassification and out-of-distribution detection include maximum softmax probability~\cite{hendrycks2017baseline} and energy scores~\cite{liu2020energy}; Ovadia et al.~\cite{ovadia2019trust} showed that calibration degrades under dataset shift, with ensembles~\cite{lakshminarayanan2017simple} among the most robust options. Post-hoc calibration methods include Platt scaling~\cite{platt1999probabilistic}, isotonic regression~\cite{zadrozny2002transforming,niculescu2005predicting} and Bayesian binning~\cite{naeini2015obtaining}.
+
+\paragraph{Conformal and selective prediction in security} Conformal prediction provides distribution-free guarantees under exchangeability~\cite{vovk2022algorithmic,lei2018distribution,angelopoulos2023conformal}, with extensions to covariate shift~\cite{tibshirani2019conformal}, online adaptation~\cite{gibbs2021adaptive}, non-exchangeable data~\cite{barber2023conformal}, risk control~\cite{angelopoulos2024conformal} and outlier testing with conformal p-values~\cite{bates2023testing}. Selective classification trades coverage for accuracy~\cite{geifman2017selective}. In security, Transcend~\cite{jordaney2017transcend,barbero2022transcending} and CADE~\cite{yang2021cade} use conformal evaluators or contrastive embeddings to detect drifting malware samples. For intrusion detection, Yumlembam et al.~\cite{yumlembam2024comprehensive} add a conformal rejection layer to an adversarially hardened botnet detector, and Li~\cite{li2026robust} restores conformal coverage under adversarial feature perturbation for LLM-based detectors. Neither considers natural cross-dataset shift, unseen families or an analyst budget.
+
+\paragraph{Positioning} Table~\ref{tab:positioning} summarises the dimensions covered by the closest works. To our knowledge, this is the first study to evaluate cross-dataset shift, unseen attack families, calibration and conformal or selective alerting \emph{jointly} and under an explicit analyst budget, as called for by a recent review~\cite{lew2026deployment}.
+
+\begin{table}[t]
+\centering
+\caption{Coverage of deployment concerns in closely related work (\checkmark: evaluated; $\circ$: partially). XD: cross-dataset shift; OS: unseen attack families; CAL: probability calibration; AB: alert budget or fixed false-positive-rate operation; CP/SEL: conformal or selective prediction.}\label{tab:positioning}
+\small
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lccccc}
+\toprule
+Work & XD & OS & CAL & AB & CP/SEL\\
+\midrule
+Talpini et al.~\cite{talpini2024enhancing} & & \checkmark & \checkmark & & \\
+Pal et al.~\cite{pal2025calibrated} & $\circ$ & $\circ$ & \checkmark & & \\
+Xin and Xu~\cite{xin2025crossdataset} & \checkmark & & \checkmark & & \\
+Cantone et al.~\cite{cantone2024cross} & \checkmark & & & & \\
+Yumlembam et al.~\cite{yumlembam2024comprehensive} & & & & & \checkmark\\
+Li~\cite{li2026robust} & $\circ$ & & & & \checkmark\\
+Jin and Lee~\cite{jin2026benchmark} & \checkmark & & \checkmark & \checkmark & \\
+\textbf{This work} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

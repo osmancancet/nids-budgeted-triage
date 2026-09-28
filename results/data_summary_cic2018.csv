@@ -1,0 +1,18 @@
+dataset,family,group,n_final
+CSE-CIC-IDS2018,Benign,Benign,200000
+CSE-CIC-IDS2018,DDOS attack-HOIC,DDoS,30000
+CSE-CIC-IDS2018,SSH-Bruteforce,BruteForce,30000
+CSE-CIC-IDS2018,DoS attacks-GoldenEye,DoS,30000
+CSE-CIC-IDS2018,Bot,Botnet,30000
+CSE-CIC-IDS2018,DoS attacks-Hulk,DoS,30000
+CSE-CIC-IDS2018,DDoS attacks-LOIC-HTTP,DDoS,30000
+CSE-CIC-IDS2018,Infilteration,Infiltration,30000
+CSE-CIC-IDS2018,DoS attacks-Slowloris,DoS,9712
+CSE-CIC-IDS2018,DDOS attack-LOIC-UDP,DDoS,1730
+CSE-CIC-IDS2018,Brute Force -Web,WebAttack,553
+CSE-CIC-IDS2018,Brute Force -XSS,WebAttack,228
+CSE-CIC-IDS2018,SQL Injection,WebAttack,84
+CSE-CIC-IDS2018,DoS attacks-SlowHTTPTest,DoS,55
+CSE-CIC-IDS2018,FTP-BruteForce,BruteForce,54
+CSE-CIC-IDS2018,__rows_raw__,,3423289
+CSE-CIC-IDS2018,__rows_dedup__,,1867592

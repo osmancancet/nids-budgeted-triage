@@ -1,0 +1,6 @@
+Highlights
+- First joint test of cross-dataset shift, unseen attacks and calibration in NIDS.
+- Across datasets, AUROC drops to 0.50-0.62 and source recalibration fails.
+- Transferred thresholds cause 5-32x false-alarm floods or near-silent detectors.
+- 14 of 47 held-out attack families are detected less than half of the time.
+- Label-free budget quantiles keep analyst queues at their planned size.
