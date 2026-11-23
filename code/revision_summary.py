@@ -198,6 +198,32 @@ def os_priorities():
             qstar = (-gc) / (gm - gc) if (gm - gc) != 0 and gc < 0 < gm else (0.0 if gc >= 0 and gm >= 0 else np.nan)
             be.append(dict(budget=c, priority=pr, gain_missed=gm, gain_caught=gc, breakeven_q=qstar))
     B = pd.DataFrame(be)
+    # bootstrap interval of the break-even value (families resampled within the caught and missed groups)
+    rngb = np.random.default_rng(2026)
+    bci = {}
+    for c in [0.01, 0.02]:
+        x = p[p.budget == c]
+        for pr in ["fisher"]:
+            d_ = {}
+            for wk, lab in [(False, "caught"), (True, "missed")]:
+                xx = x[x.weak_cf == wk]
+                a = xx[xx.priority == pr].groupby(["dataset", "held_out"]).recall.mean()
+                b = xx[xx.priority == "detector"].groupby(["dataset", "held_out"]).recall.mean()
+                d_[lab] = (a - b.reindex(a.index)).dropna().to_numpy()
+            qs, nz = [], 0
+            for _ in range(5000):
+                gm = rngb.choice(d_["missed"], len(d_["missed"])).mean()
+                gc = rngb.choice(d_["caught"], len(d_["caught"])).mean()
+                if gc >= 0 and gm > 0:
+                    qs.append(0.0); nz += 1
+                elif gc < 0 < gm:
+                    qs.append(-gc / (gm - gc))
+                else:
+                    qs.append(1.0)          # novelty evidence never pays off
+            qs = np.array(qs)
+            bci[f"{pr}_b{c}"] = dict(lo=float(np.quantile(qs, .025)), hi=float(np.quantile(qs, .975)),
+                                     share_free=nz / 5000, share_never=float((qs == 1.0).mean()))
+    N["os_breakeven_ci"] = bci
     md_table(B, "os_breakeven.md")
     N["os_breakeven"] = B.round(4).to_dict("records")
     # weight of the weighted Fisher score chosen without looking at the evaluated dataset:

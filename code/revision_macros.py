@@ -850,9 +850,96 @@ def check_macros():
             .reset_index().round(4).to_dict("records")
 
 
+def round7_macros():
+    """Load offset, break-even interval, timing spread, budget scaling, weighted Fisher under
+    contamination and for held-out groups, staleness of the novelty reference."""
+    from scipy.stats import norm as _norm
+    from revision_summary import paired
+    lo = os.path.join(RES, "load_offset.csv")
+    if os.path.exists(lo):
+        d = pd.read_csv(lo)
+        de, fi = d[d.priority == "detector"], d[d.priority == "fisher"]
+        M["lo_det_med_rng"] = f"{de['median'].min():.2f} to {de['median'].max():.2f}"
+        M["lo_fis_med_rng"] = f"{fi['median'].min():.2f} to {fi['median'].max():.2f}"
+        M["lo_sim_med_rng"] = f"{d.sim_median.min():.2f} to {d.sim_median.max():.2f}"
+        ex = fi[fi.ci_lo > fi.sim_median]
+        names = {"LGBM": "LightGBM", "RF": "the random forest", "MLP": "the MLP", "LR": "logistic regression"}
+        M["lo_fis_excl"] = " and ".join(f"{names[r.model]} ({r.ci_lo:.3f} to {r.ci_hi:.3f})" for r in ex.itertuples())
+        M["lo_fis_excl_n"] = words(len(ex))
+        M["lo_streams"] = str(int(d.streams.max()))
+        M["lo_sd_within"] = f"{d.sd_within.min():.2f} to {d.sd_within.max():.2f}"
+        M["lo_sd_between"] = f"{d.sd_between.min():.2f} to {d.sd_between.max():.2f}"
+    bc = N.get("os_breakeven_ci", {}).get("fisher_b0.01")
+    if bc:
+        M["be_ci_lo"], M["be_ci_hi"] = f(bc["lo"], 2), f(bc["hi"], 2)
+        M["be_share_free"] = pct(bc["share_free"])
+    sy = os.path.join(RES, "stream_sync.csv")
+    if os.path.exists(sy):
+        sy = pd.read_csv(sy)
+        def rr(mo, w_, b_=4096):
+            v = sy[(sy["mode"] == mo) & (sy.workers == w_) & (sy.batch == b_)].flows_per_s
+            return f"{v.min():,.0f} to {v.max():,.0f}"
+        M["sync_thr4_rng"], M["sync_sh4_rng"] = rr("threads", 4), rr("shards", 4)
+        M["sync_shared4096_rng"] = rr("shared", 4)
+        v = sy[(sy["mode"] == "shards") & (sy.workers == 4) & (sy.batch == 4096)].flows_per_s
+        M["sync_sh4_spread"] = pct((v.max() - v.min()) / v.median())
+    # warm-up size and stream length needed at small budgets (Proposition 1 and bound (7))
+    z = _norm.ppf(0.95)
+    for b_, k_ in [(0.01, "1"), (0.001, "01"), (0.0001, "001")]:
+        m_ = z ** 2 * (1 - b_) / (b_ * 0.1 ** 2)
+        M[f"scale_m_b{k_}"] = f"{int(round(m_, -3)):,}" if m_ < 1e6 else f"{m_ / 1e6:.1f} million"
+        if "bound_os_Rg" in M:
+            T_ = (float(M["bound_os_Rg"]) + 1) / (0.1 * b_)
+            M[f"scale_T_b{k_}"] = f"{int(round(T_, -3)):,}" if T_ < 1e6 else f"{T_ / 1e6:.1f} million"
+    import glob as _glob
+    rfs = sorted(_glob.glob(os.path.join(RES, "extra_reference_wf_s*.csv")))
+    if rfs:
+        x = pd.concat([pd.read_csv(v) for v in rfs])
+        if "rec_wfisher" in x:
+            g = x.groupby(["n_ref", "contamination"])[["rec_detector", "rec_fisher", "rec_wfisher"]].mean()
+            base = x[(x.n_ref == 20000) & (x.contamination == 0)].set_index(["dataset", "held_out", "seed"])
+            for c_, k_ in [(0.001, "c01"), (0.01, "c1"), (0.05, "c5")]:
+                if (20000, c_) in g.index:
+                    M[f"refwf_{k_}_wf"] = f(g.loc[(20000, c_), "rec_wfisher"], 3)
+                    M[f"refwf_{k_}_fi"] = f(g.loc[(20000, c_), "rec_fisher"], 3)
+                    M[f"refwf_{k_}_de"] = f(g.loc[(20000, c_), "rec_detector"], 3)
+                    cc_ = x[(x.n_ref == 20000) & (x.contamination == c_)].set_index(["dataset", "held_out", "seed"])
+                    a = cc_.rec_wfisher.groupby(level=[0, 1]).mean()
+                    b = base.rec_wfisher.groupby(level=[0, 1]).mean().reindex(a.index)
+                    d_ = paired(a, b)
+                    M[f"refwf_{k_}_d"] = f"{d_['mean']:+.3f}"
+                    a2 = cc_.rec_detector.groupby(level=[0, 1]).mean()
+                    M[f"refwf_{k_}_vsdet"] = f"{(a - a2).mean():+.3f}"
+            if (20000, 0.0) in g.index:
+                M["refwf_c0_wf"] = f(g.loc[(20000, 0.0), "rec_wfisher"], 3)
+                M["refwf_c0_fi"] = f(g.loc[(20000, 0.0), "rec_fisher"], 3)
+                M["refwf_c0_de"] = f(g.loc[(20000, 0.0), "rec_detector"], 3)
+    gf = os.path.join(RES, "extra_group_wf.csv")
+    if os.path.exists(gf):
+        x = pd.read_csv(gf)
+        if "rec_wfisher" in x:
+            fam = x.groupby(["dataset", "held_out_group"])[["rec_detector", "rec_fisher", "rec_wfisher"]].mean()
+            M["ogwf_n"] = str(len(fam))
+            M["ogwf_det"], M["ogwf_fi"], M["ogwf_wf"] = (f(fam[c].mean(), 3) for c in ["rec_detector", "rec_fisher", "rec_wfisher"])
+            d_ = paired(fam.rec_wfisher, fam.rec_detector)
+            M["ogwf_d"] = f"{d_['mean']:+.3f} (95% CI {d_['lo']:+.3f} to {d_['hi']:+.3f}; {pv(d_['p'])}, {d_['n']} groups)"
+            d2 = paired(fam.rec_fisher, fam.rec_detector)
+            M["ogwf_d_fi"] = f"{d2['mean']:+.3f}"
+    st = os.path.join(RES, "t1_staleness.csv")
+    if os.path.exists(st):
+        x = pd.read_csv(st).groupby("reference").mean(numeric_only=True)
+        for k_ in ["old", "recent"]:
+            M[f"st_{k_}_age"] = f(x.loc[k_, "ref_age_days"], 1)
+            M[f"st_{k_}_pnov"] = pct(x.loc[k_, "benign_pnov_le_001"], 1)
+            M[f"st_{k_}_auc"] = f(x.loc[k_, "auroc_nov"], 3)
+            for r_ in ["novelty", "detector", "fisher", "wfisher0.7"]:
+                M[f"st_{k_}_{r_.replace('.', '')}"] = f(x.loc[k_, f"rec_{r_}"], 3)
+        M["st_nseeds"] = words(pd.read_csv(st).seed.nunique())
+
+
 def build():
     os_macros()
-    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros"):
+    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros", "round7_macros"):
         fn = globals().get(mod)
         if fn:
             try:

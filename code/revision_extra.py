@@ -23,6 +23,7 @@ from revision_analysis import Ctx, priorities, topk_mask, pvals, make_stream, on
 from prepare import CIC_FEATURES
 
 OUT = os.path.join(R.ROOT, "results", "revision")
+TAG = os.environ.get("TAG", "")   # suffix for output files of a rerun
 os.makedirs(OUT, exist_ok=True)
 SEEDS = [0, 1, 2, 3, 4]
 
@@ -47,11 +48,11 @@ def triage_row(ctx, det, nov, y, seed, c=0.01, mask=None):
     rng = np.random.default_rng(seed + 7)
     idx = make_stream(y, 0.01, rng, attack_mask=mask)
     ys = y[idx]
-    pr, _, _ = priorities(ctx, det[idx], nov[idx])
+    pr, _, _ = priorities(ctx, det[idx], nov[idx], extra=True)
     out = {}
-    for name in ["detector", "fisher"]:
+    for name in ["detector", "fisher", "wfisher0.7"]:
         q = topk_mask(pr[name], c)
-        out[f"rec_{name}"] = q[ys == 1].mean()
+        out[f"rec_{name.replace('wfisher0.7', 'wfisher')}"] = q[ys == 1].mean()
     w = int(0.2 * len(ys))
     t = np.quantile(pr["fisher"][:w], 1 - c)
     out["load_warmup"] = (pr["fisher"][w:] >= t).mean() / c
@@ -152,7 +153,7 @@ def run_reference():
         df, feats = R.load(name)
         X, y, fam = df[feats].to_numpy(np.float32), df["label"].to_numpy(), df["family"].to_numpy()
         fams = [f for f, n in df.loc[df.label == 1, "family"].value_counts().items() if n >= 300]
-        for seed in [0, 1, 2]:
+        for seed in [int(v) for v in os.environ.get("REF_SEEDS", "0,1,2").split(",")]:
             pt = R.split(df, seed)
             for f in fams:
                 safe = "".join(c if c.isalnum() else "_" for c in f)
@@ -163,8 +164,10 @@ def run_reference():
                 pool_f = np.flatnonzero((pt == 0) & (fam == f))  # held-out family flows from the training period
                 det = z["det"].astype(np.float64)
                 yt, un = y[te], fam[te] == f
-                for n_ref, contam in [(1000, 0), (5000, 0), (20000, 0), (50000, 0), (20000, 0.001),
-                                      (20000, 0.01), (20000, 0.05)]:
+                configs = [(1000, 0), (5000, 0), (20000, 0), (50000, 0), (20000, 0.001), (20000, 0.01), (20000, 0.05)]
+                if os.environ.get("REF_CONTAM_ONLY"):
+                    configs = [c_ for c_ in configs if c_[0] == 20000]
+                for n_ref, contam in configs:
                     rng = np.random.default_rng(seed)
                     ref = rng.choice(ben_tr, size=min(n_ref, len(ben_tr)), replace=False)
                     n_bad = int(round(contam * len(ref)))
@@ -173,11 +176,18 @@ def run_reference():
                     if n_bad:
                         ref = np.r_[ref[:len(ref) - n_bad], rng.choice(pool_f, n_bad, replace=False)]
                     sc = LogScaler().fit(X[tr][y[tr] == 0])
-                    nn = NearestNeighbors(n_neighbors=5).fit(sc.transform(X[ref]))
+                    if os.environ.get("REF_FAISS"):     # exact search with Faiss (same neighbours, faster)
+                        import faiss
+                        ix = faiss.IndexFlatL2(X.shape[1])
+                        ix.add(np.ascontiguousarray(sc.transform(X[ref]), dtype=np.float32))
+                        knn = lambda Z: np.sqrt(np.maximum(ix.search(np.ascontiguousarray(Z, dtype=np.float32), 5)[0], 0)).mean(1)
+                    else:
+                        nn = NearestNeighbors(n_neighbors=5).fit(sc.transform(X[ref]))
+                        knn = lambda Z: nn.kneighbors(Z)[0].mean(1)
                     t0 = time.time()
-                    nov = nn.kneighbors(sc.transform(X[te]))[0].mean(1)
+                    nov = knn(sc.transform(X[te]))
                     t_knn = time.time() - t0
-                    nc = nn.kneighbors(sc.transform(X[ca]))[0].mean(1)
+                    nc = knn(sc.transform(X[ca]))
                     ctx = Ctx(z["cal_det"], nc, z["cal_y"])
                     r = dict(dataset=name, held_out=f, seed=seed, n_ref=len(ref), contamination=contam,
                              knn_us=1e6 * t_knn / te.sum(),
@@ -186,7 +196,7 @@ def run_reference():
                     r.update(triage_row(ctx, det, nov, yt, seed, mask=un))
                     rows.append(r)
                 print("reference", name, seed, f, flush=True)
-            pd.DataFrame(rows).to_csv(os.path.join(OUT, "extra_reference.csv"), index=False)
+            pd.DataFrame(rows).to_csv(os.path.join(OUT, f"extra_reference{TAG}.csv"), index=False)
 
 
 # ------------------------------------------------------------- temporal
@@ -317,7 +327,7 @@ def run_group():
                 r.update(triage_row(ctx, det, nov, yt, seed, mask=un))
                 rows.append(r)
                 print("group", name, seed, g, flush=True)
-            pd.DataFrame(rows).to_csv(os.path.join(OUT, "extra_group.csv"), index=False)
+            pd.DataFrame(rows).to_csv(os.path.join(OUT, f"extra_group{TAG}.csv"), index=False)
 
 
 # ------------------------------------------------------------------- cost
