@@ -1,0 +1,32 @@
+{
+ "CIC-IDS2017": [
+  "Bwd PSH Flags",
+  "Bwd URG Flags",
+  "Fwd Byts/b Avg",
+  "Fwd Pkts/b Avg",
+  "Fwd Blk Rate Avg",
+  "Bwd Byts/b Avg",
+  "Bwd Pkts/b Avg",
+  "Bwd Blk Rate Avg"
+ ],
+ "CSE-CIC-IDS2018": [
+  "Bwd PSH Flags",
+  "Bwd URG Flags",
+  "Fwd Byts/b Avg",
+  "Fwd Pkts/b Avg",
+  "Fwd Blk Rate Avg",
+  "Bwd Byts/b Avg",
+  "Bwd Pkts/b Avg",
+  "Bwd Blk Rate Avg"
+ ],
+ "ACI-IoT-2023": [
+  "Bwd PSH Flags",
+  "Fwd URG Flags",
+  "Bwd URG Flags",
+  "URG Flag Cnt",
+  "Fwd Byts/b Avg",
+  "Fwd Pkts/b Avg",
+  "Fwd Blk Rate Avg",
+  "Subflow Bwd Pkts"
+ ]
+}

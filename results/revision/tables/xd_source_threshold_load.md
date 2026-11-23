@@ -1,0 +1,26 @@
+| setting | priority | budget | 0.1 | 0.5 | 0.9 |
+|---|---|---|---|---|---|
+| cross-dataset | combined | 0.010 | 4.743 | 93.909 | 100.000 |
+| cross-dataset | combined | 0.020 | 13.272 | 50.000 | 50.000 |
+| cross-dataset | combined | 0.050 | 14.356 | 20.000 | 20.000 |
+| cross-dataset | detector | 0.010 | 0.000 | 0.127 | 17.838 |
+| cross-dataset | detector | 0.020 | 0.508 | 5.337 | 16.640 |
+| cross-dataset | detector | 0.050 | 2.542 | 5.959 | 8.787 |
+| cross-dataset | fisher | 0.010 | 3.047 | 54.401 | 100.000 |
+| cross-dataset | fisher | 0.020 | 15.329 | 49.994 | 50.000 |
+| cross-dataset | fisher | 0.050 | 11.710 | 20.000 | 20.000 |
+| cross-dataset | novelty | 0.010 | 28.561 | 100.000 | 100.000 |
+| cross-dataset | novelty | 0.020 | 30.867 | 50.000 | 50.000 |
+| cross-dataset | novelty | 0.050 | 16.248 | 20.000 | 20.000 |
+| in-domain | combined | 0.010 | 0.973 | 1.031 | 1.094 |
+| in-domain | combined | 0.020 | 0.939 | 1.011 | 1.066 |
+| in-domain | combined | 0.050 | 0.960 | 0.994 | 1.022 |
+| in-domain | detector | 0.010 | 0.962 | 1.011 | 1.067 |
+| in-domain | detector | 0.020 | 0.948 | 1.002 | 1.046 |
+| in-domain | detector | 0.050 | 0.963 | 0.999 | 1.033 |
+| in-domain | fisher | 0.010 | 0.961 | 1.028 | 1.097 |
+| in-domain | fisher | 0.020 | 0.951 | 1.005 | 1.056 |
+| in-domain | fisher | 0.050 | 0.942 | 0.996 | 1.035 |
+| in-domain | novelty | 0.010 | 0.889 | 0.961 | 1.061 |
+| in-domain | novelty | 0.020 | 0.924 | 0.986 | 1.052 |
+| in-domain | novelty | 0.050 | 0.930 | 0.993 | 1.014 |

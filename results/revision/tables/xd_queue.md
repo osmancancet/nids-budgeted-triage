@@ -1,0 +1,20 @@
+| regime | budget | priority | load_med | recall | precision | fa_per_tp | fa_novelty_share |
+|---|---|---|---|---|---|---|---|
+| Cross-dataset | 0.010 | combined | 0.999 | 0.051 | 0.052 | 42.875 | 0.759 |
+| Cross-dataset | 0.010 | detector | 1.013 | 0.054 | 0.050 | 29.178 | 0.682 |
+| Cross-dataset | 0.010 | fisher | 0.978 | 0.059 | 0.060 | 32.876 | 0.716 |
+| Cross-dataset | 0.020 | combined | 0.989 | 0.082 | 0.042 | 33.116 | 0.789 |
+| Cross-dataset | 0.020 | detector | 0.980 | 0.085 | 0.044 | 25.260 | 0.689 |
+| Cross-dataset | 0.020 | fisher | 0.980 | 0.087 | 0.044 | 29.754 | 0.739 |
+| Cross-dataset | 0.050 | combined | 0.998 | 0.150 | 0.030 | 56.969 | 0.808 |
+| Cross-dataset | 0.050 | detector | 0.988 | 0.130 | 0.026 | 40.400 | 0.743 |
+| Cross-dataset | 0.050 | fisher | 0.992 | 0.151 | 0.030 | 34.997 | 0.776 |
+| In-domain | 0.010 | combined | 1.056 | 0.880 | 0.816 | 0.169 | 0.486 |
+| In-domain | 0.010 | detector | 1.073 | 0.898 | 0.835 | 0.147 | 0.029 |
+| In-domain | 0.010 | fisher | 1.049 | 0.857 | 0.795 | 0.193 | 0.533 |
+| In-domain | 0.020 | combined | 1.037 | 0.934 | 0.453 | 1.210 | 0.501 |
+| In-domain | 0.020 | detector | 1.073 | 0.943 | 0.454 | 1.174 | 0.044 |
+| In-domain | 0.020 | fisher | 1.035 | 0.922 | 0.443 | 1.266 | 0.503 |
+| In-domain | 0.050 | combined | 1.028 | 0.953 | 0.188 | 4.339 | 0.492 |
+| In-domain | 0.050 | detector | 0.994 | 0.959 | 0.194 | 4.151 | 0.089 |
+| In-domain | 0.050 | fisher | 1.004 | 0.952 | 0.192 | 4.256 | 0.509 |

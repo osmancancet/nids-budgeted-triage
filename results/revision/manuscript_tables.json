@@ -1,0 +1,457 @@
+{
+ "data_raw": [
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "BENIGN",
+   "group": "Benign",
+   "n_final": 200000
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "DoS Hulk",
+   "group": "DoS",
+   "n_final": 30000
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "DDoS",
+   "group": "DDoS",
+   "n_final": 30000
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "DoS GoldenEye",
+   "group": "DoS",
+   "n_final": 10281
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "FTP-Patator",
+   "group": "BruteForce",
+   "n_final": 5929
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "DoS slowloris",
+   "group": "DoS",
+   "n_final": 5374
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "DoS Slowhttptest",
+   "group": "DoS",
+   "n_final": 5226
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "SSH-Patator",
+   "group": "BruteForce",
+   "n_final": 3218
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "PortScan",
+   "group": "Scan",
+   "n_final": 1956
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "Web Attack - Brute Force",
+   "group": "WebAttack",
+   "n_final": 1468
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "Bot",
+   "group": "Botnet",
+   "n_final": 1437
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "Web Attack - XSS",
+   "group": "WebAttack",
+   "n_final": 652
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "Infiltration",
+   "group": "Infiltration",
+   "n_final": 36
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "Web Attack - Sql Injection",
+   "group": "WebAttack",
+   "n_final": 20
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "Heartbleed",
+   "group": "Other",
+   "n_final": 9
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "__rows_raw__",
+   "group": NaN,
+   "n_final": 1113088
+  },
+  {
+   "dataset": "CIC-IDS2017",
+   "family": "__rows_dedup__",
+   "group": NaN,
+   "n_final": 822880
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "Benign",
+   "group": "Benign",
+   "n_final": 200000
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "DDOS attack-HOIC",
+   "group": "DDoS",
+   "n_final": 30000
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "SSH-Bruteforce",
+   "group": "BruteForce",
+   "n_final": 30000
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "DoS attacks-GoldenEye",
+   "group": "DoS",
+   "n_final": 30000
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "Bot",
+   "group": "Botnet",
+   "n_final": 30000
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "DoS attacks-Hulk",
+   "group": "DoS",
+   "n_final": 30000
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "DDoS attacks-LOIC-HTTP",
+   "group": "DDoS",
+   "n_final": 30000
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "Infilteration",
+   "group": "Infiltration",
+   "n_final": 30000
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "DoS attacks-Slowloris",
+   "group": "DoS",
+   "n_final": 9712
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "DDOS attack-LOIC-UDP",
+   "group": "DDoS",
+   "n_final": 1730
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "Brute Force -Web",
+   "group": "WebAttack",
+   "n_final": 553
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "Brute Force -XSS",
+   "group": "WebAttack",
+   "n_final": 228
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "SQL Injection",
+   "group": "WebAttack",
+   "n_final": 84
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "DoS attacks-SlowHTTPTest",
+   "group": "DoS",
+   "n_final": 55
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "FTP-BruteForce",
+   "group": "BruteForce",
+   "n_final": 54
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "__rows_raw__",
+   "group": NaN,
+   "n_final": 3423289
+  },
+  {
+   "dataset": "CSE-CIC-IDS2018",
+   "family": "__rows_dedup__",
+   "group": NaN,
+   "n_final": 1867592
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "Benign",
+   "group": "Benign",
+   "n_final": 200000
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "ICMP Flood",
+   "group": "DoS",
+   "n_final": 30000
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "DNS Flood",
+   "group": "DoS",
+   "n_final": 30000
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "Port Scan",
+   "group": "Scan",
+   "n_final": 30000
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "OS Scan",
+   "group": "Scan",
+   "n_final": 18075
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "Slowloris",
+   "group": "DoS",
+   "n_final": 17785
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "Ping Sweep",
+   "group": "Scan",
+   "n_final": 17330
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "Vulnerability Scan",
+   "group": "Scan",
+   "n_final": 17230
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "SYN Flood",
+   "group": "DoS",
+   "n_final": 13852
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "Dictionary Attack",
+   "group": "BruteForce",
+   "n_final": 6349
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "UDP Flood",
+   "group": "DoS",
+   "n_final": 789
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "ARP Spoofing",
+   "group": "Other",
+   "n_final": 5
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "__rows_raw__",
+   "group": NaN,
+   "n_final": 1231411
+  },
+  {
+   "dataset": "ACI-IoT-2023",
+   "family": "__rows_dedup__",
+   "group": NaN,
+   "n_final": 760253
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "Normal",
+   "group": "Normal",
+   "n_final": 85722
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "Exploits",
+   "group": "Exploits",
+   "n_final": 27215
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "Fuzzers",
+   "group": "Fuzzers",
+   "n_final": 20741
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "Reconnaissance",
+   "group": "Reconnaissance",
+   "n_final": 9786
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "Generic",
+   "group": "Generic",
+   "n_final": 7580
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "DoS",
+   "group": "DoS",
+   "n_final": 5281
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "Analysis",
+   "group": "Analysis",
+   "n_final": 1813
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "Backdoor",
+   "group": "Backdoor",
+   "n_final": 1713
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "Shellcode",
+   "group": "Shellcode",
+   "n_final": 1456
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "Worms",
+   "group": "Worms",
+   "n_final": 171
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "__rows_raw__",
+   "group": NaN,
+   "n_final": 257673
+  },
+  {
+   "dataset": "UNSW-NB15",
+   "family": "__rows_dedup__",
+   "group": NaN,
+   "n_final": 161478
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "normal",
+   "group": "normal",
+   "n_final": 23671
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "injection",
+   "group": "injection",
+   "n_final": 19849
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "password",
+   "group": "password",
+   "n_final": 15248
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "ddos",
+   "group": "ddos",
+   "n_final": 11945
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "xss",
+   "group": "xss",
+   "n_final": 8740
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "dos",
+   "group": "dos",
+   "n_final": 6447
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "scanning",
+   "group": "scanning",
+   "n_final": 4493
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "backdoor",
+   "group": "backdoor",
+   "n_final": 1966
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "mitm",
+   "group": "mitm",
+   "n_final": 1039
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "ransomware",
+   "group": "ransomware",
+   "n_final": 260
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "__rows_raw__",
+   "group": NaN,
+   "n_final": 211043
+  },
+  {
+   "dataset": "ToN-IoT",
+   "family": "__rows_dedup__",
+   "group": NaN,
+   "n_final": 93658
+  }
+ ],
+ "xd": "**Table 3.** In-domain and cross-dataset performance on the three CICFlowMeter datasets. Values are means ± standard deviations over five seeds; cross-dataset values are first averaged over the six directed pairs, so they average pairs that flood and pairs that fall silent (Appendix Table A3 gives each pair). FPR/α is the realised false-positive rate at the source threshold divided by α = 1%; TPR is measured at the same threshold; Prec is the precision implied at 1% attack prevalence.\n\n| Model | Setting | AUROC | ECE (raw) | ECE (isotonic) | FPR/α | TPR | Prec |\n|:---|:---|---:|---:|---:|---:|---:|---:|\n| LightGBM | In-domain | 0.993 ± 0.000 | 0.002 ± 0.000 | 0.001 ± 0.000 | 1.0 ± 0.0 | 0.964 ± 0.000 | 0.491 ± 0.010 |\n| LightGBM | Cross-dataset | 0.602 ± 0.010 | 0.378 ± 0.011 | 0.379 ± 0.011 | 13.7 ± 0.9 | 0.228 ± 0.021 | 0.024 ± 0.006 |\n| Random forest | In-domain | 0.992 ± 0.000 | 0.008 ± 0.000 | 0.001 ± 0.000 | 1.0 ± 0.0 | 0.961 ± 0.000 | 0.488 ± 0.012 |\n| Random forest | Cross-dataset | 0.623 ± 0.010 | 0.240 ± 0.004 | 0.280 ± 0.005 | 16.1 ± 1.4 | 0.262 ± 0.026 | 0.024 ± 0.002 |\n| MLP | In-domain | 0.988 ± 0.000 | 0.004 ± 0.001 | 0.001 ± 0.000 | 1.0 ± 0.0 | 0.942 ± 0.014 | 0.482 ± 0.011 |\n| MLP | Cross-dataset | 0.577 ± 0.073 | 0.390 ± 0.025 | 0.390 ± 0.025 | 17.4 ± 2.6 | 0.278 ± 0.057 | 0.034 ± 0.013 |\n| Logistic regression | In-domain | 0.964 ± 0.000 | 0.036 ± 0.001 | 0.002 ± 0.000 | 1.0 ± 0.1 | 0.645 ± 0.022 | 0.390 ± 0.007 |\n| Logistic regression | Cross-dataset | 0.496 ± 0.007 | 0.452 ± 0.000 | 0.454 ± 0.002 | 25.0 ± 0.9 | 0.237 ± 0.014 | 0.026 ± 0.006 |",
+ "A2": "**Table A2.** In-domain results for every dataset and model (mean over five seeds).\n\n| Dataset | Model | AUROC | ECE (raw) | ECE (iso.) | FPR/α | TPR | Prec (1%) | Prec (0.1%) |\n|:---|:---|---:|---:|---:|---:|---:|---:|---:|\n| CIC-IDS2017 | LightGBM | 1.000 | 0.001 | 0.000 | 1.01 | 1.000 | 0.500 | 0.090 |\n| CIC-IDS2017 | Random forest | 1.000 | 0.004 | 0.001 | 1.03 | 0.999 | 0.496 | 0.089 |\n| CIC-IDS2017 | MLP | 1.000 | 0.002 | 0.001 | 1.05 | 0.993 | 0.489 | 0.087 |\n| CIC-IDS2017 | Logistic regression | 0.990 | 0.018 | 0.002 | 0.96 | 0.805 | 0.459 | 0.078 |\n| CSE-CIC-IDS2018 | LightGBM | 0.980 | 0.005 | 0.002 | 0.99 | 0.894 | 0.477 | 0.083 |\n| CSE-CIC-IDS2018 | Random forest | 0.975 | 0.016 | 0.002 | 1.03 | 0.885 | 0.464 | 0.079 |\n| CSE-CIC-IDS2018 | MLP | 0.968 | 0.006 | 0.002 | 1.00 | 0.877 | 0.469 | 0.081 |\n| CSE-CIC-IDS2018 | Logistic regression | 0.933 | 0.041 | 0.003 | 1.07 | 0.533 | 0.334 | 0.047 |\n| ACI-IoT-2023 | LightGBM | 1.000 | 0.001 | 0.001 | 1.03 | 1.000 | 0.496 | 0.089 |\n| ACI-IoT-2023 | Random forest | 1.000 | 0.005 | 0.001 | 0.99 | 0.998 | 0.505 | 0.092 |\n| ACI-IoT-2023 | MLP | 0.998 | 0.004 | 0.001 | 1.01 | 0.955 | 0.489 | 0.087 |\n| ACI-IoT-2023 | Logistic regression | 0.968 | 0.050 | 0.002 | 1.00 | 0.597 | 0.377 | 0.057 |\n| UNSW-NB15 | LightGBM | 0.983 | 0.006 | 0.004 | 0.97 | 0.796 | 0.454 | 0.077 |\n| UNSW-NB15 | Random forest | 0.982 | 0.014 | 0.004 | 1.02 | 0.776 | 0.438 | 0.072 |\n| UNSW-NB15 | MLP | 0.977 | 0.007 | 0.005 | 0.99 | 0.727 | 0.426 | 0.069 |\n| UNSW-NB15 | Logistic regression | 0.964 | 0.018 | 0.005 | 1.00 | 0.554 | 0.359 | 0.053 |\n| ToN-IoT | LightGBM | 1.000 | 0.002 | 0.001 | 0.89 | 0.999 | 0.535 | 0.104 |\n| ToN-IoT | Random forest | 1.000 | 0.012 | 0.001 | 0.88 | 0.997 | 0.538 | 0.105 |\n| ToN-IoT | MLP | 0.998 | 0.003 | 0.002 | 1.06 | 0.978 | 0.483 | 0.085 |\n| ToN-IoT | Logistic regression | 0.990 | 0.009 | 0.003 | 0.96 | 0.798 | 0.458 | 0.077 |",
+ "A3": "**Table A3.** Cross-dataset results for every directed pair and model (mean over five seeds; the AUROC range is over seeds).\n\n| Model | Pair | AUROC | AUROC range | ECE (raw) | ECE (Platt) | ECE (iso.) | FPR/α | TPR |\n|:---|:---|---:|---:|---:|---:|---:|---:|---:|\n| LightGBM | ACI-IoT-2023 → CIC-IDS2017 | 0.447 | 0.40 to 0.52 | 0.317 | 0.318 | 0.319 | 1.2 | 0.023 |\n| LightGBM | ACI-IoT-2023 → CSE-CIC-IDS2018 | 0.595 | 0.58 to 0.61 | 0.518 | 0.519 | 0.519 | 1.2 | 0.025 |\n| LightGBM | CIC-IDS2017 → ACI-IoT-2023 | 0.646 | 0.63 to 0.68 | 0.392 | 0.389 | 0.382 | 22.3 | 0.350 |\n| LightGBM | CIC-IDS2017 → CSE-CIC-IDS2018 | 0.782 | 0.78 to 0.79 | 0.474 | 0.469 | 0.464 | 4.9 | 0.301 |\n| LightGBM | CSE-CIC-IDS2018 → ACI-IoT-2023 | 0.559 | 0.45 to 0.64 | 0.305 | 0.318 | 0.314 | 20.8 | 0.211 |\n| LightGBM | CSE-CIC-IDS2018 → CIC-IDS2017 | 0.580 | 0.54 to 0.62 | 0.261 | 0.281 | 0.273 | 32.2 | 0.458 |\n| Random forest | ACI-IoT-2023 → CIC-IDS2017 | 0.577 | 0.53 to 0.63 | 0.139 | 0.192 | 0.216 | 16.0 | 0.295 |\n| Random forest | ACI-IoT-2023 → CSE-CIC-IDS2018 | 0.684 | 0.65 to 0.71 | 0.298 | 0.365 | 0.383 | 18.1 | 0.349 |\n| Random forest | CIC-IDS2017 → ACI-IoT-2023 | 0.439 | 0.39 to 0.53 | 0.328 | 0.346 | 0.340 | 48.0 | 0.374 |\n| Random forest | CIC-IDS2017 → CSE-CIC-IDS2018 | 0.785 | 0.76 to 0.81 | 0.409 | 0.423 | 0.423 | 10.6 | 0.436 |\n| Random forest | CSE-CIC-IDS2018 → ACI-IoT-2023 | 0.586 | 0.53 to 0.65 | 0.173 | 0.183 | 0.226 | 1.6 | 0.009 |\n| Random forest | CSE-CIC-IDS2018 → CIC-IDS2017 | 0.666 | 0.63 to 0.74 | 0.092 | 0.093 | 0.091 | 2.1 | 0.110 |\n| MLP | ACI-IoT-2023 → CIC-IDS2017 | 0.499 | 0.25 to 0.75 | 0.323 | 0.323 | 0.323 | 0.1 | 0.000 |\n| MLP | ACI-IoT-2023 → CSE-CIC-IDS2018 | 0.618 | 0.58 to 0.65 | 0.516 | 0.516 | 0.518 | 3.4 | 0.036 |\n| MLP | CIC-IDS2017 → ACI-IoT-2023 | 0.539 | 0.27 to 0.77 | 0.401 | 0.402 | 0.403 | 33.1 | 0.459 |\n| MLP | CIC-IDS2017 → CSE-CIC-IDS2018 | 0.615 | 0.56 to 0.65 | 0.449 | 0.448 | 0.450 | 2.2 | 0.184 |\n| MLP | CSE-CIC-IDS2018 → ACI-IoT-2023 | 0.671 | 0.64 to 0.69 | 0.290 | 0.288 | 0.288 | 28.6 | 0.570 |\n| MLP | CSE-CIC-IDS2018 → CIC-IDS2017 | 0.520 | 0.48 to 0.55 | 0.359 | 0.363 | 0.357 | 37.1 | 0.421 |\n| Logistic regression | ACI-IoT-2023 → CIC-IDS2017 | 0.390 | 0.39 to 0.40 | 0.323 | 0.323 | 0.323 | 0.0 | 0.000 |\n| Logistic regression | ACI-IoT-2023 → CSE-CIC-IDS2018 | 0.514 | 0.51 to 0.52 | 0.527 | 0.527 | 0.527 | 0.0 | 0.000 |\n| Logistic regression | CIC-IDS2017 → ACI-IoT-2023 | 0.410 | 0.40 to 0.43 | 0.600 | 0.601 | 0.599 | 59.9 | 0.389 |\n| Logistic regression | CIC-IDS2017 → CSE-CIC-IDS2018 | 0.624 | 0.60 to 0.66 | 0.408 | 0.410 | 0.420 | 1.6 | 0.114 |\n| Logistic regression | CSE-CIC-IDS2018 → ACI-IoT-2023 | 0.753 | 0.74 to 0.76 | 0.307 | 0.308 | 0.287 | 27.5 | 0.612 |\n| Logistic regression | CSE-CIC-IDS2018 → CIC-IDS2017 | 0.285 | 0.28 to 0.29 | 0.546 | 0.547 | 0.571 | 60.8 | 0.305 |",
+ "A4": "**Table A4.** Cross-dataset recall per coarse attack group at the source 1%-FPR threshold (LightGBM, mean over five seeds; n is the number of target test flows in the group).\n\n| Pair | Group | n | Recall |\n|:---|:---|---:|---:|\n| ACI-IoT-2023 → CIC-IDS2017 | Botnet | 432 | 0.000 |\n| ACI-IoT-2023 → CIC-IDS2017 | BruteForce | 2,744 | 0.149 |\n| ACI-IoT-2023 → CIC-IDS2017 | DDoS | 9,000 | 0.000 |\n| ACI-IoT-2023 → CIC-IDS2017 | DoS | 15,265 | 0.003 |\n| ACI-IoT-2023 → CIC-IDS2017 | Infiltration | 11 | 0.000 |\n| ACI-IoT-2023 → CIC-IDS2017 | Other | 3 | 0.000 |\n| ACI-IoT-2023 → CIC-IDS2017 | Scan | 587 | 0.170 |\n| ACI-IoT-2023 → CIC-IDS2017 | WebAttack | 642 | 0.178 |\n| ACI-IoT-2023 → CSE-CIC-IDS2018 | Botnet | 9,000 | 0.003 |\n| ACI-IoT-2023 → CSE-CIC-IDS2018 | BruteForce | 9,016 | 0.001 |\n| ACI-IoT-2023 → CSE-CIC-IDS2018 | DDoS | 18,519 | 0.071 |\n| ACI-IoT-2023 → CSE-CIC-IDS2018 | DoS | 20,930 | 0.001 |\n| ACI-IoT-2023 → CSE-CIC-IDS2018 | Infiltration | 9,000 | 0.035 |\n| ACI-IoT-2023 → CSE-CIC-IDS2018 | WebAttack | 259 | 0.008 |\n| CIC-IDS2017 → ACI-IoT-2023 | BruteForce | 1,905 | 0.128 |\n| CIC-IDS2017 → ACI-IoT-2023 | DoS | 27,729 | 0.538 |\n| CIC-IDS2017 → ACI-IoT-2023 | Other | 2 | 1.000 |\n| CIC-IDS2017 → ACI-IoT-2023 | Scan | 24,790 | 0.156 |\n| CIC-IDS2017 → CSE-CIC-IDS2018 | Botnet | 9,000 | 0.006 |\n| CIC-IDS2017 → CSE-CIC-IDS2018 | BruteForce | 9,016 | 0.116 |\n| CIC-IDS2017 → CSE-CIC-IDS2018 | DDoS | 18,519 | 0.200 |\n| CIC-IDS2017 → CSE-CIC-IDS2018 | DoS | 20,930 | 0.701 |\n| CIC-IDS2017 → CSE-CIC-IDS2018 | Infiltration | 9,000 | 0.052 |\n| CIC-IDS2017 → CSE-CIC-IDS2018 | WebAttack | 259 | 0.401 |\n| CSE-CIC-IDS2018 → ACI-IoT-2023 | BruteForce | 1,905 | 0.119 |\n| CSE-CIC-IDS2018 → ACI-IoT-2023 | DoS | 27,729 | 0.050 |\n| CSE-CIC-IDS2018 → ACI-IoT-2023 | Other | 2 | 0.000 |\n| CSE-CIC-IDS2018 → ACI-IoT-2023 | Scan | 24,790 | 0.397 |\n| CSE-CIC-IDS2018 → CIC-IDS2017 | Botnet | 432 | 0.000 |\n| CSE-CIC-IDS2018 → CIC-IDS2017 | BruteForce | 2,744 | 0.515 |\n| CSE-CIC-IDS2018 → CIC-IDS2017 | DDoS | 9,000 | 0.002 |\n| CSE-CIC-IDS2018 → CIC-IDS2017 | DoS | 15,265 | 0.755 |\n| CSE-CIC-IDS2018 → CIC-IDS2017 | Infiltration | 11 | 0.455 |\n| CSE-CIC-IDS2018 → CIC-IDS2017 | Other | 3 | 0.000 |\n| CSE-CIC-IDS2018 → CIC-IDS2017 | Scan | 587 | 0.228 |\n| CSE-CIC-IDS2018 → CIC-IDS2017 | WebAttack | 642 | 0.081 |",
+ "os": "**Table 4.** Held-out attack families (Protocol OS) and groups (Protocol OG). Recall is measured at the source 1%-FPR threshold; medians are over held-out families or groups, each averaged over five seeds. \"<0.5\" counts the families detected less than half of the time; \"Conf.\" counts those with more than half of their flows given an isotonic-calibrated attack probability below 0.05. The AUROC columns compare held-out with benign flows, using the detector score and the benign-referenced novelty score.\n\n| Data | Model | Units | Recall (seen) | Recall (held out) | <0.5 | Conf. | AUROC det. | AUROC nov. |\n|:---|:---|---:|---:|---:|---:|---:|---:|---:|\n| CIC-IDS2017 | LightGBM | 11 | 1.000 | 0.930 | 2 | 3 | 0.996 | 0.963 |\n| CSE-CIC-IDS2018 | LightGBM | 10 | 0.878 | 0.647 | 4 | 1 | 0.953 | 0.942 |\n| ACI-IoT-2023 | LightGBM | 10 | 1.000 | 0.039 | 7 | 7 | 0.904 | 0.709 |\n| UNSW-NB15 | LightGBM | 8 | 0.788 | 0.833 | 1 | 1 | 0.989 | 0.912 |\n| ToN-IoT | LightGBM | 8 | 0.998 | 0.918 | 0 | 0 | 0.996 | 0.975 |\n| All datasets | LightGBM | 47 | 0.998 | 0.846 | 14 | 12 | 0.986 | 0.935 |\n| All datasets | Random forest | 47 | 0.998 | 0.633 | 20 | 10 | 0.985 | 0.935 |\n| All datasets | MLP | 47 | 0.972 | 0.652 | 18 | 9 | 0.953 | 0.935 |\n| All datasets | Logistic regression | 47 | 0.628 | 0.248 | 29 | 8 | 0.946 | 0.935 |\n| CICFlowMeter (groups) | LightGBM | 15 |  | 0.162 | 9 | 6 | 0.878 | 0.929 |",
+ "A6": "**Table A6.** Per-family results of Protocol OS (mean over five seeds). π is the realised attack prevalence of the held-out-family stream in percent; recall is at the source 1%-FPR threshold for each model; the last three columns are for LightGBM.\n\n| Dataset | Held-out family | π (%) | LightGBM | Random forest | MLP | Logistic regression | Conf. miss | AUROC det. | AUROC nov. |\n|:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|\n| ACI-IoT-2023 | DNS Flood | 1.00 | 0.190 | 0.179 | 0.000 | 0.000 | 0.815 | 0.970 | 0.775 |\n| ACI-IoT-2023 | Dictionary Attack | 1.00 | 0.000 | 0.000 | 0.000 | 0.037 | 0.999 | 0.494 | 0.912 |\n| ACI-IoT-2023 | ICMP Flood | 1.00 | 0.000 | 0.000 | 0.000 | 0.000 | 1.000 | 0.797 | 0.824 |\n| ACI-IoT-2023 | OS Scan | 1.00 | 0.980 | 0.991 | 0.951 | 0.945 | 0.017 | 0.995 | 0.428 |\n| ACI-IoT-2023 | Ping Sweep | 1.00 | 0.000 | 0.006 | 0.035 | 0.991 | 1.000 | 0.821 | 0.306 |\n| ACI-IoT-2023 | Port Scan | 1.00 | 0.825 | 0.954 | 0.935 | 0.898 | 0.297 | 0.983 | 0.538 |\n| ACI-IoT-2023 | SYN Flood | 1.00 | 0.000 | 0.000 | 0.000 | 0.000 | 1.000 | 0.611 | 0.067 |\n| ACI-IoT-2023 | Slowloris | 1.00 | 0.038 | 0.505 | 0.257 | 0.561 | 0.938 | 0.961 | 0.983 |\n| ACI-IoT-2023 | UDP Flood | 0.39 | 0.039 | 0.021 | 0.011 | 0.000 | 0.957 | 0.847 | 0.642 |\n| ACI-IoT-2023 | Vulnerability Scan | 1.00 | 0.916 | 0.965 | 0.869 | 0.031 | 0.075 | 0.996 | 0.904 |\n| CIC-IDS2017 | Bot | 0.71 | 0.003 | 0.002 | 0.000 | 0.000 | 0.999 | 0.878 | 0.672 |\n| CIC-IDS2017 | DDoS | 1.00 | 0.632 | 0.633 | 0.605 | 0.578 | 0.371 | 0.962 | 0.990 |\n| CIC-IDS2017 | DoS GoldenEye | 1.00 | 0.976 | 0.846 | 0.610 | 0.383 | 0.091 | 0.998 | 0.980 |\n| CIC-IDS2017 | DoS Hulk | 1.00 | 0.939 | 0.943 | 0.787 | 0.176 | 0.271 | 0.996 | 0.981 |\n| CIC-IDS2017 | DoS Slowhttptest | 1.00 | 0.930 | 0.577 | 0.488 | 0.825 | 0.295 | 0.996 | 0.562 |\n| CIC-IDS2017 | DoS slowloris | 1.00 | 0.999 | 0.993 | 0.973 | 0.884 | 0.002 | 1.000 | 0.994 |\n| CIC-IDS2017 | FTP-Patator | 1.00 | 0.855 | 0.460 | 0.652 | 0.001 | 0.569 | 0.994 | 0.963 |\n| CIC-IDS2017 | PortScan | 0.97 | 0.508 | 0.457 | 0.305 | 0.217 | 0.494 | 0.954 | 0.975 |\n| CIC-IDS2017 | SSH-Patator | 1.00 | 0.254 | 0.024 | 0.012 | 0.006 | 0.970 | 0.982 | 0.885 |\n| CIC-IDS2017 | Web Attack - Brute Force | 0.73 | 0.964 | 0.922 | 0.886 | 0.000 | 0.037 | 0.998 | 0.741 |\n| CIC-IDS2017 | Web Attack - XSS | 0.33 | 0.970 | 0.964 | 0.961 | 0.003 | 0.039 | 0.999 | 0.747 |\n| CSE-CIC-IDS2018 | Bot | 1.00 | 0.945 | 0.002 | 0.094 | 0.001 | 0.028 | 0.975 | 0.975 |\n| CSE-CIC-IDS2018 | Brute Force -Web | 0.28 | 0.584 | 0.204 | 0.501 | 0.000 | 0.241 | 0.835 | 0.658 |\n| CSE-CIC-IDS2018 | DDOS attack-HOIC | 1.00 | 0.293 | 0.639 | 0.001 | 0.000 | 0.000 | 0.930 | 0.919 |\n| CSE-CIC-IDS2018 | DDOS attack-LOIC-UDP | 0.86 | 1.000 | 1.000 | 1.000 | 1.000 | 0.000 | 1.000 | 1.000 |\n| CSE-CIC-IDS2018 | DDoS attacks-LOIC-HTTP | 1.00 | 0.076 | 0.003 | 0.127 | 0.126 | 0.094 | 0.802 | 0.949 |\n| CSE-CIC-IDS2018 | DoS attacks-GoldenEye | 1.00 | 0.888 | 0.299 | 0.684 | 0.357 | 0.002 | 0.992 | 0.970 |\n| CSE-CIC-IDS2018 | DoS attacks-Hulk | 1.00 | 0.397 | 0.130 | 0.188 | 0.498 | 0.007 | 0.977 | 0.935 |\n| CSE-CIC-IDS2018 | DoS attacks-Slowloris | 1.00 | 0.710 | 0.466 | 0.700 | 0.248 | 0.246 | 0.844 | 0.787 |\n| CSE-CIC-IDS2018 | Infilteration | 1.00 | 0.033 | 0.024 | 0.025 | 0.030 | 0.993 | 0.490 | 0.554 |\n| CSE-CIC-IDS2018 | SSH-Bruteforce | 1.00 | 0.998 | 0.000 | 0.002 | 0.001 | 0.000 | 0.999 | 0.988 |\n| ToN-IoT | backdoor | 1.00 | 0.994 | 0.991 | 0.973 | 0.982 | 0.002 | 1.000 | 0.984 |\n| ToN-IoT | ddos | 1.00 | 0.974 | 0.890 | 0.777 | 0.903 | 0.007 | 0.997 | 0.991 |\n| ToN-IoT | dos | 1.00 | 0.846 | 0.817 | 0.714 | 0.573 | 0.136 | 0.974 | 0.966 |\n| ToN-IoT | injection | 1.00 | 0.944 | 0.816 | 0.566 | 0.623 | 0.000 | 0.997 | 0.966 |\n| ToN-IoT | mitm | 1.00 | 0.879 | 0.893 | 0.693 | 0.065 | 0.048 | 0.994 | 0.967 |\n| ToN-IoT | password | 1.00 | 0.802 | 0.829 | 0.837 | 0.481 | 0.037 | 0.994 | 0.953 |\n| ToN-IoT | scanning | 1.00 | 0.999 | 0.997 | 0.990 | 0.953 | 0.000 | 1.000 | 0.986 |\n| ToN-IoT | xss | 1.00 | 0.893 | 0.969 | 0.866 | 0.544 | 0.007 | 0.995 | 0.984 |\n| UNSW-NB15 | Analysis | 1.00 | 0.779 | 0.771 | 0.785 | 0.750 | 0.129 | 0.950 | 0.911 |\n| UNSW-NB15 | Backdoor | 1.00 | 0.984 | 0.960 | 0.930 | 0.863 | 0.000 | 0.999 | 0.963 |\n| UNSW-NB15 | DoS | 1.00 | 0.927 | 0.884 | 0.846 | 0.665 | 0.000 | 0.996 | 0.913 |\n| UNSW-NB15 | Exploits | 1.00 | 0.887 | 0.844 | 0.759 | 0.661 | 0.009 | 0.991 | 0.939 |\n| UNSW-NB15 | Fuzzers | 1.00 | 0.164 | 0.166 | 0.164 | 0.112 | 0.576 | 0.892 | 0.711 |\n| UNSW-NB15 | Generic | 1.00 | 0.983 | 0.465 | 0.940 | 0.145 | 0.000 | 0.998 | 0.976 |\n| UNSW-NB15 | Reconnaissance | 1.00 | 0.611 | 0.546 | 0.570 | 0.329 | 0.000 | 0.982 | 0.774 |\n| UNSW-NB15 | Shellcode | 1.00 | 0.751 | 0.709 | 0.679 | 0.042 | 0.000 | 0.986 | 0.710 |",
+ "A7": "**Table A7.** Number of held-out families (of 47) with more than half of their flows given an isotonic-calibrated attack probability below the cutoff.\n\n| Model | 0.01 | 0.02 | 0.05 | 0.1 | 0.2 | 0.5 |\n|:---|---:|---:|---:|---:|---:|---:|\n| LightGBM | 9 | 12 | 12 | 13 | 13 | 17 |\n| Random forest | 8 | 8 | 10 | 13 | 14 | 21 |\n| MLP | 7 | 7 | 9 | 15 | 17 | 22 |\n| Logistic regression | 3 | 4 | 8 | 9 | 13 | 15 |",
+ "prio": "**Table 5.** Attack recall inside the review queue (exact top-b fraction of a stream with 1% attack prevalence; LightGBM). In-domain and cross-dataset values are for b = 1% and are averaged over dataset pairs; unseen-family values are averaged over the 47 held-out families and split, for b = 1%, into families the detector catches or misses at its threshold (groups defined on other seeds).\n\n| Ranking rule | In-domain | Cross-dataset | Unseen b = 1% | Unseen b = 2% | Unseen b = 5% | Caught | Missed |\n|:---|---:|---:|---:|---:|---:|---:|---:|\n| Detector | 0.888 | 0.051 | 0.520 | 0.679 | 0.768 | 0.707 | 0.108 |\n| Novelty | 0.208 | 0.025 | 0.199 | 0.364 | 0.557 | 0.258 | 0.071 |\n| Bonferroni | 0.871 | 0.052 | 0.478 | 0.628 | 0.774 | 0.646 | 0.108 |\n| Fisher | 0.842 | 0.058 | 0.533 | 0.665 | 0.797 | 0.689 | 0.188 |\n| Weighted Fisher, w = 0.7 | 0.883 | 0.049 | 0.556 | 0.702 | 0.800 | 0.727 | 0.175 |\n| Stouffer | 0.768 | 0.056 | 0.532 | 0.665 | 0.766 | 0.683 | 0.201 |\n| Learned combination | 0.887 | 0.045 | 0.518 | 0.676 | 0.767 | 0.705 | 0.105 |\n| Rank aggregation | 0.550 | 0.045 | 0.459 | 0.604 | 0.725 | 0.572 | 0.219 |\n| Split budget, 10% | 0.844 | 0.065 | 0.496 | 0.668 | 0.770 | 0.675 | 0.103 |\n| Calibrated uncertainty | 0.024 | 0.027 | 0.152 | 0.255 | 0.434 | 0.187 | 0.096 |\n| Label-free switch |  |  | 0.519 | 0.679 | 0.771 | 0.705 | 0.109 |\n| Random queue | 0.010 | 0.010 | 0.010 | 0.020 | 0.050 | 0.010 | 0.010 |",
+ "budget": "**Table 6.** Queue load (realised queue size divided by the planned size; median [10th, 90th percentile] over runs) and attack recall inside the queue for the Fisher priority at a 1% budget on streams with 1% prevalence (LightGBM). The warm-up quantile uses the first 20% of each stream. Behaviour on non-stationary streams is in Table 7 and Appendix Table A9.\n\n| Regime | Source: load | Source: recall | Warm-up: load | Warm-up: recall |\n|:---|---:|---:|---:|---:|\n| In-domain | 1.03 [0.96, 1.10] | 0.850 | 1.07 [0.93, 1.32] | 0.850 |\n| Cross-dataset | 54.40 [3.05, 100.00] | 0.689 | 1.00 [0.89, 1.12] | 0.062 |\n| Unseen family | 0.39 [0.08, 1.16] | 0.394 | 1.03 [0.86, 1.19] | 0.537 |",
+ "A9": "**Table A9.** Budget rules on non-stationary streams (Fisher priority, 1% budget, LightGBM). \"Burst in warm-up\": 5% of the warm-up window is attacks and 1% of the rest; \"Late campaign\": no attacks in the window and 1% after it. Load is median [10th, 90th percentile].\n\n| Regime | Scenario | Rule | Load | Recall |\n|:---|:---|:---|---:|---:|\n| Unseen family | Burst in warm-up | Online | 0.97 [0.89, 1.00] | 0.500 |\n| Unseen family | Burst in warm-up | Rolling | 0.88 [0.82, 1.00] | 0.462 |\n| Unseen family | Burst in warm-up | Warm-up | 0.30 [0.14, 0.88] | 0.161 |\n| Unseen family | Late campaign | Online | 1.02 [1.00, 1.11] | 0.543 |\n| Unseen family | Late campaign | Rolling | 1.10 [1.00, 1.18] | 0.552 |\n| Unseen family | Late campaign | Warm-up | 1.66 [0.98, 1.99] | 0.620 |\n| Cross-dataset | Burst in warm-up | Online | 1.00 [0.99, 1.00] | 0.060 |\n| Cross-dataset | Burst in warm-up | Rolling | 1.00 [0.95, 1.03] | 0.064 |\n| Cross-dataset | Burst in warm-up | Warm-up | 0.93 [0.65, 1.17] | 0.049 |\n| Cross-dataset | Late campaign | Online | 1.00 [1.00, 1.00] | 0.056 |\n| Cross-dataset | Late campaign | Rolling | 1.03 [1.00, 1.06] | 0.060 |\n| Cross-dataset | Late campaign | Warm-up | 1.09 [0.94, 1.29] | 0.061 |\n| In-domain | Burst in warm-up | Online | 0.96 [0.89, 0.98] | 0.795 |\n| In-domain | Burst in warm-up | Rolling | 0.85 [0.83, 0.94] | 0.727 |\n| In-domain | Burst in warm-up | Warm-up | 0.20 [0.16, 0.24] | 0.198 |\n| In-domain | Late campaign | Online | 1.05 [1.03, 1.19] | 0.859 |\n| In-domain | Late campaign | Rolling | 1.13 [1.10, 1.24] | 0.860 |\n| In-domain | Late campaign | Warm-up | 1.88 [1.67, 1.99] | 0.916 |",
+ "A10": "**Table A10.** Warm-up quantile under different attack prevalences (held-out-family streams, LightGBM). Realised prevalence can fall below the target for families with few test flows.\n\n| Target π | Realised π | Budget | Priority | Load | Recall | Precision |\n|---:|---:|---:|:---|---:|---:|---:|\n| 0.1% | 0.10% | 1% | Detector | 1.02 [0.83, 1.22] | 0.639 | 0.058 |\n| 0.1% | 0.10% | 1% | Fisher | 1.04 [0.82, 1.27] | 0.621 | 0.056 |\n| 0.1% | 0.10% | 2% | Detector | 0.99 [0.86, 1.13] | 0.709 | 0.033 |\n| 0.1% | 0.10% | 2% | Fisher | 1.03 [0.91, 1.23] | 0.710 | 0.032 |\n| 0.1% | 0.10% | 5% | Detector | 1.01 [0.94, 1.10] | 0.774 | 0.014 |\n| 0.1% | 0.10% | 5% | Fisher | 1.01 [0.92, 1.09] | 0.809 | 0.015 |\n| 0.5% | 0.49% | 1% | Detector | 0.99 [0.83, 1.15] | 0.591 | 0.296 |\n| 0.5% | 0.49% | 1% | Fisher | 1.01 [0.84, 1.20] | 0.588 | 0.291 |\n| 0.5% | 0.49% | 2% | Detector | 0.99 [0.89, 1.10] | 0.696 | 0.172 |\n| 0.5% | 0.49% | 2% | Fisher | 1.02 [0.91, 1.15] | 0.687 | 0.166 |\n| 0.5% | 0.49% | 5% | Detector | 1.00 [0.91, 1.07] | 0.772 | 0.076 |\n| 0.5% | 0.49% | 5% | Fisher | 1.01 [0.93, 1.06] | 0.805 | 0.079 |\n| 1% | 0.94% | 1% | Detector | 1.03 [0.88, 1.16] | 0.528 | 0.488 |\n| 1% | 0.94% | 1% | Fisher | 1.03 [0.92, 1.17] | 0.534 | 0.497 |\n| 1% | 0.94% | 2% | Detector | 1.02 [0.93, 1.14] | 0.682 | 0.317 |\n| 1% | 0.94% | 2% | Fisher | 1.04 [0.96, 1.15] | 0.670 | 0.308 |\n| 1% | 0.94% | 5% | Detector | 1.01 [0.94, 1.07] | 0.769 | 0.146 |\n| 1% | 0.94% | 5% | Fisher | 1.01 [0.94, 1.08] | 0.799 | 0.152 |\n| 2% | 1.78% | 1% | Detector | 1.01 [0.83, 1.18] | 0.372 | 0.611 |\n| 2% | 1.78% | 1% | Fisher | 1.02 [0.87, 1.15] | 0.371 | 0.614 |\n| 2% | 1.78% | 2% | Detector | 1.00 [0.88, 1.14] | 0.598 | 0.530 |\n| 2% | 1.78% | 2% | Fisher | 1.02 [0.89, 1.13] | 0.607 | 0.531 |\n| 2% | 1.78% | 5% | Detector | 1.00 [0.94, 1.08] | 0.762 | 0.273 |\n| 2% | 1.78% | 5% | Fisher | 1.00 [0.94, 1.08] | 0.782 | 0.278 |\n| 5% | 3.86% | 1% | Detector | 1.03 [0.87, 1.22] | 0.253 | 0.665 |\n| 5% | 3.86% | 1% | Fisher | 1.02 [0.87, 1.20] | 0.248 | 0.673 |\n| 5% | 3.86% | 2% | Detector | 1.01 [0.92, 1.20] | 0.409 | 0.640 |\n| 5% | 3.86% | 2% | Fisher | 1.02 [0.92, 1.17] | 0.413 | 0.647 |\n| 5% | 3.86% | 5% | Detector | 1.01 [0.96, 1.13] | 0.715 | 0.527 |\n| 5% | 3.86% | 5% | Fisher | 1.01 [0.96, 1.10] | 0.717 | 0.530 |",
+ "temporal": "**Table 7.** Chronological protocols on CSE-CIC-IDS2018 (LightGBM, mean over five seeds). Detection metrics are at the source 1%-FPR threshold. The last four columns give the queue load of the Fisher priority at a 1% budget on the chronological test stream with 1% attack prevalence, overall and (in parentheses) the lowest and highest load in the ten consecutive tenths of the stream.\n\n| Protocol | AUROC | ECE (iso.) | FPR/α | TPR | Source | Warm-up | Rolling | Online |\n|:---|---:|---:|---:|---:|---:|---:|---:|---:|\n| T1, benign split by time | 0.964 | 0.088 | 18.4 | 0.908 | 3.74 (0.18 to 13.06) | 0.47 (0.11 to 1.29) | 1.62 (0.19 to 7.81) | 1.05 (0.41 to 2.45) |\n| T1, random split | 0.980 | 0.002 | 1.0 | 0.894 | 0.70 (0.01 to 2.73) | 0.13 (0.00 to 0.61) | 1.33 (0.00 to 3.75) | 1.02 (0.54 to 1.48) |\n| T2, split by capture day | 0.726 | 0.541 | 1.2 | 0.052 | 0.21 (0.02 to 0.81) | 2.32 (0.78 to 4.58) | 1.14 (0.23 to 2.07) | 1.02 (0.72 to 1.33) |\n| T2, random split | 0.980 | 0.002 | 1.0 | 0.895 | 0.69 (0.02 to 2.61) | 0.11 (0.00 to 0.53) | 1.31 (0.00 to 3.81) | 1.02 (0.44 to 1.59) |",
+ "cost": "**Table 8.** Per-flow cost of each component of the triage layer on 50,000 CSE-CIC-IDS2018 test flows (median of three repetitions for detectors). The last column is the share of true five nearest neighbours returned by the approximate index.\n\n| Component | Reference size | µs per flow, 1 thread | µs per flow, 4 threads | Neighbour recall |\n|:---|---:|---:|---:|---:|\n| LightGBM inference |  | 13.65 | 4.75 |  |\n| Random forest inference |  | 17.45 | 5.98 |  |\n| MLP inference |  | 2.27 | 1.93 |  |\n| Logistic regression inference |  | 1.09 | 1.05 |  |\n| kNN, brute force | 1,000 | 5.44 | 1.53 |  |\n| kNN, brute force | 5,000 | 25.61 | 6.62 |  |\n| kNN, brute force | 20,000 | 87.95 | 23.34 |  |\n| kNN, brute force | 50,000 | 235.01 | 57.29 |  |\n| kNN, brute force | 100,000 | 466.74 | 128.15 |  |\n| kNN, k-d tree | 1,000 | 59.91 | 59.22 |  |\n| kNN, k-d tree | 20,000 | 857.15 | 587.19 |  |\n| kNN, k-d tree | 100,000 | 3511.74 | 1839.15 |  |\n| kNN, ball tree | 1,000 | 36.85 | 54.21 |  |\n| kNN, ball tree | 20,000 | 990.41 | 993.98 |  |\n| kNN, ball tree | 100,000 | 7015.40 | 3797.83 |  |\n| kNN, HNSW (approximate) | 1,000 | 13.19 | 3.39 | 0.999 |\n| kNN, HNSW (approximate) | 5,000 | 17.20 | 5.26 | 0.988 |\n| kNN, HNSW (approximate) | 20,000 | 27.95 | 7.26 | 0.983 |\n| kNN, HNSW (approximate) | 50,000 | 34.85 | 8.80 | 0.867 |\n| kNN, HNSW (approximate) | 100,000 | 56.36 | 9.12 | 0.960 |\n| Conformal p-values and Fisher |  | 0.313 | 0.287 |  |",
+ "A11": "**Table A11.** Cross-dataset LightGBM with all 77 features and with the 24 tool-stable features (mean over five seeds). The last rows give the AUROC of a classifier trained to separate the benign flows of two datasets.\n\n| Pair | AUROC (all) | AUROC (stable) | FPR/α (all) | FPR/α (stable) | TPR (all) | TPR (stable) |\n|:---|---:|---:|---:|---:|---:|---:|\n| ACI-IoT-2023 → CIC-IDS2017 | 0.447 | 0.415 | 1.2 | 0.4 | 0.023 | 0.000 |\n| ACI-IoT-2023 → CSE-CIC-IDS2018 | 0.595 | 0.517 | 1.2 | 0.4 | 0.025 | 0.006 |\n| CIC-IDS2017 → ACI-IoT-2023 | 0.646 | 0.695 | 22.3 | 5.5 | 0.350 | 0.083 |\n| CIC-IDS2017 → CSE-CIC-IDS2018 | 0.782 | 0.778 | 4.9 | 2.4 | 0.301 | 0.338 |\n| CSE-CIC-IDS2018 → ACI-IoT-2023 | 0.559 | 0.512 | 20.8 | 22.6 | 0.211 | 0.311 |\n| CSE-CIC-IDS2018 → CIC-IDS2017 | 0.580 | 0.842 | 32.2 | 13.8 | 0.458 | 0.679 |\n| Benign CIC-IDS2017 vs ACI-IoT-2023 | 1.000 | 1.000 |  |  |  |  |\n| Benign CIC-IDS2017 vs CSE-CIC-IDS2018 | 1.000 | 0.977 |  |  |  |  |\n| Benign CSE-CIC-IDS2018 vs ACI-IoT-2023 | 1.000 | 1.000 |  |  |  |  |",
+ "A12": "**Table A12.** Effect of thinning the benign training flows of the subsampled copies (LightGBM, five seeds). Queue recall and the warm-up load are for a 1% budget.\n\n| Dataset | Protocol | Benign share | AUROC | FPR/α | Recall (held out) | Queue recall, detector | Queue recall, Fisher | Warm-up load |\n|:---|:---|---:|---:|---:|---:|---:|---:|---:|\n| CIC-IDS2017 | Cross-dataset | 0.25 | 0.690 | 15.59 |  | 0.078 | 0.041 | 1.09 |\n| CIC-IDS2017 | Cross-dataset | 0.5 | 0.687 | 15.23 |  | 0.072 | 0.044 | 1.05 |\n| CIC-IDS2017 | Cross-dataset | 1 | 0.714 | 13.59 |  | 0.066 | 0.044 | 1.06 |\n| CIC-IDS2017 | In-domain | 0.25 | 1.000 | 0.98 |  | 0.972 | 0.920 | 1.03 |\n| CIC-IDS2017 | In-domain | 0.5 | 1.000 | 0.99 |  | 0.978 | 0.931 | 1.01 |\n| CIC-IDS2017 | In-domain | 1 | 1.000 | 1.01 |  | 0.982 | 0.945 | 1.01 |\n| CIC-IDS2017 | Unseen family | 0.25 |  |  | 0.731 | 0.610 | 0.630 | 1.03 |\n| CIC-IDS2017 | Unseen family | 0.5 |  |  | 0.709 | 0.606 | 0.641 | 1.04 |\n| CIC-IDS2017 | Unseen family | 1 |  |  | 0.730 | 0.618 | 0.647 | 1.01 |\n| ToN-IoT | In-domain | 0.25 | 1.000 | 0.97 |  | 0.889 | 0.831 | 1.22 |\n| ToN-IoT | In-domain | 0.5 | 1.000 | 0.95 |  | 0.922 | 0.844 | 1.12 |\n| ToN-IoT | In-domain | 1 | 1.000 | 0.89 |  | 0.942 | 0.881 | 1.15 |\n| ToN-IoT | Unseen family | 0.25 |  |  | 0.811 | 0.641 | 0.533 | 1.25 |\n| ToN-IoT | Unseen family | 0.5 |  |  | 0.863 | 0.689 | 0.605 | 1.10 |\n| ToN-IoT | Unseen family | 1 |  |  | 0.916 | 0.726 | 0.680 | 1.13 |",
+ "A13": "**Table A13.** Size and contamination of the benign novelty reference (Protocol OS, LightGBM, seeds 0 to 2). Contamination replaces the stated share of the reference with flows of the held-out family from the training period; families with too few such flows are omitted at that level. Where a dataset has fewer benign training flows than the stated size, all of them form the reference, and the row gives that size.\n\n| Reference size | Contamination | Families | AUROC nov. | Queue recall, detector | Queue recall, Fisher | Warm-up load | kNN µs per flow |\n|---:|---:|---:|---:|---:|---:|---:|---:|\n| 1,000 | 0% | 47 | 0.819 | 0.519 | 0.483 | 1.03 | 3.5 |\n| 5,000 | 0% | 47 | 0.840 | 0.519 | 0.511 | 1.08 | 8.3 |\n| 11,836 | 0% | 8 | 0.975 | 0.722 | 0.677 | 1.17 | 20.4 |\n| 11,836 | 0.1% | 8 | 0.926 | 0.722 | 0.582 | 1.15 | 20.2 |\n| 11,836 | 1% | 8 | 0.800 | 0.722 | 0.416 | 1.14 | 20.0 |\n| 11,836 | 5% | 7 | 0.688 | 0.731 | 0.342 | 1.15 | 20.3 |\n| 20,000 | 0% | 39 | 0.806 | 0.477 | 0.500 | 1.06 | 26.3 |\n| 20,000 | 0.1% | 39 | 0.633 | 0.477 | 0.401 | 1.04 | 26.3 |\n| 20,000 | 1% | 39 | 0.421 | 0.477 | 0.328 | 1.02 | 26.2 |\n| 20,000 | 5% | 29 | 0.322 | 0.429 | 0.249 | 1.07 | 26.2 |\n| 42,861 | 0% | 8 | 0.863 | 0.645 | 0.608 | 0.98 | 53.9 |\n| 50,000 | 0% | 31 | 0.799 | 0.434 | 0.492 | 1.08 | 62.2 |",
+ "A8": "**Table A8.** Share of benign flows flagged by the conformal rules at α = 1% ($p_{\\det} \\le 0.01$ and $p_B \\le 0.01$). The conformal guarantee bounds the expected share by 0.01 under Assumption S.\n\n| Regime | Model | p_det, mean | p_B, mean | p_B, max |\n|:---|:---|---:|---:|---:|\n| Cross-dataset | LightGBM | 0.1372 | 0.7671 | 1.0000 |\n| Cross-dataset | Logistic regression | 0.2495 | 0.8013 | 1.0000 |\n| Cross-dataset | MLP | 0.1740 | 0.7724 | 1.0000 |\n| Cross-dataset | Random forest | 0.1596 | 0.7346 | 1.0000 |\n| In-domain | LightGBM | 0.0097 | 0.0096 | 0.0115 |\n| In-domain | Logistic regression | 0.0098 | 0.0093 | 0.0115 |\n| In-domain | MLP | 0.0101 | 0.0096 | 0.0112 |\n| In-domain | Random forest | 0.0098 | 0.0096 | 0.0115 |\n| Unseen family | LightGBM | 0.0097 | 0.0096 | 0.0117 |\n| Unseen family | Logistic regression | 0.0099 | 0.0093 | 0.0122 |\n| Unseen family | MLP | 0.0100 | 0.0096 | 0.0116 |\n| Unseen family | Random forest | 0.0098 | 0.0096 | 0.0120 |",
+ "A14": "**Table A14.** Held-out coarse groups (Protocol OG, LightGBM, mean over five seeds).\n\n| Dataset | Held-out group | Test flows | Recall | Conf. miss | AUROC det. | AUROC nov. | Queue recall, detector | Queue recall, Fisher |\n|:---|:---|---:|---:|---:|---:|---:|---:|---:|\n| ACI-IoT-2023 | BruteForce | 1,905 | 0.000 | 0.999 | 0.495 | 0.912 | 0.000 | 0.043 |\n| ACI-IoT-2023 | DoS | 27,729 | 0.042 | 0.982 | 0.755 | 0.723 | 0.041 | 0.152 |\n| ACI-IoT-2023 | Scan | 24,790 | 0.000 | 1.000 | 0.428 | 0.541 | 0.000 | 0.010 |\n| CIC-IDS2017 | Botnet | 432 | 0.003 | 0.999 | 0.878 | 0.672 | 0.004 | 0.020 |\n| CIC-IDS2017 | BruteForce | 2,744 | 0.162 | 0.986 | 0.958 | 0.936 | 0.148 | 0.309 |\n| CIC-IDS2017 | DDoS | 9,000 | 0.632 | 0.371 | 0.963 | 0.989 | 0.634 | 0.641 |\n| CIC-IDS2017 | DoS | 15,265 | 0.773 | 0.491 | 0.984 | 0.940 | 0.618 | 0.827 |\n| CIC-IDS2017 | Scan | 587 | 0.508 | 0.494 | 0.954 | 0.975 | 0.506 | 0.511 |\n| CIC-IDS2017 | WebAttack | 642 | 0.923 | 0.087 | 0.994 | 0.742 | 0.854 | 0.658 |\n| CSE-CIC-IDS2018 | Botnet | 9,000 | 0.945 | 0.028 | 0.977 | 0.975 | 0.557 | 0.736 |\n| CSE-CIC-IDS2018 | BruteForce | 9,016 | 0.997 | 0.000 | 0.998 | 0.987 | 0.839 | 0.913 |\n| CSE-CIC-IDS2018 | DDoS | 18,519 | 0.002 | 0.292 | 0.625 | 0.935 | 0.002 | 0.053 |\n| CSE-CIC-IDS2018 | DoS | 20,930 | 0.176 | 0.113 | 0.814 | 0.929 | 0.160 | 0.318 |\n| CSE-CIC-IDS2018 | Infiltration | 9,000 | 0.033 | 0.993 | 0.498 | 0.554 | 0.029 | 0.060 |\n| CSE-CIC-IDS2018 | WebAttack | 259 | 0.156 | 0.171 | 0.824 | 0.734 | 0.151 | 0.416 |",
+ "A5": "**Table A5.** Features that are identically zero in the benign flows of each CICFlowMeter dataset (✓).\n\n| Feature | CIC-IDS2017 | CSE-CIC-IDS2018 | ACI-IoT-2023 |\n|:---|:---|:---|:---|\n| Bwd Blk Rate Avg | ✓ | ✓ |  |\n| Bwd Byts/b Avg | ✓ | ✓ |  |\n| Bwd PSH Flags | ✓ | ✓ | ✓ |\n| Bwd Pkts/b Avg | ✓ | ✓ |  |\n| Bwd URG Flags | ✓ | ✓ | ✓ |\n| Fwd Blk Rate Avg | ✓ | ✓ | ✓ |\n| Fwd Byts/b Avg | ✓ | ✓ | ✓ |\n| Fwd Pkts/b Avg | ✓ | ✓ | ✓ |\n| Fwd URG Flags |  |  | ✓ |\n| Subflow Bwd Pkts |  |  | ✓ |\n| URG Flag Cnt |  |  | ✓ |",
+ "adapt": "**Table 9.** Adapting the triage pipeline to a new network (six cross-dataset pairs, LightGBM, mean over pairs of five seeds). Each cell gives queue recall / queue precision on the 80% of the target stream after the warm-up window, at 1% attack prevalence.\n\n| Variant | Target labels | 1% budget | 2% budget | 5% budget |\n|:---|:---|---:|---:|---:|\n| Source pipeline, Fisher priority | none | 0.059 / 0.058 | 0.087 / 0.044 | 0.151 / 0.029 |\n| Source pipeline, detector priority | none | 0.054 / 0.050 | 0.085 / 0.044 | 0.130 / 0.026 |\n| TN: per-network quantile features | none | 0.015 / 0.016 | 0.035 / 0.018 | 0.101 / 0.021 |\n| TR: target novelty reference and calibration | none | 0.066 / 0.060 | 0.103 / 0.048 | 0.199 / 0.037 |\n| TN and TR combined | none | 0.018 / 0.017 | 0.044 / 0.020 | 0.093 / 0.017 |\n| FB: analyst feedback | reviewed flows | 0.343 / 0.331 | 0.498 / 0.234 | 0.735 / 0.142 |\n| FB without random exploration | reviewed flows | 0.332 / 0.302 |  |  |\n| FB, last fifth of the stream | reviewed flows | 0.494 / 0.479 | 0.680 / 0.308 | 0.852 / 0.161 |",
+ "A15": "**Table A15.** Queue recall at a 1% budget for each directed pair (LightGBM, mean over five seeds) and number of reviewed flows (and attacks among them) that the feedback loop collected.\n\n| Source | Target | Fisher | Detector | TN | TR | TN+TR | FB | FB, no expl. | Labels | Attack labels |\n|:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n| ACI-IoT-2023 | CIC-IDS2017 | 0.021 | 0.021 | 0.015 | 0.036 | 0.019 | 0.348 | 0.167 | 599 | 169 |\n| ACI-IoT-2023 | CSE-CIC-IDS2018 | 0.022 | 0.018 | 0.059 | 0.030 | 0.036 | 0.291 | 0.265 | 622 | 148 |\n| CIC-IDS2017 | ACI-IoT-2023 | 0.045 | 0.069 | 0.000 | 0.051 | 0.001 | 0.224 | 0.186 | 622 | 113 |\n| CIC-IDS2017 | CSE-CIC-IDS2018 | 0.054 | 0.088 | 0.016 | 0.135 | 0.046 | 0.498 | 0.507 | 710 | 251 |\n| CSE-CIC-IDS2018 | ACI-IoT-2023 | 0.002 | 0.003 | 0.001 | 0.004 | 0.003 | 0.082 | 0.246 | 607 | 41 |\n| CSE-CIC-IDS2018 | CIC-IDS2017 | 0.209 | 0.127 | 0.000 | 0.139 | 0.006 | 0.615 | 0.619 | 610 | 321 |"
+}

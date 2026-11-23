@@ -11,3 +11,4 @@ manuscript/*.fls
 manuscript/*.log
 manuscript/*.out
 manuscript/*.spl
+data/dumps/

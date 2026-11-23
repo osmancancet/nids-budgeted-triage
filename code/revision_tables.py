@@ -1,0 +1,449 @@
+"""Manuscript tables (pandoc pipe tables with captions) built from results/ and results/revision/.
+
+Writes results/revision/manuscript_tables.json: {name: markdown}. Tables whose inputs are missing are
+skipped with a message.
+"""
+import os
+import json
+import numpy as np
+import pandas as pd
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RES, REV = os.path.join(ROOT, "results"), os.path.join(ROOT, "results", "revision")
+CIC = ["CIC-IDS2017", "CSE-CIC-IDS2018", "ACI-IoT-2023"]
+DS = CIC + ["UNSW-NB15", "ToN-IoT"]
+MODELS = ["LGBM", "RF", "MLP", "LR"]
+MN = {"LGBM": "LightGBM", "RF": "Random forest", "MLP": "MLP", "LR": "Logistic regression"}
+PRN = {"detector": "Detector", "novelty": "Novelty", "combined": "Bonferroni", "fisher": "Fisher",
+       "wfisher0.6": "Weighted Fisher, w = 0.6", "wfisher0.7": "Weighted Fisher, w = 0.7",
+       "wfisher0.8": "Weighted Fisher, w = 0.8", "wfisher0.9": "Weighted Fisher, w = 0.9",
+       "stouffer": "Stouffer", "stacked": "Learned combination", "borda": "Rank aggregation",
+       "uncertainty": "Calibrated uncertainty", "split0.1": "Split budget, 10%", "split0.25": "Split budget, 25%",
+       "split0.5": "Split budget, 50%", "proxy_switch": "Label-free switch"}
+T = {}
+
+
+def r(name):
+    p = os.path.join(REV, name)
+    return pd.read_csv(p) if os.path.exists(p) else None
+
+
+def ms(v, k=3):
+    return f"{np.mean(v):.{k}f} ± {np.std(v, ddof=1):.{k}f}"
+
+
+def q3(v, k=2):
+    v = pd.Series(v)
+    return f"{v.median():.{k}f} [{v.quantile(.1):.{k}f}, {v.quantile(.9):.{k}f}]"
+
+
+def table(caption, header, rows, align=None):
+    align = align or ["l"] + ["r"] * (len(header) - 1)
+    sep = ["---:" if a == "r" else ":---" for a in align]
+    out = [caption, "", "| " + " | ".join(header) + " |", "|" + "|".join(sep) + "|"]
+    out += ["| " + " | ".join(str(c) for c in row) + " |" for row in rows]
+    return "\n".join(out)
+
+
+# ---------------------------------------------------------------- Table 2
+def t_data():
+    rows = []
+    for f, ds in [("cic2017", "CIC-IDS2017"), ("cic2018", "CSE-CIC-IDS2018"), ("aci", "ACI-IoT-2023"),
+                  ("unsw", "UNSW-NB15"), ("ton", "ToN-IoT")]:
+        d = pd.read_csv(os.path.join(RES, f"data_summary_{f}.csv"))
+        x = d.iloc[0]
+        rows.append([ds] + [str(x[c]) for c in d.columns[1:]])
+    T["data_raw"] = pd.concat([pd.read_csv(os.path.join(RES, f"data_summary_{f}.csv")) for f in
+                               ["cic2017", "cic2018", "aci", "unsw", "ton"]]).to_dict("records")
+
+
+# ---------------------------------------------------------------- Table 3 / A2 / A3
+def t_xd():
+    d = pd.read_csv(os.path.join(RES, "xd_detection.csv"))
+    m = d[d.group.isna()]
+    rows = []
+    for model in MODELS:
+        for setting, lab in [("in-domain", "In-domain"), ("cross-dataset", "Cross-dataset")]:
+            x = m[(m.model == model) & (m.setting == setting) & m.source.isin(CIC)]
+            g = x.groupby("seed").mean(numeric_only=True)
+            rows.append([MN[model], lab, ms(g.auroc), ms(g.ece_raw), ms(g.ece_iso), ms(g.fpr_inflation, 1),
+                         ms(g.tpr_at_alpha), ms(g["prec_at_pi0.01"])])
+    T["xd"] = table("**Table 3.** In-domain and cross-dataset performance on the three CICFlowMeter datasets. "
+                    "Values are means ± standard deviations over five seeds; cross-dataset values are first "
+                    "averaged over the six directed pairs, so they average pairs that flood and pairs that fall "
+                    "silent (Appendix Table A3 gives each pair). FPR/α is the realised false-positive rate at the "
+                    "source threshold divided by α = 1%; TPR is measured at the same threshold; Prec is the "
+                    "precision implied at 1% attack prevalence.",
+                    ["Model", "Setting", "AUROC", "ECE (raw)", "ECE (isotonic)", "FPR/α", "TPR", "Prec"], rows,
+                    ["l", "l"] + ["r"] * 6)
+    # A2: in-domain, all datasets
+    rows = []
+    for ds in DS:
+        for model in MODELS:
+            x = m[(m.model == model) & (m.setting == "in-domain") & (m.source == ds)]
+            rows.append([ds, MN[model], f"{x.auroc.mean():.3f}", f"{x.ece_raw.mean():.3f}", f"{x.ece_iso.mean():.3f}",
+                         f"{x.fpr_inflation.mean():.2f}", f"{x.tpr_at_alpha.mean():.3f}",
+                         f"{x['prec_at_pi0.01'].mean():.3f}", f"{x['prec_at_pi0.001'].mean():.3f}"])
+    T["A2"] = table("**Table A2.** In-domain results for every dataset and model (mean over five seeds).",
+                    ["Dataset", "Model", "AUROC", "ECE (raw)", "ECE (iso.)", "FPR/α", "TPR", "Prec (1%)",
+                     "Prec (0.1%)"], rows, ["l", "l"] + ["r"] * 7)
+    rows = []
+    x = m[m.setting == "cross-dataset"]
+    for model in MODELS:
+        for (s, t), g in x[x.model == model].groupby(["source", "target"]):
+            rows.append([MN[model], f"{s} → {t}", f"{g.auroc.mean():.3f}", f"{g.auroc.min():.2f} to {g.auroc.max():.2f}",
+                         f"{g.ece_raw.mean():.3f}", f"{g.ece_platt.mean():.3f}", f"{g.ece_iso.mean():.3f}",
+                         f"{g.fpr_inflation.mean():.1f}", f"{g.tpr_at_alpha.mean():.3f}"])
+    T["A3"] = table("**Table A3.** Cross-dataset results for every directed pair and model (mean over five seeds; "
+                    "the AUROC range is over seeds).",
+                    ["Model", "Pair", "AUROC", "AUROC range", "ECE (raw)", "ECE (Platt)", "ECE (iso.)", "FPR/α", "TPR"],
+                    rows, ["l", "l"] + ["r"] * 7)
+    g = pd.read_csv(os.path.join(RES, "xd_group_recall_lgbm.csv"))
+    g = g[g.source != g.target]
+    rows = [[f"{a.source} → {a.target}", a.group, f"{int(a.n):,}", f"{a.rec:.3f}"] for a in g.itertuples()]
+    T["A4"] = table("**Table A4.** Cross-dataset recall per coarse attack group at the source 1%-FPR threshold "
+                    "(LightGBM, mean over five seeds; n is the number of target test flows in the group).",
+                    ["Pair", "Group", "n", "Recall"], rows, ["l", "l", "r", "r"])
+
+
+# ---------------------------------------------------------------- Table 4 / A6 / A7
+def t_os():
+    d = r("os_detection_all.csv")
+    og = r("extra_group.csv")
+    rows = []
+    L = d[d.model == "LGBM"].groupby(["dataset", "held_out"]).mean(numeric_only=True).reset_index()
+    for ds in DS:
+        x = L[L.dataset == ds]
+        rows.append([ds, "LightGBM", len(x), f"{x.recall_seen_at_alpha.median():.3f}",
+                     f"{x.recall_unseen_at_alpha.median():.3f}", int((x.recall_unseen_at_alpha < .5).sum()),
+                     int((x["cm_0.05"] > .5).sum()), f"{x.auroc_det.median():.3f}", f"{x.auroc_nov.median():.3f}"])
+    for model in MODELS:
+        x = d[d.model == model].groupby(["dataset", "held_out"]).mean(numeric_only=True).reset_index()
+        if x.empty:
+            continue
+        rows.append(["All datasets", MN[model], len(x), f"{x.recall_seen_at_alpha.median():.3f}",
+                     f"{x.recall_unseen_at_alpha.median():.3f}", int((x.recall_unseen_at_alpha < .5).sum()),
+                     int((x["cm_0.05"] > .5).sum()), f"{x.auroc_det.median():.3f}", f"{x.auroc_nov.median():.3f}"])
+    if og is not None:
+        G = og.groupby(["dataset", "held_out_group"]).mean(numeric_only=True).reset_index()
+        rows.append(["CICFlowMeter (groups)", "LightGBM", len(G), "", f"{G.recall_unseen.median():.3f}",
+                     int((G.recall_unseen < .5).sum()), int((G.cm_005 > .5).sum()), f"{G.auroc_det.median():.3f}",
+                     f"{G.auroc_nov.median():.3f}"])
+    T["os"] = table("**Table 4.** Held-out attack families (Protocol OS) and groups (Protocol OG). Recall is "
+                    "measured at the source 1%-FPR threshold; medians are over held-out families or groups, each "
+                    "averaged over five seeds. \"<0.5\" counts the families detected less than half of the time; "
+                    "\"Conf.\" counts those with more than half of their flows given an isotonic-calibrated attack "
+                    "probability below 0.05. The AUROC columns compare held-out with benign flows, using the "
+                    "detector score and the benign-referenced novelty score.",
+                    ["Data", "Model", "Units", "Recall (seen)", "Recall (held out)", "<0.5", "Conf.",
+                     "AUROC det.", "AUROC nov."], rows, ["l", "l"] + ["r"] * 7)
+    # A6 per family (LGBM + recall of other models)
+    piv = d.groupby(["dataset", "held_out", "model"]).recall_unseen_at_alpha.mean().unstack()
+    rows = []
+    for a in L.itertuples():
+        pr = piv.loc[(a.dataset, a.held_out)]
+        rows.append([a.dataset, a.held_out, f"{a.stream_pi * 100:.2f}"] +
+                    [f"{pr[mo]:.3f}" if mo in pr and not np.isnan(pr[mo]) else "" for mo in MODELS] +
+                    [f"{a._asdict()['_10']:.3f}" if False else f"{getattr(a, '_14', np.nan):.3f}" if False else
+                     f"{L.loc[(L.dataset == a.dataset) & (L.held_out == a.held_out), 'cm_0.05'].iloc[0]:.3f}",
+                     f"{a.auroc_det:.3f}", f"{a.auroc_nov:.3f}"])
+    T["A6"] = table("**Table A6.** Per-family results of Protocol OS (mean over five seeds). π is the realised "
+                    "attack prevalence of the held-out-family stream in percent; recall is at the source "
+                    "1%-FPR threshold for each model; the last three columns are for LightGBM.",
+                    ["Dataset", "Held-out family", "π (%)"] + [MN[mo] for mo in MODELS] +
+                    ["Conf. miss", "AUROC det.", "AUROC nov."], rows, ["l", "l"] + ["r"] * 8)
+    rows = []
+    for model in MODELS:
+        x = d[d.model == model].groupby(["dataset", "held_out"]).mean(numeric_only=True)
+        if x.empty:
+            continue
+        rows.append([MN[model]] + [str(int((x[f"cm_{c}"] > .5).sum())) for c in [0.01, 0.02, 0.05, 0.1, 0.2, 0.5]])
+    T["A7"] = table("**Table A7.** Number of held-out families (of 47) with more than half of their flows given "
+                    "an isotonic-calibrated attack probability below the cutoff.",
+                    ["Model", "0.01", "0.02", "0.05", "0.1", "0.2", "0.5"], rows)
+
+
+# ---------------------------------------------------------------- Table 5
+def t_prio():
+    o = r("os_priorities.csv")
+    x = r("xd_priorities.csv")
+    N = json.load(open(os.path.join(REV, "revision_numbers.json")))
+    P = pd.DataFrame(N["os_priorities"]).set_index(["priority", "budget"])
+    rules = ["detector", "novelty", "combined", "fisher", "wfisher0.7", "stouffer", "stacked", "borda",
+             "split0.1", "uncertainty", "proxy_switch"]
+    xm = None
+    if x is not None:
+        x = x[x.model == "LGBM"]
+        xm = x.groupby(["regime", "source", "target", "budget", "priority"]).recall.mean() \
+            .groupby(["regime", "budget", "priority"]).mean()
+    rows = []
+    for pr in rules:
+        row = [PRN[pr]]
+        for reg in ["In-domain", "Cross-dataset"]:
+            v = xm.get((reg, 0.01, pr), np.nan) if xm is not None else np.nan
+            row.append("" if np.isnan(v) else f"{v:.3f}")
+        for c in [0.01, 0.02, 0.05]:
+            row.append(f"{P.loc[(pr, c), 'all']:.3f}")
+        row += [f"{P.loc[(pr, 0.01), 'caught']:.3f}", f"{P.loc[(pr, 0.01), 'missed']:.3f}"]
+        rows.append(row)
+    rows.append(["Random queue", "0.010", "0.010", "0.010", "0.020", "0.050", "0.010", "0.010"])
+    T["prio"] = table("**Table 5.** Attack recall inside the review queue (exact top-b fraction of a stream with "
+                      "1% attack prevalence; LightGBM). In-domain and cross-dataset values are for b = 1% and are "
+                      "averaged over dataset pairs; unseen-family values are averaged over the 47 held-out families "
+                      "and split, for b = 1%, into families the detector catches or misses at its threshold "
+                      "(groups defined on other seeds).",
+                      ["Ranking rule", "In-domain", "Cross-dataset", "Unseen b = 1%", "Unseen b = 2%",
+                       "Unseen b = 5%", "Caught", "Missed"], rows)
+
+
+# ---------------------------------------------------------------- Table 6
+def t_budget():
+    N = json.load(open(os.path.join(REV, "revision_numbers.json")))
+    xt = pd.read_csv(os.path.join(RES, "xd_triage.csv"))
+    xt = xt[(xt.model == "LGBM") & (xt.priority == "fisher") & (xt.budget == 0.01)]
+    w = r("os_warmup.csv")
+    w = w[(w.model == "LGBM") & (w.priority == "fisher") & (w.budget == 0.01)]
+    xw = r("xd_warmup.csv")
+    rows = []
+    for lab, reg in [("In-domain", "in-domain"), ("Cross-dataset", "cross-dataset")]:
+        z = xt[xt.setting == reg]
+        row = [lab, q3(z.load_src), f"{z.recall_src.mean():.3f}"]
+        if xw is not None:
+            y = xw[(xw.model == "LGBM") & (xw.priority == "fisher") & (xw.budget == 0.01) & (xw.warmup == 0.2) &
+                   (xw.regime == lab)]
+            row += [q3(y.load), f"{y.recall.mean():.3f}"]
+        else:
+            row += ["", ""]
+        rows.append(row)
+    if "rule" in w:
+        s, y = w[w.rule == "source"], w[(w.rule == "warmup") & (w.warmup == 0.2)]
+        rows.append(["Unseen family", q3(s.load), f"{s.recall.mean():.3f}", q3(y.load), f"{y.recall.mean():.3f}"])
+    T["budget"] = table("**Table 6.** Queue load (realised queue size divided by the planned size; median "
+                        "[10th, 90th percentile] over runs) and attack recall inside the queue for the Fisher "
+                        "priority at a 1% budget on streams with 1% prevalence (LightGBM). The warm-up quantile "
+                        "uses the first 20% of each stream. Behaviour on non-stationary streams is in Table 7 and "
+                        "Appendix Table A9.",
+                        ["Regime", "Source: load", "Source: recall", "Warm-up: load", "Warm-up: recall"], rows,
+                        ["l", "r", "r", "r", "r"])
+    # A9: non-stationary streams, OS and XD
+    rows = []
+    for src, tag in [("os_nonstationary.csv", "Unseen family"), ("xd_nonstationary.csv", None)]:
+        s = r(src)
+        if s is None:
+            continue
+        s = s[(s.model == "LGBM") & (s.budget == 0.01)]
+        if tag:
+            s = s.assign(regime=tag)
+        for (reg, sc, rule), g in s.groupby(["regime", "scenario", "rule"]):
+            rows.append([reg, {"burst_in_warmup": "Burst in warm-up", "late_campaign": "Late campaign"}[sc],
+                         rule.capitalize() if rule != "warmup" else "Warm-up", q3(g.load), f"{g.recall.mean():.3f}"])
+    T["A9"] = table("**Table A9.** Budget rules on non-stationary streams (Fisher priority, 1% budget, LightGBM). "
+                    "\"Burst in warm-up\": 5% of the warm-up window is attacks and 1% of the rest; \"Late "
+                    "campaign\": no attacks in the window and 1% after it. Load is median [10th, 90th percentile].",
+                    ["Regime", "Scenario", "Rule", "Load", "Recall"], rows, ["l", "l", "l", "r", "r"])
+    p = r("os_prevalence.csv")
+    p = p[p.model == "LGBM"]
+    rows = []
+    for (pi, c, pr), g in p.groupby(["target_pi", "budget", "priority"]):
+        rows.append([f"{100 * pi:g}%", f"{100 * g.real_pi.mean():.2f}%", f"{100 * c:g}%", PRN[pr], q3(g.load),
+                     f"{g.recall.mean():.3f}", f"{g.precision.mean():.3f}"])
+    T["A10"] = table("**Table A10.** Warm-up quantile under different attack prevalences (held-out-family streams, "
+                     "LightGBM). Realised prevalence can fall below the target for families with few test flows.",
+                     ["Target π", "Realised π", "Budget", "Priority", "Load", "Recall", "Precision"], rows,
+                     ["r", "r", "r", "l", "r", "r", "r"])
+
+
+# ---------------------------------------------------------------- Table 7
+def t_temporal():
+    t = r("extra_temporal.csv")
+    s = r("extra_temporal_stream.csv")
+    if t is None:
+        return
+    rows = []
+    names = {"T1-benign-time": "T1, benign split by time", "T1-random": "T1, random split",
+             "T2-day": "T2, split by capture day", "T2-random": "T2, random split"}
+    for pr in ["T1-benign-time", "T1-random", "T2-day", "T2-random"]:
+        g = t[t.protocol == pr]
+        row = [names[pr], f"{g.auroc.mean():.3f}", f"{g.ece_iso.mean():.3f}", f"{g.fpr_inflation.mean():.1f}",
+               f"{g.tpr.mean():.3f}"]
+        for rule in ["source", "warmup", "rolling", "online"]:
+            z = s[(s.protocol == pr) & (s.rule == rule) & (s.priority == "fisher") & (s.budget == 0.01)]
+            row.append(f"{z.load.mean():.2f} ({z.load_min10.mean():.2f} to {z.load_max10.mean():.2f})")
+        rows.append(row)
+    T["temporal"] = table("**Table 7.** Chronological protocols on CSE-CIC-IDS2018 (LightGBM, mean over five "
+                          "seeds). Detection metrics are at the source 1%-FPR threshold. The last four columns give "
+                          "the queue load of the Fisher priority at a 1% budget on the chronological test stream "
+                          "with 1% attack prevalence, overall and (in parentheses) the lowest and highest load in "
+                          "the ten consecutive tenths of the stream.",
+                          ["Protocol", "AUROC", "ECE (iso.)", "FPR/α", "TPR", "Source", "Warm-up", "Rolling",
+                           "Online"], rows, ["l"] + ["r"] * 8)
+
+
+# ---------------------------------------------------------------- Table 8 + appendix extras
+def t_cost():
+    c = r("extra_cost.csv")
+    if c is None:
+        return
+    rows = []
+    def us(comp, m=None, n=None, th=1):
+        z = c[(c.threads == th) & (c.component == comp)]
+        if m is not None:
+            z = z[z.model == m]
+        if n is not None:
+            z = z[z.n_ref == n]
+        return z
+    for m in MODELS:
+        a, b = us("detector", m, th=1), us("detector", m, th=4)
+        if len(a) and len(b):
+            rows.append([f"{MN[m]} inference", "", f"{a.us_per_flow.iloc[0]:.2f}", f"{b.us_per_flow.iloc[0]:.2f}", ""])
+    for algo in ["brute", "kd_tree", "ball_tree", "hnsw"]:
+        for n in ([1000, 20000, 100000] if algo in ("kd_tree", "ball_tree") else [1000, 5000, 20000, 50000, 100000]):
+            a, b = us("knn", algo, n, 1), us("knn", algo, n, 4)
+            if len(a) and len(b):
+                rc = b.recall_at5.iloc[0] if "recall_at5" in b and not np.isnan(b.recall_at5.iloc[0]) else np.nan
+                rows.append([{"brute": "kNN, brute force", "kd_tree": "kNN, k-d tree", "ball_tree": "kNN, ball tree",
+                              "hnsw": "kNN, HNSW (approximate)"}[algo], f"{n:,}",
+                             f"{a.us_per_flow.iloc[0]:.2f}", f"{b.us_per_flow.iloc[0]:.2f}",
+                             "" if np.isnan(rc) else f"{rc:.3f}"])
+    a, b = us("conformal+fisher", th=1), us("conformal+fisher", th=4)
+    if len(a) and len(b):
+        rows.append(["Conformal p-values and Fisher", "", f"{a.us_per_flow.iloc[0]:.3f}", f"{b.us_per_flow.iloc[0]:.3f}", ""])
+    T["cost"] = table("**Table 8.** Per-flow cost of each component of the triage layer on 50,000 CSE-CIC-IDS2018 "
+                      "test flows (median of three repetitions for detectors). The last column is the share of "
+                      "true five nearest neighbours returned by the approximate index.",
+                      ["Component", "Reference size", "µs per flow, 1 thread", "µs per flow, 4 threads",
+                       "Neighbour recall"], rows, ["l", "r", "r", "r", "r"])
+
+
+def t_extras():
+    f = r("extra_features.csv")
+    if f is not None:
+        if "kind" not in f:
+            f["kind"] = np.nan
+        x = f[f.kind.isna() & (f.source != f.target)]
+        rows = []
+        for (s, t), g in x.groupby(["source", "target"]):
+            a, b = g[g.features == "all"], g[g.features == "robust"]
+            rows.append([f"{s} → {t}", f"{a.auroc.mean():.3f}", f"{b.auroc.mean():.3f}", f"{a.fpr_inflation.mean():.1f}",
+                         f"{b.fpr_inflation.mean():.1f}", f"{a.tpr.mean():.3f}", f"{b.tpr.mean():.3f}"])
+        dom = f[f.kind == "benign_domain_auc"]
+        for (s, t), g in dom.groupby(["source", "target"]):
+            rows.append([f"Benign {s} vs {t}", f"{g[g.features == 'all'].auroc.mean():.3f}",
+                         f"{g[g.features == 'robust'].auroc.mean():.3f}", "", "", "", ""])
+        T["A11"] = table("**Table A11.** Cross-dataset LightGBM with all 77 features and with the 24 tool-stable "
+                         "features (mean over five seeds). The last rows give the AUROC of a classifier trained to "
+                         "separate the benign flows of two datasets.",
+                         ["Pair", "AUROC (all)", "AUROC (stable)", "FPR/α (all)", "FPR/α (stable)", "TPR (all)",
+                          "TPR (stable)"], rows)
+    s = r("extra_subsample.csv")
+    if s is not None:
+        rows = []
+        for (d, p, fr), g in s.groupby(["dataset", "protocol", "benign_frac"]):
+            rows.append([d, {"in-domain": "In-domain", "cross-dataset": "Cross-dataset", "unseen": "Unseen family"}[p],
+                         f"{fr:g}", f"{g.auroc.mean():.3f}" if g.auroc.notna().any() else "",
+                         f"{g.fpr_inflation.mean():.2f}" if g.fpr_inflation.notna().any() else "",
+                         f"{g.recall_unseen.mean():.3f}" if "recall_unseen" in g and g.recall_unseen.notna().any() else "",
+                         f"{g.rec_detector.mean():.3f}", f"{g.rec_fisher.mean():.3f}", f"{g.load_warmup.median():.2f}"])
+        T["A12"] = table("**Table A12.** Effect of thinning the benign training flows of the subsampled copies "
+                         "(LightGBM, five seeds). Queue recall and the warm-up load are for a 1% budget.",
+                         ["Dataset", "Protocol", "Benign share", "AUROC", "FPR/α", "Recall (held out)",
+                          "Queue recall, detector", "Queue recall, Fisher", "Warm-up load"], rows,
+                         ["l", "l"] + ["r"] * 7)
+    rf = r("extra_reference.csv")
+    if rf is not None:
+        fam = rf.groupby(["dataset", "held_out", "n_ref", "contamination"]).mean(numeric_only=True).reset_index()
+        rows = []
+        for (n, c), g in fam.groupby(["n_ref", "contamination"]):
+            rows.append([f"{int(n):,}", f"{100 * c:g}%", len(g), f"{g.auroc_nov.mean():.3f}", f"{g.rec_detector.mean():.3f}",
+                         f"{g.rec_fisher.mean():.3f}", f"{g.load_warmup.median():.2f}", f"{g.knn_us.median():.1f}"])
+        T["A13"] = table("**Table A13.** Size and contamination of the benign novelty reference (Protocol OS, "
+                         "LightGBM, seeds 0 to 2). Contamination replaces the stated share of the reference with "
+                         "flows of the held-out family from the training period; families with too few such flows "
+                         "are omitted at that level. Where a dataset has fewer benign training flows than the stated size, all of "
+                         "them form the reference, and the row gives that size.",
+                         ["Reference size", "Contamination", "Families", "AUROC nov.", "Queue recall, detector",
+                          "Queue recall, Fisher", "Warm-up load", "kNN µs per flow"], rows, ["r"] * 8)
+    v = r("xd_validity.csv")
+    if v is not None:
+        o = r("os_validity.csv").assign(regime="Unseen family")
+        rows = []
+        for (reg, m), g in pd.concat([v, o]).groupby(["regime", "model"]):
+            rows.append([reg, MN[m], f"{g.fpr_pdet.mean():.4f}", f"{g.fpr_pB.mean():.4f}", f"{g.fpr_pB.max():.4f}"])
+        T["A8"] = table("**Table A8.** Share of benign flows flagged by the conformal rules at α = 1% "
+                        "($p_{\\det} \\le 0.01$ and $p_B \\le 0.01$). The conformal guarantee bounds the expected "
+                        "share by 0.01 under Assumption S.",
+                        ["Regime", "Model", "p_det, mean", "p_B, mean", "p_B, max"], rows, ["l", "l", "r", "r", "r"])
+    g = r("extra_group.csv")
+    if g is not None:
+        G = g.groupby(["dataset", "held_out_group"]).mean(numeric_only=True).reset_index()
+        rows = [[a.dataset, a.held_out_group, f"{int(a.n_unseen):,}", f"{a.recall_unseen:.3f}", f"{a.cm_005:.3f}",
+                 f"{a.auroc_det:.3f}", f"{a.auroc_nov:.3f}", f"{a.rec_detector:.3f}", f"{a.rec_fisher:.3f}"]
+                for a in G.itertuples()]
+        T["A14"] = table("**Table A14.** Held-out coarse groups (Protocol OG, LightGBM, mean over five seeds).",
+                         ["Dataset", "Held-out group", "Test flows", "Recall", "Conf. miss", "AUROC det.",
+                          "AUROC nov.", "Queue recall, detector", "Queue recall, Fisher"], rows, ["l", "l"] + ["r"] * 7)
+
+
+def t_zero():
+    z = json.load(open(os.path.join(REV, "zero_features.json")))
+    feats = sorted(set(sum(z.values(), [])))
+    rows = [[f] + ["✓" if f in z[d] else "" for d in CIC] for f in feats]
+    T["A5"] = table("**Table A5.** Features that are identically zero in the benign flows of each CICFlowMeter "
+                    "dataset (✓).", ["Feature"] + CIC, rows, ["l", "l", "l", "l"])
+
+
+def t_adapt():
+    a = r("xd_adapt.csv")
+    if a is None:
+        return
+    cv = r("xd_adapt_curve.csv")
+    pp = a.groupby(["source", "target", "budget", "variant"]).mean(numeric_only=True).reset_index()
+    g = pp.groupby(["budget", "variant"]).mean(numeric_only=True)
+    names = [("base_fisher", "Source pipeline, Fisher priority"),
+             ("base_detector", "Source pipeline, detector priority"),
+             ("TN_wfisher", "TN: per-network quantile features"),
+             ("TR_wfisher", "TR: target novelty reference and calibration"),
+             ("TNTR_wfisher", "TN and TR combined"),
+             ("FB", "FB: analyst feedback"),
+             ("FB_noexplore", "FB without random exploration")]
+    rows = []
+    for v, nm in names:
+        row = [nm, "none" if not v.startswith("FB") else "reviewed flows"]
+        for c in [0.01, 0.02, 0.05]:
+            if (c, v) in g.index:
+                z = g.loc[(c, v)]
+                row.append(f"{z.recall:.3f} / {z.precision:.3f}")
+            else:
+                row.append("")
+        rows.append(row)
+    c4 = cv[cv.segment == 4].groupby(["source", "target", "budget", "variant"]).mean(numeric_only=True)
+    c4 = c4.reset_index().groupby(["budget", "variant"]).mean(numeric_only=True)
+    row = ["FB, last fifth of the stream", "reviewed flows"]
+    for c in [0.01, 0.02, 0.05]:
+        z = c4.loc[(c, "FB")]
+        row.append(f"{z.recall:.3f} / {z.precision:.3f}")
+    rows.append(row)
+    T["adapt"] = table("**Table 9.** Adapting the triage pipeline to a new network (six cross-dataset pairs, "
+                       "LightGBM, mean over pairs of five seeds). Each cell gives queue recall / queue precision on "
+                       "the 80% of the target stream after the warm-up window, at 1% attack prevalence.",
+                       ["Variant", "Target labels", "1% budget", "2% budget", "5% budget"], rows,
+                       ["l", "l", "r", "r", "r"])
+    rows = []
+    for (src, tgt), z in pp[pp.budget == 0.01].groupby(["source", "target"]):
+        z = z.set_index("variant")
+        rows.append([src, tgt] + [f"{z.loc[v, 'recall']:.3f}" for v, _ in names] +
+                    [f"{z.loc['FB', 'labels']:.0f}", f"{z.loc['FB', 'n_attack_labels']:.0f}"])
+    T["A15"] = table("**Table A15.** Queue recall at a 1% budget for each directed pair (LightGBM, mean over five "
+                     "seeds) and number of reviewed flows (and attacks among them) that the feedback loop collected.",
+                     ["Source", "Target", "Fisher", "Detector", "TN", "TR", "TN+TR", "FB", "FB, no expl.",
+                      "Labels", "Attack labels"], rows, ["l", "l"] + ["r"] * 9)
+
+
+if __name__ == "__main__":
+    for f in (t_data, t_xd, t_os, t_prio, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt):
+        try:
+            f()
+            print("ok", f.__name__)
+        except Exception as e:
+            print("fail", f.__name__, repr(e))
+    json.dump(T, open(os.path.join(REV, "manuscript_tables.json"), "w"), indent=1, ensure_ascii=False)

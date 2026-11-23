@@ -1,0 +1,20 @@
+| scenario | budget | rule | load_median | load_q10 | load_q90 | recall |
+|---|---|---|---|---|---|---|
+| burst_in_warmup | 0.010 | online | 0.967 | 0.885 | 1.000 | 0.500 |
+| burst_in_warmup | 0.010 | rolling | 0.883 | 0.816 | 0.997 | 0.462 |
+| burst_in_warmup | 0.010 | warmup | 0.300 | 0.140 | 0.883 | 0.161 |
+| burst_in_warmup | 0.020 | online | 0.981 | 0.892 | 0.999 | 0.656 |
+| burst_in_warmup | 0.020 | rolling | 0.883 | 0.828 | 0.994 | 0.617 |
+| burst_in_warmup | 0.020 | warmup | 0.270 | 0.186 | 0.920 | 0.307 |
+| burst_in_warmup | 0.050 | online | 0.996 | 0.955 | 1.000 | 0.801 |
+| burst_in_warmup | 0.050 | rolling | 0.910 | 0.881 | 0.988 | 0.795 |
+| burst_in_warmup | 0.050 | warmup | 0.369 | 0.226 | 0.940 | 0.687 |
+| late_campaign | 0.010 | online | 1.023 | 0.998 | 1.114 | 0.543 |
+| late_campaign | 0.010 | rolling | 1.098 | 1.004 | 1.184 | 0.552 |
+| late_campaign | 0.010 | warmup | 1.656 | 0.980 | 1.989 | 0.620 |
+| late_campaign | 0.020 | online | 1.005 | 0.999 | 1.051 | 0.667 |
+| late_campaign | 0.020 | rolling | 1.054 | 1.006 | 1.098 | 0.675 |
+| late_campaign | 0.020 | warmup | 1.380 | 1.035 | 1.542 | 0.706 |
+| late_campaign | 0.050 | online | 1.001 | 0.999 | 1.007 | 0.793 |
+| late_campaign | 0.050 | rolling | 1.022 | 1.004 | 1.043 | 0.800 |
+| late_campaign | 0.050 | warmup | 1.155 | 1.033 | 1.243 | 0.808 |

@@ -34,15 +34,16 @@ class LogScaler:
 
 # ------------------------------------------------------------------- models
 MODEL_NAMES = ["LGBM", "RF", "MLP", "LR"]
+NJOBS = int(__import__("os").environ.get("NJOBS", "4"))  # threads per model
 
 
 def make_model(name, seed):
     if name == "LGBM":
         return lgb.LGBMClassifier(n_estimators=300, num_leaves=63, learning_rate=0.05,
                                   subsample=0.8, subsample_freq=1, colsample_bytree=0.8,
-                                  random_state=seed, n_jobs=4, verbose=-1)
+                                  random_state=seed, n_jobs=NJOBS, verbose=-1)
     if name == "RF":
-        return RandomForestClassifier(n_estimators=150, min_samples_leaf=2, n_jobs=4,
+        return RandomForestClassifier(n_estimators=150, min_samples_leaf=2, n_jobs=NJOBS,
                                       random_state=seed)
     if name == "MLP":
         return MLPClassifier(hidden_layer_sizes=(128, 64), early_stopping=True,
