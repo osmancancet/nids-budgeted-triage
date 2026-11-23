@@ -644,12 +644,22 @@ def t_stream():
         x = pd.read_csv(f)
         ok = x.groupby(["seed", "protocol"]).scheme.nunique()
         x = x.set_index(["seed", "protocol"]).loc[ok[ok == 4].index].reset_index()
+        fx = os.path.join(REV, "extra_shards_fix.csv")
+        if os.path.exists(fx):
+            x = pd.concat([x, pd.read_csv(fx).query("scheme != 'global'")])
         names = {"global": "One threshold", "protocol": "One shard per protocol",
-                 "skew4": "Four shards, attacks on one", "sync4": "Four shards, shared batched threshold"}
+                 "skew4": "Four shards, attacks on one", "sync4": "Four shards, shared batched threshold",
+                 "protocol_sync256": "Per protocol, shared threshold every 256 flows",
+                 "protocol_share": "Per protocol, budgets from warm-up share",
+                 "skew4_sync256": "Attacks on one, shared threshold every 256 flows",
+                 "skew4_share": "Attacks on one, budgets from warm-up share"}
         rows = []
         for pr in ["T1-benign-time", "T2-day"]:
-            for sc in ["global", "protocol", "skew4", "sync4"]:
+            for sc in ["global", "protocol", "skew4", "sync4", "protocol_sync256", "skew4_sync256",
+                       "protocol_share", "skew4_share"]:
                 v = x[(x.protocol == pr) & (x.scheme == sc)]
+                if v.empty:
+                    continue
                 rows.append([pr.split("-")[0] if sc == "global" else "", names[sc], str(v.seed.nunique()),
                              str(int(v.n_shards.iloc[0])), f"{v.load.mean():.2f}",
                              f"{v.load_shard_min.min():.2f} to {v.load_shard_max.max():.2f}",
@@ -657,8 +667,11 @@ def t_stream():
                              f"{100 * (v.precision * v.load * 0.01 / v.recall).mean():.2f}%"])
         T["A21"] = table("**Table A21.** Online budget on heterogeneous shards of the chronological streams "
                          "(CSE-CIC-IDS2018, LightGBM, weighted Fisher priority, 1% budget). Each shard has its own "
-                         "warm-up threshold and online update unless the threshold is shared; the shared threshold is "
-                         "updated after every 4,096 flows of the merged stream. Load is the queue size divided by "
+                         "warm-up threshold and online update unless the threshold is shared; the shared batched threshold is "
+                         "updated after every 4,096 flows of the merged stream, the other shared threshold after every "
+                         "256 flows with the same per-flow step. With budgets from the warm-up share, one warm-up "
+                         "threshold is taken over the merged stream, each shard's budget is the share of its own "
+                         "warm-up flows above it, and each shard then runs its own update with that budget. Load is the queue size divided by "
                          "the budget; shard loads give the lowest and highest shard over all seeds. Recall, precision and load are "
                          "measured after the warm-up windows; because attacks cluster in time, the attack share of "
                          "that part of the stream (last column, precision × load × budget / recall, mean over seeds) "

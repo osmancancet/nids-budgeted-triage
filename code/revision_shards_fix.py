@@ -1,0 +1,168 @@
+"""Online budget update on heterogeneous shards of the chronological streams (CSE-CIC-IDS2018,
+Protocols T1 and T2, LightGBM, weighted Fisher priority w = 0.7, 1% budget, five seeds).
+
+The time-ordered test stream is split into shards that differ in size and content, and each shard runs
+its own warm-up threshold (first 20% of its flows) and its own online quantile update (g = 0.02):
+
+  global     one threshold over the whole stream (reference)
+  protocol   one shard per transport protocol, so shards differ in size and in attack mix
+  skew4      four shards with all attack flows on shard 0 and benign flows dealt round-robin
+  sync4      the skew4 shards with one shared threshold, updated after every 4,096 flows of the
+             merged stream from the excess of all shards together
+
+This script tests two remedies on the skew4 and protocol shards (same streams and seeds):
+
+  sync256    one shared threshold, updated after every 256 merged flows (with the per-flow step x 256)
+  sync1      one shared threshold updated after every merged flow (each shard reads the latest value)
+  share      label-free budget allocation: the first 20% of the merged stream gives one warm-up threshold;
+             each shard's budget is the share of its own warm-up flows above it (summing to about the
+             overall budget), and each shard then runs its own warm-up threshold and online update
+             with that budget
+
+  python revision_shards_fix.py   -> results/revision/extra_shards_fix.csv
+"""
+import os
+import numpy as np
+import pandas as pd
+
+import run_experiments as R
+from revision_analysis import priorities, online_quantile
+from revision_extra import fit_eval, OUT, SEEDS
+from prepare import CIC_FEATURES
+
+C, G, B = 0.01, 0.02, 4096
+
+
+def warm(s):
+    w = int(0.2 * len(s))
+    return w, np.quantile(s[:w], 1 - C), G * (np.quantile(s[:w], .999) - np.quantile(s[:w], .5))
+
+
+def run_shards(s, shard):
+    """Independent per-shard updates; returns flags and the post-warm-up mask in stream order."""
+    f, post = np.zeros(len(s), bool), np.zeros(len(s), bool)
+    for k in np.unique(shard):
+        ix = np.flatnonzero(shard == k)
+        w, t, g = warm(s[ix])
+        f[ix] = online_quantile(s[ix], C, t, g)
+        post[ix[w:]] = True
+    return f, post
+
+
+def run_shards_c(s, shard, cs):
+    """Independent per-shard updates with per-shard budgets cs[k]."""
+    f, post = np.zeros(len(s), bool), np.zeros(len(s), bool)
+    for k in np.unique(shard):
+        ix = np.flatnonzero(shard == k)
+        c = cs[k]
+        w = int(0.2 * len(ix))
+        sk = s[ix]
+        t = np.quantile(sk[:w], 1 - c)
+        g = G * (np.quantile(sk[:w], .999) - np.quantile(sk[:w], .5))
+        f[ix] = online_quantile(sk, c, t, g)
+        post[ix[w:]] = True
+    return f, post
+
+
+def share_budgets(s, shard):
+    w = int(0.2 * len(s))
+    t0 = np.quantile(s[:w], 1 - C)
+    cs = {}
+    for k in np.unique(shard):
+        ix = np.flatnonzero(shard == k)
+        wk = ix[:int(0.2 * len(ix))]
+        cs[k] = float(np.clip((s[wk] >= t0).mean(), 1e-4, 0.5))
+    return cs
+
+
+def run_sync(s, shard, B=B):
+    """Shared threshold: every shard compares with t; t moves once per block of B merged flows."""
+    w, t, g = warm(s)
+    f = np.zeros(len(s), bool)
+    f[:w] = s[:w] >= t
+    for i in range(w, len(s), B):
+        f[i:i + B] = s[i:i + B] >= t
+        t += g * (f[i:i + B].sum() - C * len(f[i:i + B]))
+    post = np.zeros(len(s), bool)
+    post[w:] = True
+    return f, post
+
+
+def main():
+
+    df = pd.read_parquet(os.path.join(R.PROC, "CSE-CIC-IDS2018-temporal.parquet"))
+    feats = CIC_FEATURES + ["Protocol"]
+    days = sorted(df.day.unique())
+    rows = []
+    for seed in SEEDS[:4]:
+        rng = np.random.default_rng(seed)
+        parts = []
+        for fam_, g in df.groupby("family"):
+            if fam_ != "Benign" and len(g) > 30000:
+                g = g.iloc[np.sort(rng.choice(len(g), 30000, replace=False))]
+            parts.append(g)
+        d = pd.concat(parts).sort_values("ts", kind="stable").reset_index(drop=True)
+        if (d.label == 0).sum() > 200000:
+            bi = np.flatnonzero(d.label.to_numpy() == 0)
+            d = d.drop(index=rng.choice(bi, len(bi) - 200000, replace=False)).reset_index(drop=True)
+        X, y, ts = d[feats].to_numpy(np.float32), d.label.to_numpy(), d.ts.to_numpy()
+        for proto in ["T1-benign-time", "T2-day"]:
+            part = np.empty(len(d), np.int8)
+            if proto.startswith("T1"):
+                ben = np.flatnonzero(y == 0)
+                a, b = int(0.5 * len(ben)), int(0.7 * len(ben))
+                part[ben[:a]], part[ben[a:b]], part[ben[b:]] = 0, 1, 2
+                for _, idx in d[d.label == 1].groupby("family").indices.items():
+                    idx = rng.permutation(d.index[d.label == 1].to_numpy()[idx])
+                    a, b = int(round(.5 * len(idx))), int(round(.7 * len(idx)))
+                    part[idx[:a]], part[idx[a:b]], part[idx[b:]] = 0, 1, 2
+            else:
+                early = np.isin(d.day.to_numpy(), days[:5])
+                tr_pool = rng.permutation(np.flatnonzero(early))
+                k = int(0.7 * len(tr_pool))
+                part[tr_pool[:k]], part[tr_pool[k:]] = 0, 1
+                part[~early] = 2
+            F, ctx = fit_eval("LGBM", seed, X[part == 0], y[part == 0], X[part == 1], y[part == 1])
+            te = np.flatnonzero(part == 2)
+            te = te[np.argsort(ts[te], kind="stable")]
+            det, nov = F.scores(X[te])
+            yt = y[te]
+            ben, att = np.flatnonzero(yt == 0), np.flatnonzero(yt == 1)
+            n_att = min(len(att), int(round(0.01 / 0.99 * len(ben))))
+            sel = np.sort(np.r_[ben, rng.choice(att, n_att, replace=False)])
+            ys = yt[sel]
+            s = priorities(ctx, det[sel], nov[sel], extra=True)[0]["wfisher0.7"]
+            proto_te = X[te][sel][:, feats.index("Protocol")]
+            schemes = {"global": np.zeros(len(s), int), "protocol": proto_te.astype(int)}
+            sk = np.zeros(len(s), int)
+            bi = np.flatnonzero(ys == 0)
+            sk[bi] = np.arange(len(bi)) % 4
+            schemes["skew4"] = sk
+            runs = [("global", schemes["global"])]
+            for base in ["protocol", "skew4"]:
+                runs += [(base + "_sync256", schemes[base]), (base + "_sync1", schemes[base]),
+                         (base + "_share", schemes[base])]
+            for name, shard in runs:
+                if name == "global":
+                    w, t, g = warm(s)
+                    fl = online_quantile(s, C, t, g)
+                    post = np.zeros(len(s), bool); post[w:] = True
+                elif name.endswith("_sync256"):
+                    fl, post = run_sync(s, shard, 256)
+                elif name.endswith("_sync1"):
+                    fl, post = run_sync(s, shard, 1)
+                else:
+                    fl, post = run_shards_c(s, shard, share_budgets(s, shard))
+                loads = [fl[post & (shard == k)].mean() / C for k in np.unique(shard)]
+                shares = [(shard[post] == k).mean() for k in np.unique(shard)]
+                rows.append(dict(seed=seed, protocol=proto, scheme=name, n_shards=len(loads),
+                                 load=fl[post].mean() / C, load_shard_min=min(loads), load_shard_max=max(loads),
+                                 size_share_min=min(shares), size_share_max=max(shares),
+                                 recall=fl[post & (ys == 1)].mean(),
+                                 precision=(fl[post] & (ys[post] == 1)).sum() / max(fl[post].sum(), 1)))
+                print(rows[-1], flush=True)
+            pd.DataFrame(rows).to_csv(os.path.join(OUT, "extra_shards_fix.csv"), index=False)
+
+
+if __name__ == "__main__":
+    main()

@@ -923,6 +923,70 @@ def round7_macros():
     for w in ("0.8", "0.9"):
         M[f"holm_wf{w[2]}"] = f"{hol['wfisher' + w]:.3f}"
         M[f"d_wf{w[2]}"] = f"{(fr['wfisher' + w] - fr['detector']).mean():+.3f}"
+    # caught/missed comparison without the family whose group differs between the two seed halves
+    from revision_summary import paired as _paired
+    po = pd.read_csv(os.path.join(RES, "os_priorities.csv"))
+    dt = pd.read_csv(os.path.join(RES, "os_detection_all.csv"))
+    po, dt = po[(po.model == "LGBM") & (po.budget == 0.01)], dt[dt.model == "LGBM"]
+    ga = dt[dt.seed <= 2].groupby(["dataset", "held_out"]).recall_unseen_at_alpha.mean() < .5
+    gb = dt[dt.seed >= 3].groupby(["dataset", "held_out"]).recall_unseen_at_alpha.mean() < .5
+    dis = ga[ga != gb].index.tolist()
+    M["cm_dis_fam"] = "; ".join(f"{h} ({d_})" for d_, h in dis)
+    po = po.set_index(["dataset", "held_out"])
+    po["wk"] = np.where(po.seed >= 3, ga.reindex(po.index).values, gb.reindex(po.index).values)
+    po = po[~po.index.isin(dis)].reset_index()
+    for wk, lab in [(False, "caught"), (True, "missed")]:
+        xx = po[po.wk == wk]
+        a = xx[xx.priority == "wfisher0.7"].groupby(["dataset", "held_out"]).recall.mean()
+        b = xx[xx.priority == "detector"].groupby(["dataset", "held_out"]).recall.mean()
+        q = _paired(a, b)
+        M[f"cmx_{lab}"] = f"{q['mean']:+.3f} (95% CI {q['lo']:+.3f} to {q['hi']:+.3f}; {pv(q['p'])}, {q['n']} families)"
+    # observed load against the exact expectation of the same flows under random order
+    fo = os.path.join(RES, "offset_order.csv")
+    if os.path.exists(fo):
+        od = pd.read_csv(fo)
+        rg = np.random.default_rng(7)
+        out = {}
+        for prn in ["detector", "fisher"]:
+            dl, lo_, hi_ = [], [], []
+            for m_, x_ in od.groupby("model"):
+                st = (x_[f"load_{prn}"] - x_[f"load_{prn}_expected"]).groupby([x_.dataset, x_.seed]).mean().to_numpy()
+                bs = [rg.choice(st, len(st)).mean() for _ in range(4000)]
+                dl.append(st.mean()); lo_.append(np.quantile(bs, .025)); hi_.append(np.quantile(bs, .975))
+            out[prn] = (dl, lo_, hi_)
+            M[f"od_{prn}_diff_rng"] = f"{min(dl):+.3f} to {max(dl):+.3f}"
+            M[f"od_{prn}_ci_rng"] = f"{min(lo_):+.3f} to {max(hi_):+.3f}"
+            M[f"od_{prn}_obs_rng"] = f"{od.groupby('model')[f'load_{prn}'].mean().min():.2f} to {od.groupby('model')[f'load_{prn}'].mean().max():.2f}"
+            M[f"od_{prn}_exp_rng"] = f"{od.groupby('model')[f'load_{prn}_expected'].mean().min():.2f} to {od.groupby('model')[f'load_{prn}_expected'].mean().max():.2f}"
+        M["od_nperm"] = "100"
+        M["od_all_include0"] = "yes" if all(l <= 0 <= h for prn in out for l, h in zip(out[prn][1], out[prn][2])) else "no"
+    # remedies for heterogeneous shards
+    fx = os.path.join(RES, "extra_shards_fix.csv")
+    if os.path.exists(fx):
+        fx_ = pd.read_csv(fx)
+        g_ = fx_.groupby(["protocol", "scheme"]).mean(numeric_only=True)
+        g_["load_shard_min"] = fx_.groupby(["protocol", "scheme"]).load_shard_min.min()
+        g_["load_shard_max"] = fx_.groupby(["protocol", "scheme"]).load_shard_max.max()
+        for pk, pr_ in [("t1", "T1-benign-time"), ("t2", "T2-day")]:
+            for sc in ["skew4_sync256", "skew4_sync1", "skew4_share", "protocol_sync256", "protocol_share"]:
+                v = g_.loc[(pr_, sc)]
+                k_ = f"shfix_{pk}_{sc}"
+                M[k_ + "_rec"] = f"{v.recall:.3f}"
+                M[k_ + "_load"] = f"{v.load:.2f}"
+                M[k_ + "_shrng"] = f"{v.load_shard_min:.2f} to {v.load_shard_max:.2f}"
+        M["shfix_nseeds"] = words(pd.read_csv(fx).seed.nunique())
+    # shuffled-order control of the chronological protocols
+    fs_ = os.path.join(RES, "extra_temporal_shuffled.csv")
+    if os.path.exists(fs_):
+        t_ = pd.read_csv(fs_)
+        t_ = t_[t_.budget == 0.01].groupby(["protocol", "priority", "rule"]).mean(numeric_only=True)
+        for pk, pr_ in [("t1", "T1-benign-time"), ("t2", "T2-day")]:
+            for qk, q_ in [("fi", "fisher"), ("de", "detector")]:
+                for rk, rl_ in [("wu", "warmup"), ("on", "online")]:
+                    v = t_.loc[(pr_, q_, rl_)]
+                    M[f"tsh_{pk}_{qk}_{rk}_load"] = f"{v.load:.2f}"
+                    M[f"tsh_{pk}_{qk}_{rk}_rng"] = f"{v.load_min10:.2f} to {v.load_max10:.2f}"
+                    M[f"tsh_{pk}_{qk}_{rk}_rec"] = f"{v.recall:.3f}"
     bc = N.get("os_breakeven_ci", {}).get("fisher_b0.01")
     if bc:
         M["be_ci_lo"], M["be_ci_hi"] = f(bc["lo"], 2), f(bc["hi"], 2)
