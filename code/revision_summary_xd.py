@@ -27,7 +27,8 @@ def xd_reconcile(N):
     out["all"] = {c: _rng(pp[c]) for c in ["auroc", "ece_raw", "ece_platt", "ece_iso", "fpr_inflation",
                                            "tpr_at_alpha", "prec_at_pi0.01"]}
     # model means over pairs (Table 3 form)
-    mm = pp.groupby("model")[["auroc", "ece_raw", "ece_iso", "fpr_inflation", "prec_at_pi0.01"]].mean()
+    cols_ = ["auroc", "ece_raw", "ece_iso", "fpr_inflation", "prec_at_pi0.01"]
+    mm = x.groupby(["model", "seed"])[cols_].mean().groupby("model").mean()   # same aggregation as Table 3
     out["model_mean_over_pairs"] = {c: _rng(mm[c]) for c in mm.columns}
     # per-run range of AUROC
     out["auroc_run_range"] = _rng(x.auroc)

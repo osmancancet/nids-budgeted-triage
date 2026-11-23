@@ -164,7 +164,7 @@ def os_macros():
     Q = N["os_queue"]
     for pr in ["detector", "fisher"]:
         r = rec(Q, budget=0.01, priority=pr)
-        M[f"os_q_{pr}_prec"] = f(r["precision"], 2)
+        M[f"os_q_{pr}_prec"] = f(r["precision"], 3)
         M[f"os_q_{pr}_fatp"] = f((1 - r["precision"]) / r["precision"], 2)  # implied by the mean precision
         M[f"os_q_{pr}_novshare"] = pct(r["fa_novelty_share"])
     for c in [0.02, 0.05]:
@@ -309,21 +309,44 @@ def extra_macros():
         fpr_lower = d2["hi"] < 0
         M["feat_fpr_all"], M["feat_fpr_rob"] = f(fa, 1), f(fr, 1)
         if ranking_same and fpr_lower:
-            M["feat_sentence"] = (f"The tool-stable features thus lower the mean false-alarm inflation from {f(fa, 1)} to "
-                                  f"{f(fr, 1)} times nominal but do not restore the ranking, and benign traffic stays "
-                                  "almost perfectly separable, which points to differences between the networks, "
-                                  "rather than the extractor, as the main cause of the ranking loss.")
+            xd_ = fe[(fe.kind != "benign_domain_auc") & (fe.source != fe.target)] if "kind" in fe else fe
+            pp = xd_.groupby(["source", "target", "features"])[["auroc", "fpr_inflation", "tpr"]].mean().unstack()
+            dA = pp["auroc"]["robust"] - pp["auroc"]["all"]
+            top = dA.idxmax()
+            rest = dA.drop(top)
+            sil = pp[(pp["tpr"]["robust"] < 0.01)]
+            M["feat_top_pair"] = f"{top[0]} to {top[1]}"
+            M["feat_top_auc"] = f"{pp['auroc']['all'].loc[top]:.3f} to {pp['auroc']['robust'].loc[top]:.3f}"
+            M["feat_rest_rng"] = f"{rest.min():+.3f} to {rest.max():+.3f}"
+            M["feat_n_silent"] = words(len(sil))
+            M["feat_silent_fpr"] = " and ".join(f"{v:.2f}" for v in sil["fpr_inflation"]["robust"])
+            M["feat_silent_tpr"] = " and ".join(f"{v:.3f}" for v in sil["tpr"]["robust"])
+            M["feat_sentence"] = (f"The tool-stable features lower the mean false-alarm inflation from {f(fa, 1)} to "
+                                  f"{f(fr, 1)} times nominal, but part of this drop is detectors falling silent: in "
+                                  f"{M['feat_n_silent']} pairs the inflation falls to {M['feat_silent_fpr']} while the "
+                                  f"detection rate falls to {M['feat_silent_tpr']}. The ranking changes differently by "
+                                  f"pair. For {M['feat_top_pair']}, AUROC rises from {M['feat_top_auc']}, so the extractor "
+                                  f"explains much of the loss for that pair; on the other five pairs AUROC changes by "
+                                  f"{M['feat_rest_rng']}, and benign traffic stays almost perfectly separable. The retained "
+                                  "packet counts and lengths still depend on where the extractor ends a flow (timeouts and "
+                                  "FIN/RST handling), so this residual separability can come from the networks or from "
+                                  "remaining tooling differences, and the experiment does not tell the two apart.")
             M["feat_disc"] = ("Restricting the detector to features computed identically by all CICFlowMeter versions "
-                              "reduced the false-alarm flood but did not restore the ranking (Section 4.7).")
+                              f"raised AUROC markedly for one pair ({M["feat_top_pair"]}, {M["feat_top_auc"]}) but not for the other five, and "
+                              "part of its lower false-alarm rate came from detectors that stopped alerting (Section 4.7).")
             M["feat_lim"] = ("Restricting the features to those computed identically across CICFlowMeter versions "
-                             "reduced the false-alarm inflation but left AUROC and the separability of benign traffic "
-                             "almost unchanged, which bounds the share of tooling shift without removing it")
+                             f"raised AUROC for {M["feat_top_pair"]} but left AUROC and the separability of benign "
+                             "traffic almost unchanged on the other five pairs. Because the retained packet counts and lengths "
+                             "still depend on how the extractor ends a flow, this bounds only the tooling shift carried by "
+                             "timing, flag and bulk features, not tooling shift as a whole")
             M["resp_feat"] = (f"With all features, the benign flows of two datasets are separable with an AUROC of "
                               f"{M['dom_auc_rng']}, and with the tool-stable features {M['dom_auc_rob_rng']}. Restricting "
-                              f"the detector to these features changes cross-dataset AUROC by {M['feat_d_auroc']} and "
-                              f"lowers the mean false-alarm inflation from {f(fa, 1)} to {f(fr, 1)} times nominal. Tooling "
-                              "therefore explains part of the false-alarm flood but not the loss of ranking, which we "
-                              "attribute mainly to differences between the networks; Section 5.4 states that public "
+                              f"the detector to these features changes cross-dataset AUROC by {M['feat_d_auroc']}; "
+                              f"the mean is driven by {M['feat_top_pair']} ({M['feat_top_auc']}), and the other five "
+                              f"pairs change by {M['feat_rest_rng']}. The mean false-alarm inflation falls from "
+                              f"{f(fa, 1)} to {f(fr, 1)} times nominal, partly because {M['feat_n_silent']} detectors "
+                              "stop alerting. Tooling therefore explains the ranking loss for one pair and part of the "
+                              "false-alarm flood, and network differences the rest; Section 5.4 states that public "
                               "data do not allow a complete separation.")
         else:
             raise KeyError("feature outcome needs new wording")
@@ -347,6 +370,9 @@ def extra_macros():
         keep = all((g.rec_fisher > g.rec_det).nunique() == 1 for _, g in S.groupby(["dataset", "protocol"]))
         xd = S[S.protocol == "cross-dataset"]
         ton = S[(S.dataset == "ToN-IoT") & (S.protocol == "unseen")].set_index("benign_frac")
+        _raw = pd.read_csv(os.path.join(RES, "extra_subsample.csv"))
+        _raw = _raw[(_raw.dataset == "ToN-IoT") & (_raw.protocol == "unseen")].groupby("benign_frac").rec_fisher.mean()
+        ton = ton.assign(rec_fisher=_raw.reindex(ton.index).values)  # same aggregation as Table A12
         cic = S[(S.dataset == "CIC-IDS2017") & (S.protocol == "unseen")]
         M["sub_lo_load"], M["sub_hi_load"] = f(S.load_warmup.min(), 2), f(S.load_warmup.max(), 2)
         if not keep:
@@ -409,7 +435,7 @@ def extra_macros():
             "exact kNN search, not the detector, dominates the cost of the layer. It grows linearly with the reference "
             f"({M['cost_knn100k_4']} µs per flow at 100,000 flows). An approximate HNSW index brings it down to "
             f"{M['cost_hnsw20k_4']} µs at 20,000 flows and {M['cost_hnsw100k_4']} µs at 100,000 flows, with top-5 "
-            f"neighbour recall between {M['cost_hnsw_rec_min']} and {M['cost_hnsw20k_rec']}; tree indexes are slower "
+            f"neighbour recall between {M['cost_hnsw_rec_min']} and {M['cost_hnsw_rec_max']}; tree indexes are slower "
             "than brute-force search on these 77 features.")
 
 
@@ -599,12 +625,22 @@ def stream_macros():
             M[f"stream_fps_b{B}"] = f"{b.loc[B, 'flows_per_s']:,.0f}".replace(",", ",")
             M[f"stream_us_b{B}"] = f(b.loc[B, "us_per_flow"], 1)
             M[f"stream_p99_b{B}"] = f(b.loc[B, "p99_ms"], 1)
+        M["stream_review_ps"] = f"{int(round(0.01 * b.loc[4096, 'flows_per_s'], -1)):,}"
         sh = pd.read_csv(os.path.join(RES, "stream_shards.csv")).set_index("shards")
         for P in sh.index:
             M[f"stream_fps_s{P}"] = f"{sh.loc[P, 'flows_per_s']:,.0f}"
             M[f"stream_load_s{P}"] = f(sh.loc[P, "load_union"], 2)
         M["stream_speedup_s4"] = f(sh.loc[4, "flows_per_s"] / sh.loc[1, "flows_per_s"], 1)
         M["stream_shard_load_rng"] = f"{sh.load_shard_min.min():.2f} to {sh.load_shard_max.max():.2f}"
+        sy_ = os.path.join(RES, "stream_sync.csv")
+        if os.path.exists(sy_):   # headline shard figures: median of the repeated runs (Table A22)
+            g_ = pd.read_csv(sy_)
+            g_ = g_[(g_["mode"] == "shards") & (g_.batch == 4096)].groupby("workers").median(numeric_only=True)
+            for P in [2, 4]:
+                M[f"stream_fps_s{P}"] = f"{g_.loc[P, 'flows_per_s']:,.0f}"
+                M[f"stream_load_s{P}"] = f(g_.loc[P, "load_union"], 2)
+            M["stream_speedup_s4"] = f(g_.loc[4, "flows_per_s"] / g_.loc[1, "flows_per_s"], 1)
+            M["stream_shard_load_rng"] = f"{g_.load_shard_min.min():.2f} to {g_.load_shard_max.max():.2f}"
         mi = pd.read_csv(os.path.join(RES, "stream_misc.csv"))
         v = lambda it, th=None: mi[(mi["item"] == it) & ((mi.threads == th) if th else True)].value.iloc[0]
         M["stream_ntrain"] = f"{int(mi[mi['item'] == 'retrain_lgbm_s'].n_train.iloc[0]):,}"
@@ -686,9 +722,137 @@ def stream_macros():
         N["extra_shards_het"] = h.round(4).to_dict("records")
 
 
+def check_macros():
+    """Weighted-Fisher load and per-family counts, label conflicts, CORAL baseline."""
+    from revision_summary import paired
+    w = os.path.join(RES, "wf_load.csv")
+    if os.path.exists(w):
+        d = pd.read_csv(w)
+        d = d[d.budget == 0.01]
+        for reg, k in [("Unseen family", "os"), ("Cross-dataset", "xd"), ("In-domain", "id")]:
+            for pr_, kp in [("wfisher0.7", "wf"), ("fisher", "fi"), ("detector", "de")]:
+                g = d[(d.regime == reg) & (d.priority == pr_)].load
+                M[f"wfl_{k}_{kp}_med"] = f(g.median())
+                M[f"wfl_{k}_{kp}_q10"], M[f"wfl_{k}_{kp}_q90"] = f(g.quantile(.1)), f(g.quantile(.9))
+    m = pd.read_csv(os.path.join(RES, "os_models_wf.csv"))
+    m = m[m.budget == 0.01]
+    for mod, g in m.groupby("model"):
+        q = g.pivot_table(index=["dataset", "held_out"], columns="rule", values="recall", aggfunc="mean")
+        y = q["wfisher0.7"] - q["detector"]
+        M[f"wfam_{mod}_up"], M[f"wfam_{mod}_down"] = str(int((y > 0).sum())), str(int((y < 0).sum()))
+        M[f"wfam_{mod}_same"] = str(int((y == 0).sum()))
+        if mod == "LGBM":   # per-dataset mean gain over held-out families
+            short = {"ACI-IoT-2023": "ACI-IoT-2023", "CIC-IDS2017": "CIC-IDS2017", "CSE-CIC-IDS2018": "CSE-CIC-IDS2018",
+                     "UNSW-NB15": "UNSW-NB15", "ToN-IoT": "ToN-IoT"}
+            pdg = y.groupby(level="dataset").agg(["mean", "size"])
+            M["wfds_LGBM"] = "; ".join(f"{short.get(ds, ds)} {r_['mean']:+.3f} ({int(r_['size'])} families)"
+                                       for ds, r_ in pdg.iterrows())
+            M["wfds_LGBM_npos"] = words(int((pdg["mean"] > 0).sum()))
+            M["wfds_LGBM_n"] = words(len(pdg))
+    gm = pd.read_csv(os.path.join(RES, "extra_gamma.csv"))
+    gm = gm[~gm.rule.str.startswith("batched")].groupby(["protocol", "rule"]).load.mean()
+    for pr_, kp in [("T1-benign-time", "t1"), ("T2-day", "t2")]:
+        M[f"gam_{kp}_load_rng"] = f"{gm.loc[pr_].min():.2f} to {gm.loc[pr_].max():.2f}"
+    tb = os.path.join(RES, "budget_ties.csv")
+    if os.path.exists(tb):
+        tb = pd.read_csv(tb)
+        idm = tb[(tb.regime == "In-domain") & (tb.priority == "fisher")]
+        M["tie_id_runs_tied"] = words(int(idm.tie_at_threshold.sum()))
+        M["tie_id_load"] = f(idm.load.median())
+        M["tie_id_load_jit"] = f(idm.load_jitter.median())
+        M["tie_id_load_noton"] = f(idm[idm.source != "ToN-IoT"].load.median())
+        xw = pd.read_csv(os.path.join(RES, "xd_warmup.csv"))
+        xw = xw[(xw.model == "LGBM") & (xw.source == "ToN-IoT") & (xw.target == "ToN-IoT") & (xw.warmup == 0.2)]
+        M["tie_id_ton_m"] = f"{int(xw.n_warm.median()):,}"
+        allt = tb.groupby("regime").tie_at_threshold.mean()
+        M["tie_share_runs_os"] = pct(allt["Unseen family"])
+        M["tie_share_runs_xd"] = pct(allt["Cross-dataset"])
+        osw = tb[(tb.regime == "Unseen family") & (tb.priority == "wfisher0.7")]
+        M["bound_os_wf_med"] = f(osw.bound_rel.median())
+        M["bound_os_wf_rng"] = f"{osw.bound_rel.quantile(.1):.2f} to {osw.bound_rel.quantile(.9):.2f}"
+        M["bound_os_T"] = f"{int(osw['T'].median()):,}"
+        M["bound_os_Rg"] = f"{(osw.range / osw.gamma).median():.0f}"
+    bb = os.path.join(RES, "budget_band.csv")
+    if os.path.exists(bb):
+        bb = pd.read_csv(bb)
+        M["band_exact_rng"] = f"{pct(bb.cover_exact.min())} to {pct(bb.cover_exact.max())}"
+        M["band_normal_rng"] = f"{pct(bb.cover_normal.min())} to {pct(bb.cover_normal.max())}"
+        r1 = bb[(bb.budget == 0.01) & (bb.warmup == 0.01)].iloc[0]
+        M["band_small_exact"], M["band_small_normal"] = pct(r1.cover_exact), pct(r1.cover_normal)
+    dc = os.path.join(RES, "budget_decoy.csv")
+    if os.path.exists(dc):
+        dc = pd.read_csv(dc)
+        g = dc.groupby(["decoy_frac", "rule", "priority"])[["recall", "load", "decoy_share"]].mean()
+        M["dec_nruns"] = str(dc[dc.decoy_frac == 0][["source", "seed"]].drop_duplicates().shape[0])
+        for fr_, kf in [(0.0, "0"), (0.01, "1"), (0.02, "2")]:
+            for rl, kr in [("online", "on"), ("warmup", "wu")]:
+                for pr_, kp in [("detector", "de"), ("fisher", "fi"), ("wfisher0.7", "wf")]:
+                    r_ = g.loc[(fr_, rl, pr_)]
+                    M[f"dec_{kf}_{kr}_{kp}_rec"] = f(r_.recall, 3)
+                    M[f"dec_{kf}_{kr}_{kp}_load"] = f(r_.load)
+                    M[f"dec_{kf}_{kr}_{kp}_share"] = pct(r_.decoy_share)
+        N["budget_decoy"] = g.reset_index().round(4).to_dict("records")
+    if "ctrl_fb_better_rl" in M:
+        M["ctrl_rl_better_n"] = words(6 - int(M["ctrl_fb_better_rl"]))
+    sy = os.path.join(RES, "stream_sync.csv")
+    if os.path.exists(sy):
+        sy = pd.read_csv(sy)
+        g = sy.groupby(["mode", "workers", "batch"]).median(numeric_only=True)
+        b1 = g.loc[("threads", 1, 4096)].flows_per_s
+        M["sync_reps"] = words(sy.rep.nunique())
+        for w_ in [1, 2, 4]:
+            M[f"sync_thr{w_}_fps"] = f"{g.loc[('threads', w_, 4096)].flows_per_s:,.0f}"
+            M[f"sync_thr{w_}_su"] = f"{g.loc[('threads', w_, 4096)].flows_per_s / b1:.1f}"
+        for w_ in [1, 2, 3, 4]:
+            M[f"sync_sh{w_}_fps"] = f"{g.loc[('shards', w_, 4096)].flows_per_s:,.0f}"
+            bs = g.loc[("shards", 1, 4096)].flows_per_s
+            M[f"sync_sh{w_}_su"] = f"{g.loc[('shards', w_, 4096)].flows_per_s / bs:.1f}"
+            M[f"sync_sh{w_}_eff"] = pct(g.loc[('shards', w_, 4096)].flows_per_s / bs / w_)
+        M["sync_sh4_wallfps"] = f"{g.loc[('shards', 4, 4096)].flows_per_s_wall:,.0f}"
+        M["sync_sh1_wallfps"] = f"{g.loc[('shards', 1, 4096)].flows_per_s_wall:,.0f}"
+        for s_ in [256, 1024, 4096]:
+            r_ = g.loc[("shared", 4, s_)]
+            M[f"sync_shared{s_}_fps"] = f"{r_.flows_per_s:,.0f}"
+            M[f"sync_shared{s_}_wait"] = pct(r_.lock_wait_share, 2)
+            M[f"sync_shared{s_}_tenth"] = f"{r_.load_tenth_min:.2f} to {r_.load_tenth_max:.2f}"
+            M[f"sync_shared{s_}_load"] = f(r_.load_union)
+        r_ = g.loc[("shards", 4, 4096)]
+        M["sync_sh4_tenth"] = f"{r_.load_tenth_min:.2f} to {r_.load_tenth_max:.2f}"
+        mx = sy[sy["mode"] == "shared"].lock_wait_share.max()
+        M["sync_wait_max"] = pct(mx, 2)
+    c = os.path.join(RES, "label_conflicts.csv")
+    if os.path.exists(c):
+        c = pd.read_csv(c)
+        M["conf_max_share"] = pct(c.share.max(), 1)
+        M["conf_max_ds"] = c.loc[c.share.idxmax(), "dataset"]
+        M["conf_min_share"] = pct(c.share.min(), 2)
+        N["label_conflicts"] = c.round(6).to_dict("records")
+    k = os.path.join(RES, "xd_coral.csv")
+    if os.path.exists(k):
+        k = pd.read_csv(k)
+        a = pd.read_csv(os.path.join(RES, "xd_adapt.csv"))
+        M["coral_nseeds"] = words(k.seed.nunique())
+        for c_ in [0.01, 0.05]:
+            cc = int(round(100 * c_))
+            for v, kv in [("CORAL_detector", "det"), ("CORAL_wfisher", "wf")]:
+                g = k[(k.budget == c_) & (k.variant == v)]
+                M[f"coral_{kv}_rec_b{cc}"] = f(g.groupby(["source", "target"]).recall.mean().mean(), 3)
+                M[f"coral_{kv}_load_b{cc}"] = f(g.load.median())
+            b = a[(a.budget == c_) & (a.variant == "base_wfisher")].merge(
+                k[(k.budget == c_) & (k.variant == "CORAL_wfisher")][["source", "target", "seed"]],
+                on=["source", "target", "seed"])
+            bp = b.groupby(["source", "target"]).recall.mean()
+            kp = k[(k.budget == c_) & (k.variant == "CORAL_wfisher")].groupby(["source", "target"]).recall.mean()
+            M[f"coral_base_rec_b{cc}"] = f(bp.mean(), 3)
+            if len(kp) == 6:
+                M[f"coral_vs_base_b{cc}"] = ci_pairs(paired(kp, bp))
+        N["xd_coral"] = k.groupby(["source", "target", "variant", "budget"])[["recall", "precision", "load"]].mean() \
+            .reset_index().round(4).to_dict("records")
+
+
 def build():
     os_macros()
-    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros"):
+    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros"):
         fn = globals().get(mod)
         if fn:
             try:

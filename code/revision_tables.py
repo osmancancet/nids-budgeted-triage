@@ -150,7 +150,8 @@ def t_os():
                      f"{a.auroc_det:.3f}", f"{a.auroc_nov:.3f}"])
     T["A6"] = table("**Table A6.** Per-family results of Protocol OS (mean over five seeds). π is the realised "
                     "attack prevalence of the held-out-family stream in percent; recall is at the source "
-                    "1%-FPR threshold for each model; the last three columns are for LightGBM.",
+                    "1%-FPR threshold for each model; the last three columns are for LightGBM. Family names are as labelled in each dataset (e.g. "
+                    "'Infilteration' in CSE-CIC-IDS2018).",
                     ["Dataset", "Held-out family", "π (%)"] + [MN[mo] for mo in MODELS] +
                     ["Conf. miss", "AUROC det.", "AUROC nov."], rows, ["l", "l"] + ["r"] * 8)
     rows = []
@@ -192,7 +193,8 @@ def t_prio():
                       "1% attack prevalence; LightGBM). In-domain and cross-dataset values are for b = 1% and are "
                       "averaged over dataset pairs; unseen-family values are averaged over the 47 held-out families "
                       "and split, for b = 1%, into families the detector catches or misses at its threshold "
-                      "(groups defined on other seeds).",
+                      "(groups defined on other seeds). Of the split budgets, only the 10% novelty share is shown; "
+                      "the 25% and 50% shares did no better (Section 4.5).",
                       ["Ranking rule", "In-domain", "Cross-dataset", "Unseen b = 1%", "Unseen b = 2%",
                        "Unseen b = 5%", "Caught", "Missed"], rows)
 
@@ -250,7 +252,9 @@ def t_budget():
         rows.append([f"{100 * pi:g}%", f"{100 * g.real_pi.mean():.2f}%", f"{100 * c:g}%", PRN[pr], q3(g.load),
                      f"{g.recall.mean():.3f}", f"{g.precision.mean():.3f}"])
     T["A10"] = table("**Table A10.** Warm-up quantile under different attack prevalences (held-out-family streams, "
-                     "LightGBM). Realised prevalence can fall below the target for families with few test flows.",
+                     "LightGBM). Realised prevalence can fall below the target for families with few test flows. Recall and precision are "
+                     "averaged separately over families with different realised prevalences, so the row means need "
+                     "not satisfy precision = recall × π / (load × b).",
                      ["Target π", "Realised π", "Budget", "Priority", "Load", "Recall", "Precision"], rows,
                      ["r", "r", "r", "l", "r", "r", "r"])
 
@@ -312,7 +316,8 @@ def t_cost():
         rows.append(["Conformal p-values and Fisher", "", f"{a.us_per_flow.iloc[0]:.3f}", f"{b.us_per_flow.iloc[0]:.3f}", ""])
     T["cost"] = table("**Table 8.** Per-flow cost of each component of the triage layer on 50,000 CSE-CIC-IDS2018 "
                       "test flows (median of three repetitions for detectors). The last column is the share of "
-                      "true five nearest neighbours returned by the approximate index.",
+                      "true five nearest neighbours returned by the approximate index; it depends on the sampled reference "
+                      "flows and is therefore not monotone in the reference size (Section 4.11).",
                       ["Component", "Reference size", "µs per flow, 1 thread", "µs per flow, 4 threads",
                        "Neighbour recall"], rows, ["l", "r", "r", "r", "r"])
 
@@ -388,10 +393,13 @@ def t_extras():
 
 def t_zero():
     z = json.load(open(os.path.join(REV, "zero_features.json")))
-    feats = sorted(set(sum(z.values(), [])))
-    rows = [[f] + ["✓" if f in z[d] else "" for d in CIC] for f in feats]
+    from revision_extra import ROBUST
+    zf = sorted(set(sum(z.values(), [])))
+    feats = zf + [f for f in ROBUST if f not in zf]
+    rows = [[f] + ["✓" if f in z[d] else "" for d in CIC] + ["✓" if f in ROBUST else ""] for f in feats]
     T["A5"] = table("**Table A5.** Features that are identically zero in the benign flows of each CICFlowMeter "
-                    "dataset (✓).", ["Feature"] + CIC, rows, ["l", "l", "l", "l"])
+                    "dataset (✓), and the 24 tool-stable features used in Section 4.7 (last column).",
+                    ["Feature"] + CIC + ["Tool-stable"], rows, ["l", "l", "l", "l", "l"])
 
 
 def t_adapt():
@@ -460,29 +468,61 @@ def t_ctrl():
                      "pair (LightGBM, mean over five seeds). Random labels and uncertainty sampling retrain on the "
                      "same number of target flows as feedback, chosen uniformly at random or closest to a predicted "
                      "attack probability of 0.5; the flipped columns flip the stated share of analyst verdicts" + (
-                     ", and the last column adds the randomly drawn flows to training as benign without review "
-                     "(" + ("seed " if c[c.variant == 'PU'].seed.nunique() == 1 else "seeds ") + ", ".join(str(int(x)) for x in sorted(c[c.variant == 'PU'].seed.unique())) + " only; blank cells were not run)." if "PU" in d.columns else "."),
+                     ", and the last column adds the randomly drawn flows to training as benign without review"
+                     + ("." if c[c.variant == "PU"].shape[0] >= 30 else
+                        " (" + ("seed " if c[c.variant == 'PU'].seed.nunique() == 1 else "seeds ") + ", ".join(str(int(x)) for x in sorted(c[c.variant == 'PU'].seed.unique())) + " only; blank cells were not run).") if "PU" in d.columns else "."),
                      ["Source", "Target"] + [n for _, n in cols], rows, ["l", "l"] + ["r"] * len(cols))
+
+
+def t_sync():
+    f = os.path.join(REV, "stream_sync.csv")
+    if not os.path.exists(f):
+        return
+    s = pd.read_csv(f)
+    g = s.groupby(["mode", "workers", "batch"]).agg(
+        fps=("flows_per_s", "median"), load=("load_union", "median"), lo=("load_tenth_min", "median"),
+        hi=("load_tenth_max", "median"), wait=("lock_wait_share", "median"), reps=("rep", "nunique"),
+        fpsw=("flows_per_s_wall", "median")).reset_index()
+    b_thr = g[(g["mode"] == "threads") & (g.workers == 1)].fps.iloc[0]
+    b_sh = g[(g["mode"] == "shards") & (g.workers == 1)].fps.iloc[0]
+    name = {"threads": "Threads in one process", "shards": "Independent shards", "shared": "Shards, shared threshold"}
+    rows = []
+    for m_ in ["threads", "shards", "shared"]:
+        for x in g[g["mode"] == m_].itertuples():
+            base = b_thr if m_ == "threads" else b_sh
+            rows.append([name[m_], str(int(x.workers)), f"{int(x.batch):,}", f"{x.fps:,.0f}",
+                         "" if np.isnan(x.fpsw) else f"{x.fpsw:,.0f}", f"{x.fps / base:.2f}",
+                         f"{x.load:.2f}", "" if np.isnan(x.lo) else f"{x.lo:.2f} to {x.hi:.2f}",
+                         "" if m_ != "shared" else f"{100 * x.wait:.2f}"])
+    T["A22"] = table("**Table A22.** Parallel execution of the triage layer on the CSE-CIC-IDS2018 test stream "
+                     "(LightGBM, HNSW reference, weighted Fisher priority, 1% budget; median of "
+                     f"{int(g.reps.max())} repetitions; one machine with four cores). Throughput counts the time from the "
+                     "end of the warm-up to the last flow of the slowest worker; the next column also counts loading the "
+                     "models and the warm-up in each worker. Speed-up is relative to one thread for threads and to one "
+                     "shard for shards. With a shared threshold, workers flag each micro-batch with the "
+                     "current threshold and update it under a lock; lock wait is the largest share of a worker's "
+                     "time spent waiting for the lock.",
+                     ["Mode", "Workers", "Batch", "Flows per s", "Incl. loading", "Speed-up", "Load", "Load per tenth",
+                      "Lock wait (%)"], rows, ["l", "r", "r", "r", "r", "r", "r", "r", "r"])
 
 
 def t_stream():
     f = os.path.join(REV, "stream_batch.csv")
     if os.path.exists(f):
         b = pd.read_csv(f)
-        sh = pd.read_csv(os.path.join(REV, "stream_shards.csv"))
-        rows = [[f"{int(x.batch):,}", "1", f"{x.flows_per_s:,.0f}", f"{x.us_per_flow:.1f}", f"{x.p50_ms:.1f}",
-                 f"{x.p99_ms:.1f}", f"{x.load:.2f}", ""] for x in b.itertuples()]
-        rows += [["4,096", str(int(x.shards)), f"{x.flows_per_s:,.0f}", f"{1e6 / x.flows_per_s:.1f}", "",
-                  f"{x.p99_ms:.1f}", f"{x.load_union:.2f}", f"{x.load_shard_min:.2f} to {x.load_shard_max:.2f}"]
-                 for x in sh.itertuples()]
+        sy = pd.read_csv(os.path.join(REV, "stream_sync.csv"))
+        one = sy[(sy.workers == 1) & (sy.batch == 4096)].groupby("mode").flows_per_s.median()
+        one_lo, one_hi = one.min(), one.max()
+        rows = [[f"{int(x.batch):,}", f"{x.flows_per_s:,.0f}", f"{x.us_per_flow:.1f}", f"{x.p50_ms:.1f}",
+                 f"{x.p99_ms:.1f}", f"{x.load:.2f}"] for x in b.itertuples()]
         T["A17"] = table("**Table A17.** Streaming throughput of the full triage layer (CSE-CIC-IDS2018 test stream, "
                          "LightGBM, HNSW reference of 20,000 benign flows, weighted Fisher priority, online threshold "
-                         "update; one thread per process; p50 and p99 are batch latencies). The upper rows vary the micro-batch size on one shard; the "
-                         "lower rows split the stream into independent shards, each with its own models and "
-                         "threshold. Load is the queue size divided by the 1% budget.",
-                         ["Batch", "Shards", "Flows per s", "µs per flow", "p50 (ms)", "p99 (ms)", "Load",
-                          "Shard loads"], rows,
-                         ["r", "r", "r", "r", "r", "r", "r", "r"])
+                         "update; one process, one thread; p50 and p99 are batch latencies). Load is the queue size divided by the "
+                         "1% budget. Each row is one run that also records the latency of every batch; the one-worker rows of "
+                         f"Table A22, medians of repeated runs at batches of 4,096, give {one_lo:,.0f} to {one_hi:,.0f} flows per "
+                         "second. Runs on several cores are in Table A22.",
+                         ["Batch", "Flows per s", "µs per flow", "p50 (ms)", "p99 (ms)", "Load"], rows,
+                         ["r", "r", "r", "r", "r", "r"])
     f = os.path.join(REV, "os_mixed.csv")
     if os.path.exists(f):
         x = pd.read_csv(f)
@@ -513,7 +553,8 @@ def t_stream():
                              f"{v['novelty']:.3f}", f"{v['detector']:.3f}", f"{v['fisher']:.3f}", f"{v['wfisher0.7']:.3f}"])
         T["A19"] = table("**Table A19.** Novelty scorers inside the same conformal wrapper (Protocol OS, LightGBM, "
                          "47 held-out families, mean over five seeds). Each scorer is fitted on the benign training "
-                         "flows; recall is that of the top share of the stream given by the budget.",
+                         "flows; recall is that of the top share of the stream given by the budget. The table comes from a "
+                         "separate run of all four scorers, so its kNN rows can differ from Table 5 in the third decimal.",
                          ["Novelty score", "AUROC nov.", "Budget", "Novelty", "Detector", "Fisher", "Weighted Fisher"],
                          rows, ["l", "r", "r", "r", "r", "r", "r"])
     f = os.path.join(REV, "extra_gamma.csv")
@@ -558,7 +599,7 @@ def t_stream():
 
 
 if __name__ == "__main__":
-    for f in (t_data, t_xd, t_os, t_prio, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream):
+    for f in (t_data, t_xd, t_os, t_prio, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync):
         try:
             f()
             print("ok", f.__name__)

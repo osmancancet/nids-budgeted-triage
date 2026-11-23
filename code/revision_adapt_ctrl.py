@@ -95,7 +95,8 @@ def main():
             base = R.Fitted("LGBM", seed, Xs, ys, Xc, yc)
             pc, nc = base.scores(Xc)
             cal_d, cal_n = pc[yc == 0], nc[yc == 0]
-            for tgt in [t for t in R.CIC if t != src]:
+            skip = set(os.environ.get("SKIP", "").split(";"))
+            for tgt in [t for t in R.CIC if t != src and f"{seed}:{src}>{t}" not in skip]:
                 tdf = data[tgt][0]
                 tm = parts[tgt] == 2
                 Xt0, yt0 = tdf.loc[tm, feats].to_numpy(np.float32), tdf.loc[tm, "label"].to_numpy()

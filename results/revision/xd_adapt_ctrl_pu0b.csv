@@ -1,0 +1,2 @@
+source,target,seed,budget,variant,recall,precision,n_flag,load,labels,n_attack_labels
+CIC-IDS2017,ACI-IoT-2023,0,0.01,PU,0.0019646365422396855,0.0021008403361344537,476,0.9817469320408374,605,12
