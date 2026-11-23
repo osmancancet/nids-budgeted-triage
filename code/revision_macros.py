@@ -899,6 +899,30 @@ def round7_macros():
             bs.append(np.concatenate([rb.choice(groups[i], len(groups[i])) for i in pick]).mean())
         M["hb_wf_ci"] = f"{np.quantile(bs, .025):+.3f} to {np.quantile(bs, .975):+.3f}".replace("-0.000", "0.000")
         M["hb_wf_mean"] = f"{dif.mean():+.3f}"
+    # queue recall of the threshold rules on the chronological streams (1% budget)
+    ts = pd.read_csv(os.path.join(RES, "extra_temporal_stream.csv"))
+    ts = ts[ts.budget == 0.01].groupby(["protocol", "priority", "rule"])[["recall", "precision"]].mean()
+    for pk, pr in [("t1", "T1-benign-time"), ("t1r", "T1-random"), ("t2", "T2-day"), ("t2r", "T2-random")]:
+        for qk, q in [("fi", "fisher"), ("de", "detector")]:
+            for rk, rl_ in [("on", "online"), ("so", "source")]:
+                M[f"ts_{pk}_{qk}_{rk}"] = f"{ts.loc[(pr, q, rl_), 'recall']:.3f}"
+    # Holm results for the other weights (LightGBM, 1% budget)
+    from scipy.stats import wilcoxon
+    pp = pd.read_csv(os.path.join(RES, "os_priorities.csv"))
+    pp = pp[(pp.model == "LGBM") & (pp.budget == 0.01)]
+    fr = pp.groupby(["dataset", "held_out", "priority"]).recall.mean().unstack()
+    rules = [r_ for r_ in fr.columns if r_ not in ("detector", "proxy_switch")]
+    ps = {}
+    for r_ in rules:
+        d = (fr[r_] - fr["detector"]).dropna()
+        ps[r_] = wilcoxon(d[d != 0]).pvalue
+    hol, run = {}, 0.0
+    for i, r_ in enumerate(sorted(ps, key=ps.get)):
+        run = max(run, min(1.0, (len(ps) - i) * ps[r_]))
+        hol[r_] = run
+    for w in ("0.8", "0.9"):
+        M[f"holm_wf{w[2]}"] = f"{hol['wfisher' + w]:.3f}"
+        M[f"d_wf{w[2]}"] = f"{(fr['wfisher' + w] - fr['detector']).mean():+.3f}"
     bc = N.get("os_breakeven_ci", {}).get("fisher_b0.01")
     if bc:
         M["be_ci_lo"], M["be_ci_hi"] = f(bc["lo"], 2), f(bc["hi"], 2)

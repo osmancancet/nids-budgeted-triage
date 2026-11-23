@@ -194,7 +194,7 @@ def t_prio():
                       "averaged over dataset pairs; unseen-family values are averaged over the 47 held-out families "
                       "and split, for b = 1%, into families the detector catches or misses at its threshold "
                       "(groups defined on other seeds). Of the split budgets, only the 10% novelty share is shown; "
-                      "the 25% and 50% shares did no better (Section 4.5).",
+                      "the 25% and 50% shares did no better (Appendix Table A23 lists all rules).",
                       ["Ranking rule", "In-domain", "Cross-dataset", "Unseen b = 1%", "Unseen b = 2%",
                        "Unseen b = 5%", "Caught", "Missed"], rows)
 
@@ -257,6 +257,42 @@ def t_budget():
                      "not satisfy precision = recall × π / (load × b).",
                      ["Target π", "Realised π", "Budget", "Priority", "Load", "Recall", "Precision"], rows,
                      ["r", "r", "r", "l", "r", "r", "r"])
+
+
+# ---------------------------------------------------------------- Table A23
+def t_allrules():
+    from scipy.stats import wilcoxon
+    o = r("os_priorities.csv")
+    if o is None:
+        return
+    N = json.load(open(os.path.join(REV, "revision_numbers.json")))
+    P = pd.DataFrame(N["os_priorities"]).set_index(["priority", "budget"])
+    o = o[o.model == "LGBM"]
+    fr = {b: o[o.budget == b].groupby(["dataset", "held_out", "priority"]).recall.mean().unstack() for b in (0.01, 0.02, 0.05)}
+    rules = [r_ for r_ in PRN if r_ not in ("detector", "proxy_switch")]
+    ps, dd = {}, {}
+    for r_ in rules:
+        d = (fr[0.01][r_] - fr[0.01]["detector"]).dropna()
+        ps[r_], dd[r_] = wilcoxon(d[d != 0]).pvalue, d.mean()
+    order = sorted(ps, key=ps.get)
+    holm, run = {}, 0.0
+    for i, r_ in enumerate(order):
+        run = max(run, min(1.0, (len(order) - i) * ps[r_]))
+        holm[r_] = run
+    fp = lambda v: "< 0.001" if v < 0.001 else f"{v:.3f}"
+    rows = []
+    for r_ in ["detector"] + rules + ["proxy_switch"]:
+        row = [PRN[r_]] + [f"{P.loc[(r_, b), 'all']:.3f}" for b in (0.01, 0.02, 0.05)]
+        row += [f"{P.loc[(r_, 0.01), 'caught']:.3f}", f"{P.loc[(r_, 0.01), 'missed']:.3f}"]
+        row += ["", "", ""] if r_ not in ps else [f"{dd[r_]:+.3f}", fp(ps[r_]), fp(holm[r_])]
+        rows.append(row)
+    T["A23"] = table("**Table A23.** All ranking rules on the held-out families (Protocol OS, LightGBM, 47 families, "
+                     "mean over five seeds). Recall is that of the exact top-b fraction of the stream; caught and "
+                     "missed families are defined as in Table 5. The last three columns compare each rule with the "
+                     "detector at b = 1%: mean paired difference over families, Wilcoxon signed-rank p-value and the "
+                     "Holm-adjusted p-value over the " + str(len(rules)) + " rules of the family.",
+                     ["Ranking rule", "b = 1%", "b = 2%", "b = 5%", "Caught, 1%", "Missed, 1%", "Difference",
+                      "p", "p (Holm)"], rows, ["l"] + ["r"] * 8)
 
 
 # ---------------------------------------------------------------- Table 7
@@ -395,12 +431,18 @@ def t_extras():
     g = r("extra_group.csv")
     if g is not None:
         G = g.groupby(["dataset", "held_out_group"]).mean(numeric_only=True).reset_index()
+        gw = r("extra_group_wf.csv")
+        wfg = {} if gw is None else {k: f"{v:.3f}" for k, v in
+                                     gw.groupby(["dataset", "held_out_group"]).rec_wfisher.mean().items()}
         rows = [[a.dataset, a.held_out_group, f"{int(a.n_unseen):,}", f"{a.recall_unseen:.3f}", f"{a.cm_005:.3f}",
-                 f"{a.auroc_det:.3f}", f"{a.auroc_nov:.3f}", f"{a.rec_detector:.3f}", f"{a.rec_fisher:.3f}"]
+                 f"{a.auroc_det:.3f}", f"{a.auroc_nov:.3f}", f"{a.rec_detector:.3f}", f"{a.rec_fisher:.3f}",
+                 wfg.get((a.dataset, a.held_out_group), "")]
                 for a in G.itertuples()]
-        T["A14"] = table("**Table A14.** Held-out coarse groups (Protocol OG, LightGBM, mean over five seeds).",
+        T["A14"] = table("**Table A14.** Held-out coarse groups (Protocol OG, LightGBM, mean over five seeds). "
+                         "Weighted Fisher (w = 0.7) comes from a separate run on the same groups and seeds.",
                          ["Dataset", "Held-out group", "Test flows", "Recall", "Conf. miss", "AUROC det.",
-                          "AUROC nov.", "Queue recall, detector", "Queue recall, Fisher"], rows, ["l", "l"] + ["r"] * 7)
+                          "AUROC nov.", "Queue recall, detector", "Queue recall, Fisher",
+                          "Queue recall, weighted Fisher"], rows, ["l", "l"] + ["r"] * 8)
 
 
 def t_zero():
@@ -438,6 +480,14 @@ def t_adapt():
             else:
                 row.append("")
         rows.append(row)
+    fc = os.path.join(REV, "xd_coral.csv")
+    if os.path.exists(fc):
+        co = pd.read_csv(fc).groupby(["source", "target", "budget", "variant"]).mean(numeric_only=True)
+        co = co.reset_index().groupby(["budget", "variant"]).mean(numeric_only=True)
+        for v, nm in [("CORAL_detector", "CORAL feature alignment, detector priority"),
+                      ("CORAL_wfisher", "CORAL feature alignment, weighted Fisher")]:
+            rows.append([nm, "none"] + [f"{co.loc[(c, v)].recall:.3f} / {co.loc[(c, v)].precision:.3f}"
+                                         if (c, v) in co.index else "" for c in [0.01, 0.02, 0.05]])
     c4 = cv[cv.segment == 4].groupby(["source", "target", "budget", "variant"]).mean(numeric_only=True)
     c4 = c4.reset_index().groupby(["budget", "variant"]).mean(numeric_only=True)
     row = ["FB, last fifth of the stream", "reviewed flows"]
@@ -447,7 +497,8 @@ def t_adapt():
     rows.append(row)
     T["adapt"] = table("**Table 9.** Adapting the triage pipeline to a new network (six cross-dataset pairs, "
                        "LightGBM, mean over pairs of five seeds). Each cell gives queue recall / queue precision on "
-                       "the 80% of the target stream after the warm-up window, at 1% attack prevalence.",
+                       "the 80% of the target stream after the warm-up window, at 1% attack prevalence. The CORAL rows come "
+                       "from a separate run on the same pairs and seeds.",
                        ["Variant", "Target labels", "1% budget", "2% budget", "5% budget"], rows,
                        ["l", "l", "r", "r", "r"])
     rows = []
@@ -619,7 +670,7 @@ def t_stream():
 
 
 if __name__ == "__main__":
-    for f in (t_data, t_xd, t_os, t_prio, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync):
+    for f in (t_data, t_xd, t_os, t_prio, t_allrules, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync):
         try:
             f()
             print("ok", f.__name__)
