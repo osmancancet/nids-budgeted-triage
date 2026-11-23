@@ -63,6 +63,14 @@ def os_macros():
     _d = pd.read_csv(os.path.join(RES, "os_detection_all.csv"))
     _g = _d[_d.model == "LGBM"].groupby(["dataset", "held_out"]).mean(numeric_only=True)
     M["os_n_cm_and_missed"] = words(int(((_g["cm_0.05"] > .5) & (_g.recall_unseen_at_alpha < .5)).sum()))
+    M["os_n_cm_and_missed_cap"] = M["os_n_cm_and_missed"].capitalize()
+    _m = _g[_g.recall_unseen_at_alpha < .5]
+    M["os_missed_auc_rng"] = f"{_m.auroc_det.min():.2f} to {_m.auroc_det.max():.2f}"
+    M["os_missed_auc_hi"] = words(int((_m.auroc_det >= .9).sum()))
+    M["os_missed_auc_lo"] = words(int((_m.auroc_det < .7).sum()))
+    M["os_missed_auc_med"] = f(_m.auroc_det.median(), 2)
+    _odd = _g[(_g["cm_0.05"] > .5) & (_g.recall_unseen_at_alpha >= .5)]
+    assert list(_odd.index) == [("CIC-IDS2017", "FTP-Patator")], list(_odd.index)  # named in Section 4.4
     ps = list(N["os_lgbm_below_half_per_seed"].values())
     M["os_below_half_seed_rng"] = f"{min(ps)} to {max(ps)}"
     M["os_n_stream_below_1pct"] = words(o["n_stream_below_1pct"])
@@ -157,7 +165,7 @@ def os_macros():
     for pr in ["detector", "fisher"]:
         r = rec(Q, budget=0.01, priority=pr)
         M[f"os_q_{pr}_prec"] = f(r["precision"], 2)
-        M[f"os_q_{pr}_fatp"] = f(r["fa_per_tp"], 2)
+        M[f"os_q_{pr}_fatp"] = f((1 - r["precision"]) / r["precision"], 2)  # implied by the mean precision
         M[f"os_q_{pr}_novshare"] = pct(r["fa_novelty_share"])
     for c in [0.02, 0.05]:
         r = rec(Q, budget=c, priority="fisher")
@@ -216,7 +224,7 @@ def xd_macros():
     if "xd_queue" in N:
         r = rec(N["xd_queue"], regime="Cross-dataset", budget=0.01, priority="fisher")
         M["xd_q_fisher_prec"] = f(r["precision"], 3)
-        M["xd_q_fisher_fatp"] = f(r["fa_per_tp"], 0)
+        M["xd_q_fisher_fatp"] = f((1 - r["precision"]) / r["precision"], 0)
         r = rec(N["xd_queue"], regime="In-domain", budget=0.01, priority="detector")
         M["id_q_detector_prec"] = f(r["precision"], 2)
     if "xd_repro" in N:
@@ -326,13 +334,14 @@ def extra_macros():
     if "reference" in N:
         R = N["reference"]
         base = rec(R, n_ref=20000, contamination=0.0)
-        M["ref_auc_20k"] = f(base["auroc_nov"], 3)
-        M["ref_auc_1k"] = f(rec(R, n_ref=1000, contamination=0.0)["auroc_nov"], 3)
+        _p = N["reference_auc_n1000_c0.0"]
+        M["ref_auc_20k"], M["ref_auc_1k"], M["ref_n_common"] = f(_p["base"], 3), f(_p["ref"], 3), str(_p["n"])
         for key, n, c in [("1k", 1000, 0.0), ("50k", 50000, 0.0), ("c1", 20000, 0.01), ("c5", 20000, 0.05), ("c01", 20000, 0.001)]:
             k = f"reference_paired_n{n}_c{c}"
             if k in N:
                 M[f"ref_d_{key}"] = ci(N[k])
         M["ref_c1_pct"] = "1%"
+        M["ref_d_c01_short"] = f(abs(N["reference_paired_n20000_c0.001"]["mean"]), 3)
     if "subsample" in N:
         S = pd.DataFrame(N["subsample"])
         keep = all((g.rec_fisher > g.rec_det).nunique() == 1 for _, g in S.groupby(["dataset", "protocol"]))
@@ -387,6 +396,7 @@ def extra_macros():
         M["cost_flows_per_s"] = f"{int(round(1e6 / tot, -3)):,}"
         h20 = knn("hnsw", 20000)
         M["cost_hnsw20k_4"], M["cost_hnsw20k_rec"] = f(h20.us_per_flow.iloc[0], 1), f(h20.recall_at5.iloc[0], 3)
+        M["cost_hnsw_rec_max"] = f(z[(z.component == "knn") & (z.model == "hnsw")].recall_at5.max(), 3)
         M["cost_hnsw_rec_min"] = f(z[(z.component == "knn") & (z.model == "hnsw")].recall_at5.min(), 3)
         M["cost_hnsw_rec_min_n"] = f"{int(z[(z.component == 'knn') & (z.model == 'hnsw')].sort_values('recall_at5').n_ref.iloc[0]):,}"
         toth = det("LGBM") + h20.us_per_flow.iloc[0] + conf
@@ -453,9 +463,39 @@ def adapt_macros():
     M["ad_nx_better_pairs"] = words((nx > fb).sum())
 
 
+def ctrl_macros():
+    """Controls for the feedback loop (revision_adapt_ctrl.py), paired with FB over the six pairs."""
+    import glob
+    from revision_summary import paired
+    fs = sorted(glob.glob(os.path.join(RES, "xd_adapt_ctrl*.csv")))
+    if not fs:
+        return
+    c = pd.concat([pd.read_csv(x) for x in fs])
+    a = pd.read_csv(os.path.join(RES, "xd_adapt.csv"))
+    a = a[(a.budget == 0.01) & (a.variant.isin(["FB", "base_fisher"]))]
+    d = pd.concat([c, a])
+    pair = d.groupby(["variant", "source", "target"])[["recall", "precision", "labels"]].mean()
+    n_runs = d.groupby("variant").size()
+    M["ctrl_n_runs"] = str(int(n_runs.get("RL", 0)))
+    fb = pair.loc["FB"]
+    if len(pair.loc["RL"]) < 6 if "RL" in pair.index.get_level_values(0) else True:
+        return
+    for v, k in [("RL", "rl"), ("US", "us"), ("FB_n10", "n10"), ("FB_n20", "n20")]:
+        if v not in pair.index.get_level_values(0):
+            continue
+        g = pair.loc[v]
+        M[f"ctrl_{k}_rec"] = f(g.recall.mean(), 3)
+        M[f"ctrl_{k}_prec"] = f(g.precision.mean(), 3)
+        M[f"ctrl_{k}_labels"] = f"{g.labels.mean():,.0f}"
+        M[f"ctrl_fb_vs_{k}"] = ci_pairs(paired(fb.recall, g.recall))
+        M[f"ctrl_fb_better_{k}"] = str(int((fb.recall > g.recall).sum()))
+    M["ctrl_fb_labels"] = f"{fb.labels.mean():,.0f}"
+    N["xd_adapt_ctrl"] = pair.reset_index().round(4).to_dict("records")
+
+
 def build():
     os_macros()
-    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros"):
+    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros"):
         fn = globals().get(mod)
         if fn:
             try:

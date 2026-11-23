@@ -91,6 +91,9 @@ def reference(N):
             continue
         g = g.set_index(["dataset", "held_out"])
         N[f"reference_paired_n{n}_c{c}"] = paired(g.rec_fisher, base.rec_fisher)
+        common = g.index.intersection(base.index)
+        N[f"reference_auc_n{n}_c{c}"] = dict(n=int(len(common)), ref=float(g.loc[common, "auroc_nov"].mean()),
+                                             base=float(base.loc[common, "auroc_nov"].mean()))
 
 
 def subsample(N):

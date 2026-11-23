@@ -439,8 +439,28 @@ def t_adapt():
                       "Labels", "Attack labels"], rows, ["l", "l"] + ["r"] * 9)
 
 
+def t_ctrl():
+    import glob
+    fs = sorted(glob.glob(os.path.join(REV, "xd_adapt_ctrl*.csv")))
+    if not fs:
+        return
+    c = pd.concat([pd.read_csv(x) for x in fs])
+    a = pd.read_csv(os.path.join(REV, "xd_adapt.csv"))
+    a = a[(a.budget == 0.01) & (a.variant == "FB")]
+    d = pd.concat([a, c]).groupby(["source", "target", "variant"]).recall.mean().unstack()
+    cols = [("FB", "Feedback"), ("RL", "Random labels"), ("US", "Uncertainty sampling"),
+            ("FB_n10", "Feedback, 10% flipped"), ("FB_n20", "Feedback, 20% flipped")]
+    rows = [[s_, t_] + [f"{r[v]:.3f}" for v, _ in cols] for (s_, t_), r in d.iterrows()]
+    rows.append(["Mean", ""] + [f"{d[v].mean():.3f}" for v, _ in cols])
+    T["A16"] = table("**Table A16.** Controls for the feedback loop: queue recall at a 1% budget for each directed "
+                     "pair (LightGBM, mean over five seeds). Random labels and uncertainty sampling retrain on the "
+                     "same number of target flows as feedback, chosen uniformly at random or closest to a predicted "
+                     "attack probability of 0.5; the last two columns flip the stated share of analyst verdicts.",
+                     ["Source", "Target"] + [n for _, n in cols], rows, ["l", "l"] + ["r"] * 5)
+
+
 if __name__ == "__main__":
-    for f in (t_data, t_xd, t_os, t_prio, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt):
+    for f in (t_data, t_xd, t_os, t_prio, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl):
         try:
             f()
             print("ok", f.__name__)
