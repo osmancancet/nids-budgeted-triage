@@ -95,7 +95,7 @@ class Triage:
 
 
 def coordinator(port, nworkers, t0, delay_ms, q):
-    lst = Listener(("127.0.0.1", port), authkey=AUTH)
+    lst = Listener(("127.0.0.1", port), backlog=128, authkey=AUTH)
     state = {"t": t0, "n": 0, "stale": 0.0}
     lock = threading.Lock()
 
@@ -103,7 +103,7 @@ def coordinator(port, nworkers, t0, delay_ms, q):
         while True:
             try:
                 msg = conn.recv()
-            except EOFError:
+            except (EOFError, OSError):
                 return
             if msg is None:
                 conn.close()
@@ -116,7 +116,10 @@ def coordinator(port, nworkers, t0, delay_ms, q):
                 t, n = state["t"], state["n"]
             if delay_ms:
                 time.sleep(delay_ms / 1000.0)
-            conn.send((t, n))
+            try:
+                conn.send((t, n))
+            except OSError:
+                return
     ths = []
     for _ in range(nworkers):
         th = threading.Thread(target=serve, args=(lst.accept(),), daemon=True)
@@ -124,6 +127,7 @@ def coordinator(port, nworkers, t0, delay_ms, q):
         ths.append(th)
     for th in ths:
         th.join()
+    lst.close()
     q.put((state["n"], state["stale"] / max(state["n"], 1)))
 
 
@@ -216,6 +220,7 @@ def main():
             rows.append(dict(host, rep=rep, mode="indep", workers=P, batch=4096, delay_ms=0,
                              **run(d, n, P, 4096, "indep", 0, None)))
             print(rows[-1], flush=True)
+            pd.DataFrame(rows).to_csv(a.out, index=False)
         for s in [int(x) for x in a.batches.split(",")]:
             for dl in [int(x) for x in a.delays.split(",")]:
                 for stp in ["full", "perworker"]:
@@ -223,7 +228,7 @@ def main():
                     rows.append(dict(host, rep=rep, mode="coord", workers=max(ws), batch=s, delay_ms=dl, step=stp,
                                      **run(d, n, max(ws), s, "coord", dl, port, stp)))
                     print(rows[-1], flush=True)
-        pd.DataFrame(rows).to_csv(a.out, index=False)
+                    pd.DataFrame(rows).to_csv(a.out, index=False)
 
 
 if __name__ == "__main__":
