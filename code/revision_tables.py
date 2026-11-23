@@ -102,7 +102,8 @@ def t_xd():
     g = g[g.source != g.target]
     rows = [[f"{a.source} → {a.target}", a.group, f"{int(a.n):,}", f"{a.rec:.3f}"] for a in g.itertuples()]
     T["A4"] = table("**Table A4.** Cross-dataset recall per coarse attack group at the source 1%-FPR threshold "
-                    "(LightGBM, mean over five seeds; n is the number of target test flows in the group).",
+                    "(LightGBM, mean over five seeds; n is the number of target test flows in the group). Other holds "
+                    "Heartbleed in CIC-IDS2017 and ARP Spoofing in ACI-IoT-2023.",
                     ["Pair", "Group", "n", "Recall"], rows, ["l", "l", "r", "r"])
 
 
@@ -221,8 +222,9 @@ def t_budget():
     T["budget"] = table("**Table 6.** Queue load (realised queue size divided by the planned size; median "
                         "[10th, 90th percentile] over runs) and attack recall inside the queue for the Fisher "
                         "priority at a 1% budget on streams with 1% prevalence (LightGBM). The warm-up quantile "
-                        "uses the first 20% of each stream. Behaviour on non-stationary streams is in Table 7 and "
-                        "Appendix Table A9.",
+                        "uses the first 20% of each stream. Under cross-dataset shift the source threshold's recall comes "
+                        "from a queue many times the planned size (load column). Behaviour on non-stationary streams is in "
+                        "Table 7 and Appendix Table A9.",
                         ["Regime", "Source: load", "Source: recall", "Warm-up: load", "Warm-up: recall"], rows,
                         ["l", "r", "r", "r", "r"])
     # A9: non-stationary streams, OS and XD
@@ -449,18 +451,114 @@ def t_ctrl():
     a = a[(a.budget == 0.01) & (a.variant == "FB")]
     d = pd.concat([a, c]).groupby(["source", "target", "variant"]).recall.mean().unstack()
     cols = [("FB", "Feedback"), ("RL", "Random labels"), ("US", "Uncertainty sampling"),
-            ("FB_n10", "Feedback, 10% flipped"), ("FB_n20", "Feedback, 20% flipped")]
-    rows = [[s_, t_] + [f"{r[v]:.3f}" for v, _ in cols] for (s_, t_), r in d.iterrows()]
-    rows.append(["Mean", ""] + [f"{d[v].mean():.3f}" for v, _ in cols])
+            ("FB_n10", "Feedback, 10% flipped"), ("FB_n20", "Feedback, 20% flipped"),
+            ("PU", "Unreviewed as benign")]
+    cols = [cv for cv in cols if cv[0] in d.columns]
+    rows = [[s_, t_] + [f"{r[v]:.3f}" if pd.notna(r[v]) else "" for v, _ in cols] for (s_, t_), r in d.iterrows()]
+    rows.append(["Mean", ""] + [f"{d[v].mean():.3f}" if d[v].notna().all() else "" for v, _ in cols])
     T["A16"] = table("**Table A16.** Controls for the feedback loop: queue recall at a 1% budget for each directed "
                      "pair (LightGBM, mean over five seeds). Random labels and uncertainty sampling retrain on the "
                      "same number of target flows as feedback, chosen uniformly at random or closest to a predicted "
-                     "attack probability of 0.5; the last two columns flip the stated share of analyst verdicts.",
-                     ["Source", "Target"] + [n for _, n in cols], rows, ["l", "l"] + ["r"] * 5)
+                     "attack probability of 0.5; the flipped columns flip the stated share of analyst verdicts" + (
+                     ", and the last column adds the randomly drawn flows to training as benign without review "
+                     "(" + ("seed " if c[c.variant == 'PU'].seed.nunique() == 1 else "seeds ") + ", ".join(str(int(x)) for x in sorted(c[c.variant == 'PU'].seed.unique())) + " only; blank cells were not run)." if "PU" in d.columns else "."),
+                     ["Source", "Target"] + [n for _, n in cols], rows, ["l", "l"] + ["r"] * len(cols))
+
+
+def t_stream():
+    f = os.path.join(REV, "stream_batch.csv")
+    if os.path.exists(f):
+        b = pd.read_csv(f)
+        sh = pd.read_csv(os.path.join(REV, "stream_shards.csv"))
+        rows = [[f"{int(x.batch):,}", "1", f"{x.flows_per_s:,.0f}", f"{x.us_per_flow:.1f}", f"{x.p50_ms:.1f}",
+                 f"{x.p99_ms:.1f}", f"{x.load:.2f}", ""] for x in b.itertuples()]
+        rows += [["4,096", str(int(x.shards)), f"{x.flows_per_s:,.0f}", f"{1e6 / x.flows_per_s:.1f}", "",
+                  f"{x.p99_ms:.1f}", f"{x.load_union:.2f}", f"{x.load_shard_min:.2f} to {x.load_shard_max:.2f}"]
+                 for x in sh.itertuples()]
+        T["A17"] = table("**Table A17.** Streaming throughput of the full triage layer (CSE-CIC-IDS2018 test stream, "
+                         "LightGBM, HNSW reference of 20,000 benign flows, weighted Fisher priority, online threshold "
+                         "update; one thread per process; p50 and p99 are batch latencies). The upper rows vary the micro-batch size on one shard; the "
+                         "lower rows split the stream into independent shards, each with its own models and "
+                         "threshold. Load is the queue size divided by the 1% budget.",
+                         ["Batch", "Shards", "Flows per s", "µs per flow", "p50 (ms)", "p99 (ms)", "Load",
+                          "Shard loads"], rows,
+                         ["r", "r", "r", "r", "r", "r", "r", "r"])
+    f = os.path.join(REV, "os_mixed.csv")
+    if os.path.exists(f):
+        x = pd.read_csv(f)
+        x = x[x["mode"] == "topk"]
+        g = x.groupby(["pi_u", "budget", "rule", "dataset", "held_out"])[["recall_unseen", "recall_known", "precision"]].mean()
+        g = g.groupby(["pi_u", "budget", "rule"]).mean()
+        names = {"detector": "Detector", "fisher": "Fisher", "wfisher0.7": "Weighted Fisher, w = 0.7"}
+        rows = [[f"{pu:.1%}", f"{1 - pu - 0.01 + pu:.1%}" if False else f"{(0.01 - pu):.1%}", f"{c:.0%}", names[r_],
+                 f"{v.recall_unseen:.3f}", f"{v.recall_known:.3f}", f"{v.precision:.3f}"]
+                for (pu, c, r_), v in g.iterrows()]
+        T["A18"] = table("**Table A18.** Held-out families arriving together with known attacks (Protocol OS, "
+                         "LightGBM, mean over families of five seeds). Each stream holds all benign test flows, the "
+                         "held-out family and the known attack families of the same dataset at the stated "
+                         "prevalences; the queue is the top share of the stream given by the budget.",
+                         ["Unseen prevalence", "Known prevalence", "Budget", "Priority", "Recall (unseen)",
+                          "Recall (known)", "Precision"], rows, ["r", "r", "r", "l", "r", "r", "r"])
+    f = os.path.join(REV, "os_novalt.csv")
+    if os.path.exists(f):
+        x = pd.read_csv(f)
+        a = x.groupby(["novelty", "dataset", "held_out"]).auroc_nov.mean().groupby("novelty").mean()
+        g = x.groupby(["novelty", "budget", "rule", "dataset", "held_out"]).recall.mean().groupby(["novelty", "budget", "rule"]).mean().unstack()
+        names = {"knn": "kNN distance (k = 5)", "iforest": "Isolation forest", "lof": "Local outlier factor", "maha": "Mahalanobis distance"}
+        rows = []
+        for k in ["knn", "iforest", "lof", "maha"]:
+            for c in [0.01, 0.02, 0.05]:
+                v = g.loc[(k, c)]
+                rows.append([names[k] if c == 0.01 else "", f"{a[k]:.3f}" if c == 0.01 else "", f"{c:.0%}",
+                             f"{v['novelty']:.3f}", f"{v['detector']:.3f}", f"{v['fisher']:.3f}", f"{v['wfisher0.7']:.3f}"])
+        T["A19"] = table("**Table A19.** Novelty scorers inside the same conformal wrapper (Protocol OS, LightGBM, "
+                         "47 held-out families, mean over five seeds). Each scorer is fitted on the benign training "
+                         "flows; recall is that of the top share of the stream given by the budget.",
+                         ["Novelty score", "AUROC nov.", "Budget", "Novelty", "Detector", "Fisher", "Weighted Fisher"],
+                         rows, ["l", "r", "r", "r", "r", "r", "r"])
+    f = os.path.join(REV, "extra_gamma.csv")
+    if os.path.exists(f):
+        x = pd.read_csv(f)
+        g = x.groupby(["protocol", "rule"])[["load", "load_min10", "load_max10", "recall"]].mean()
+        lab = lambda r_: ("batched, 4,096 flows, g = 0.02" if r_.startswith("batched") else "g = " + r_[1:])
+        g = g.reset_index()
+        g["_o"] = g.rule.map(lambda r_: 99.0 if r_.startswith("batched") else float(r_[1:]))
+        g = g.sort_values(["protocol", "_o"]).set_index(["protocol", "rule"])
+        rows = [[pr.split("-")[0], lab(r_), f"{v.load:.2f}", f"{v.load_min10:.2f} to {v.load_max10:.2f}", f"{v.recall:.3f}"]
+                for (pr, r_), v in g.iterrows()]
+        T["A20"] = table("**Table A20.** Step size of the online update on the chronological streams (Fisher priority, "
+                         "1% budget, LightGBM, mean over five seeds). The step is g times the spread between the median "
+                         "and the 99.9th percentile of the warm-up priorities; the main experiments use g = 0.02. The "
+                         "range gives the lowest and highest load among the ten consecutive tenths of the stream.",
+                         ["Protocol", "Update", "Load", "Load range over tenths", "Recall"], rows,
+                         ["l", "l", "r", "r", "r"])
+
+    f = os.path.join(REV, "extra_shards_het.csv")
+    if os.path.exists(f):
+        x = pd.read_csv(f)
+        ok = x.groupby(["seed", "protocol"]).scheme.nunique()
+        x = x.set_index(["seed", "protocol"]).loc[ok[ok == 4].index].reset_index()
+        names = {"global": "One threshold", "protocol": "One shard per protocol",
+                 "skew4": "Four shards, attacks on one", "sync4": "Four shards, shared batched threshold"}
+        rows = []
+        for pr in ["T1-benign-time", "T2-day"]:
+            for sc in ["global", "protocol", "skew4", "sync4"]:
+                v = x[(x.protocol == pr) & (x.scheme == sc)]
+                rows.append([pr.split("-")[0] if sc == "global" else "", names[sc], str(v.seed.nunique()),
+                             str(int(v.n_shards.iloc[0])), f"{v.load.mean():.2f}",
+                             f"{v.load_shard_min.min():.2f} to {v.load_shard_max.max():.2f}",
+                             f"{v.recall.mean():.3f}", f"{v.precision.mean():.3f}"])
+        T["A21"] = table("**Table A21.** Online budget on heterogeneous shards of the chronological streams "
+                         "(CSE-CIC-IDS2018, LightGBM, weighted Fisher priority, 1% budget). Each shard has its own "
+                         "warm-up threshold and online update unless the threshold is shared; the shared threshold is "
+                         "updated after every 4,096 flows of the merged stream. Load is the queue size divided by "
+                         "the budget; shard loads give the lowest and highest shard over all seeds.",
+                         ["Protocol", "Sharding", "Seeds", "Shards", "Load", "Shard loads", "Recall", "Precision"],
+                         rows, ["l", "l", "r", "r", "r", "r", "r", "r"])
 
 
 if __name__ == "__main__":
-    for f in (t_data, t_xd, t_os, t_prio, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl):
+    for f in (t_data, t_xd, t_os, t_prio, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream):
         try:
             f()
             print("ok", f.__name__)

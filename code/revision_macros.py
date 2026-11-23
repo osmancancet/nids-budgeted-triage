@@ -480,22 +480,215 @@ def ctrl_macros():
     fb = pair.loc["FB"]
     if len(pair.loc["RL"]) < 6 if "RL" in pair.index.get_level_values(0) else True:
         return
-    for v, k in [("RL", "rl"), ("US", "us"), ("FB_n10", "n10"), ("FB_n20", "n20")]:
+    att = d.groupby("variant").n_attack_labels.mean()
+    for v, k in [("RL", "rl"), ("US", "us"), ("FB_n10", "n10"), ("FB_n20", "n20"), ("FB_d1", "d1"), ("PU", "pu")]:
         if v not in pair.index.get_level_values(0):
             continue
-        g = pair.loc[v]
+        # pair with FB on the seeds that this variant has
+        sv = d[d.variant == v][["source", "target", "seed"]]
+        fbv = d[d.variant == "FB"].merge(sv, on=["source", "target", "seed"])
+        fbp = fbv.groupby(["source", "target"]).recall.mean()
+        g = d[d.variant == v].groupby(["source", "target"])[["recall", "precision", "labels"]].mean()
+        if len(g) < 6:
+            continue
         M[f"ctrl_{k}_rec"] = f(g.recall.mean(), 3)
         M[f"ctrl_{k}_prec"] = f(g.precision.mean(), 3)
         M[f"ctrl_{k}_labels"] = f"{g.labels.mean():,.0f}"
-        M[f"ctrl_fb_vs_{k}"] = ci_pairs(paired(fb.recall, g.recall))
-        M[f"ctrl_fb_better_{k}"] = str(int((fb.recall > g.recall).sum()))
+        M[f"ctrl_{k}_att"] = f"{att[v]:.0f}"
+        M[f"ctrl_{k}_nseeds"] = str(sv.seed.nunique())
+        M[f"ctrl_fb_vs_{k}"] = ci_pairs(paired(fbp, g.recall))
+        M[f"ctrl_fb_better_{k}"] = str(int((fbp > g.recall).sum()))
+    # label-free PU control, paired run by run with RL and FB on whatever runs exist
+    if "PU" in pair.index.get_level_values(0):
+        k3 = ["source", "target", "seed"]
+        pu = d[d.variant == "PU"].set_index(k3)
+        rl = d[d.variant == "RL"].set_index(k3).reindex(pu.index)
+        fbr = d[d.variant == "FB"].set_index(k3).reindex(pu.index)
+        base = d[d.variant == "base_fisher"].set_index(k3).reindex(pu.index)
+        M["pu_nruns"] = str(len(pu))
+        M["pu_npairs"] = words(pu.reset_index()[["source", "target"]].drop_duplicates().shape[0])
+        M["pu_nseeds"] = words(pu.reset_index().seed.nunique())
+        M["pu_rec"] = f(pu.recall.mean(), 3)
+        M["pu_rl_rec"] = f(rl.recall.mean(), 3)
+        M["pu_fb_rec"] = f(fbr.recall.mean(), 3)
+        M["pu_base_rec"] = f(base.recall.mean(), 3)
+        M["pu_att"] = f"{pu.n_attack_labels.mean():.0f}"
+        M["pu_vs_rl"] = f"{(pu.recall - rl.recall).mean():+.3f}"
+        M["pu_vs_base"] = f"{(pu.recall - base.recall).mean():+.3f}"
+        M["pu_vs_fb"] = f"{(pu.recall - fbr.recall).mean():+.3f}"
+        M["pu_gt_base"] = str(int((pu.recall > base.recall).sum()))
+        N["xd_adapt_pu"] = pu.reset_index().round(4).to_dict("records")
+    M["ctrl_fb_att"] = f"{att['FB']:.0f}"
     M["ctrl_fb_labels"] = f"{fb.labels.mean():,.0f}"
     N["xd_adapt_ctrl"] = pair.reset_index().round(4).to_dict("records")
 
 
+def stream_macros():
+    """Mixed streams, alternative novelty scores, Holm correction, step size and streaming throughput."""
+    from scipy.stats import wilcoxon
+    from revision_summary import paired
+    # Holm over the rules compared with the detector (OS, LightGBM, 1% budget, family means)
+    p = pd.read_csv(os.path.join(RES, "os_priorities.csv"))
+    p = p[(p.model == "LGBM") & (p.budget == 0.01)]
+    fr = p.groupby(["dataset", "held_out", "priority"]).recall.mean().unstack()
+    rules = [r for r in fr.columns if r not in ("detector", "proxy_switch")]
+    ps = {}
+    for r in rules:
+        d = (fr[r] - fr["detector"]).dropna()
+        ps[r] = wilcoxon(d[d != 0]).pvalue
+    order = sorted(ps, key=ps.get)
+    holm, run = {}, 0.0
+    for i, r in enumerate(order):
+        run = max(run, min(1.0, (len(order) - i) * ps[r]))
+        holm[r] = run
+    M["holm_n_rules"] = str(len(rules))
+    M["holm_wf07"] = pv(holm["wfisher0.7"])
+    N["os_holm_b0.01"] = {r: dict(p=ps[r], p_holm=holm[r]) for r in rules}
+    # mixed streams
+    fm = os.path.join(RES, "os_mixed.csv")
+    if os.path.exists(fm):
+        x = pd.read_csv(fm)
+        for (pu, mode, tag) in [(0.002, "topk", ""), (0.002, "warmup", "_warm"), (0.005, "topk", "_05")]:
+            y = x[(x.pi_u == pu) & (x.budget == 0.01) & (x["mode"] == mode)]
+            g = y.groupby(["dataset", "held_out", "rule"])[["recall_unseen", "recall_known", "recall_all"]].mean()
+            u, k = g.recall_unseen.unstack(), g.recall_known.unstack()
+            r = paired(u["wfisher0.7"], u["detector"])
+            M["mix_d" + tag] = ci(r)
+            if tag == "":
+                M["mix_dm"] = f"{r['mean']:.3f}"
+                M["mix_n"] = str(r["n"])
+                for rule, kk in [("detector", "det"), ("fisher", "fi"), ("wfisher0.7", "wf")]:
+                    M[f"mix_u_{kk}"] = f(u[rule].mean(), 3)
+                    M[f"mix_k_{kk}"] = f(k[rule].mean(), 3)
+                M["mix_dk_wf"] = ci(paired(k["wfisher0.7"], k["detector"]))
+                M["mix_dk_fi"] = ci(paired(k["fisher"], k["detector"]))
+                N["os_mixed_b0.01"] = dict(unseen=u.mean().round(4).to_dict(), known=k.mean().round(4).to_dict())
+    # alternative novelty scores
+    fn = os.path.join(RES, "os_novalt.csv")
+    if os.path.exists(fn):
+        x = pd.read_csv(fn)
+        x = x[x.budget == 0.01]
+        g = x.groupby(["dataset", "held_out", "novelty", "rule"]).recall.mean().unstack(["novelty", "rule"])
+        a = x.groupby(["dataset", "held_out", "novelty"]).auroc_nov.mean().unstack()
+        M["nalt_n"] = str(len(g))
+        for kind in ["knn", "iforest", "lof", "maha"]:
+            M[f"nalt_{kind}_wf"] = f(g[(kind, "wfisher0.7")].mean(), 3)
+            M[f"nalt_{kind}_nov"] = f(g[(kind, "novelty")].mean(), 3)
+            M[f"nalt_{kind}_auc"] = f(a[kind].mean(), 2)
+            if kind != "knn":
+                M[f"nalt_knn_vs_{kind}"] = ci(paired(g[("knn", "wfisher0.7")], g[(kind, "wfisher0.7")]))
+                M[f"nalt_{kind}_vs_det"] = ci(paired(g[(kind, "wfisher0.7")], g[("knn", "detector")]))
+        M["nalt_det"] = f(g[("knn", "detector")].mean(), 3)
+        N["os_novalt_b0.01"] = {k: dict(wf=float(g[(k, "wfisher0.7")].mean()), nov=float(g[(k, "novelty")].mean()),
+                                    auroc=float(a[k].mean())) for k in ["knn", "iforest", "lof", "maha"]}
+    # step size of the online update
+    fg = os.path.join(RES, "extra_gamma.csv")
+    if os.path.exists(fg):
+        x = pd.read_csv(fg)
+        t = x.groupby(["rule", "protocol"])[["load", "load_min10", "load_max10", "recall"]].mean()
+        for rule in x.rule.unique():
+            k = rule.replace(".", "").replace("_", "")
+            M[f"gam_{k}_load"] = f"{t.loc[rule].load.min():.2f} to {t.loc[rule].load.max():.2f}"
+            M[f"gam_{k}_rng"] = f"{t.loc[rule].load_min10.min():.2f} to {t.loc[rule].load_max10.max():.2f}"
+        N["extra_gamma"] = t.reset_index().round(4).to_dict("records")
+    # streaming throughput
+    fb = os.path.join(RES, "stream_batch.csv")
+    if os.path.exists(fb):
+        b = pd.read_csv(fb).set_index("batch")
+        for B in b.index:
+            M[f"stream_fps_b{B}"] = f"{b.loc[B, 'flows_per_s']:,.0f}".replace(",", ",")
+            M[f"stream_us_b{B}"] = f(b.loc[B, "us_per_flow"], 1)
+            M[f"stream_p99_b{B}"] = f(b.loc[B, "p99_ms"], 1)
+        sh = pd.read_csv(os.path.join(RES, "stream_shards.csv")).set_index("shards")
+        for P in sh.index:
+            M[f"stream_fps_s{P}"] = f"{sh.loc[P, 'flows_per_s']:,.0f}"
+            M[f"stream_load_s{P}"] = f(sh.loc[P, "load_union"], 2)
+        M["stream_speedup_s4"] = f(sh.loc[4, "flows_per_s"] / sh.loc[1, "flows_per_s"], 1)
+        M["stream_shard_load_rng"] = f"{sh.load_shard_min.min():.2f} to {sh.load_shard_max.max():.2f}"
+        mi = pd.read_csv(os.path.join(RES, "stream_misc.csv"))
+        v = lambda it, th=None: mi[(mi["item"] == it) & ((mi.threads == th) if th else True)].value.iloc[0]
+        M["stream_ntrain"] = f"{int(mi[mi['item'] == 'retrain_lgbm_s'].n_train.iloc[0]):,}"
+        M["stream_retrain_1"] = f(v("retrain_lgbm_s", 1), 0)
+        M["stream_retrain_4"] = f(v("retrain_lgbm_s", 4), 0)
+        M["stream_mb_hnsw"] = f(v("state_mb_hnsw"), 1)
+        M["stream_mb_lgbm"] = f(v("state_mb_lgbm"), 1)
+        M["stream_mb_cal"] = f(v("state_mb_calibration"), 1)
+        h = mi[mi["item"] == "hnsw"].groupby(["n_ref", "ef"])[["recall_at5", "build_s", "us_per_flow"]].agg(["mean", "min", "max"])
+        for nr in [20000, 50000, 100000]:
+            kk = nr // 1000
+            M[f"hnsw_build_{kk}k"] = f(h.loc[(nr, 64), ("build_s", "mean")], 1)
+            for ef in [64, 128, 256]:
+                M[f"hnsw_rec_{kk}k_ef{ef}"] = f"{h.loc[(nr, ef), ('recall_at5', 'mean')]:.3f}"
+                M[f"hnsw_recrng_{kk}k_ef{ef}"] = f"{h.loc[(nr, ef), ('recall_at5', 'min')]:.3f} to {h.loc[(nr, ef), ('recall_at5', 'max')]:.3f}"
+                M[f"hnsw_us_{kk}k_ef{ef}"] = f(h.loc[(nr, ef), ("us_per_flow", "mean")], 1)
+
+    # weighted Fisher for all four model families
+    fw = os.path.join(RES, "os_models_wf.csv")
+    if os.path.exists(fw):
+        x = pd.read_csv(fw)
+        x = x[x.budget == 0.01]
+        out = {}
+        for m, g in x.groupby("model"):
+            fr = g.groupby(["dataset", "held_out", "rule"]).recall.mean().unstack()
+            r = paired(fr["wfisher0.7"], fr["detector"])
+            M[f"mwf_{m}"] = ci(r)
+            M[f"mwf_{m}_m"] = f"{r['mean']:.3f}"
+            M[f"mwf_{m}_det"] = f(fr["detector"].mean(), 3)
+            M[f"mwf_{m}_wf"] = f(fr["wfisher0.7"].mean(), 3)
+            out[m] = dict(r, det=float(fr["detector"].mean()), wf=float(fr["wfisher0.7"].mean()))
+        oth = [out[m]["mean"] for m in out if m != "LGBM"]
+        M["mwf_rng"] = f"{min(oth):.3f} to {max(oth):.3f}"
+        N["os_models_wf_b0.01"] = out
+    # tie-breaking at the p-value floor
+    ft = os.path.join(RES, "os_ties.csv")
+    if os.path.exists(ft):
+        t = pd.read_csv(ft)
+        fam = t.groupby(["dataset", "held_out", "rule"])[["floor", "tied", "recall", "recall_random_tie"]].mean()
+        dd, ww = fam.xs("detector", level="rule"), fam.xs("wfisher0.7", level="rule")
+        M["tie_floor_pct"] = pct(dd.floor.mean(), 0)
+        M["tie_det_pct"] = pct(dd.tied.mean(), 1)
+        M["tie_wf_pct"] = pct(ww.tied.mean(), 2)
+        M["tie_det_max_pct"] = pct(t[t.rule == "detector"].tied.max(), 0)
+        M["tie_det_rec"] = f(dd.recall.mean(), 3)
+        M["tie_det_rec_rand"] = f(dd.recall_random_tie.mean(), 3)
+        M["tie_wf_rec"] = f(ww.recall.mean(), 3)
+        M["tie_wf_rec_rand"] = f(ww.recall_random_tie.mean(), 3)
+        N["os_ties"] = dict(floor=float(dd.floor.mean()), tied_det=float(dd.tied.mean()), tied_wf=float(ww.tied.mean()))
+    # per-flow cost of each stage of the streaming path
+    fp = os.path.join(RES, "stream_profile.csv")
+    if os.path.exists(fp):
+        p = pd.read_csv(fp).set_index("stage")
+        for st in p.index:
+            M[f"prof_{st}_us"] = f(p.loc[st, "us_per_flow"], 1 if p.loc[st, "us_per_flow"] >= 0.1 else 2)
+            M[f"prof_{st}_pct"] = pct(p.loc[st, "share"], 0 if p.loc[st, "share"] >= 0.01 else 1)
+        M["prof_triage_pct"] = pct(p.loc[["p_detector", "p_novelty", "fisher", "update"], "share"].sum(), 1)
+        M["prof_triage_us"] = f(p.loc[["p_detector", "p_novelty", "fisher", "update"], "us_per_flow"].sum(), 2)
+        N["stream_profile"] = p.reset_index().to_dict("records")
+    # heterogeneous shards on the chronological streams
+    fh = os.path.join(RES, "extra_shards_het.csv")
+    if os.path.exists(fh):
+        h = pd.read_csv(fh)
+        ok = h.groupby(["seed", "protocol"]).scheme.nunique()
+        keep = ok[ok == 4].index
+        h = h.set_index(["seed", "protocol"]).loc[keep].reset_index()
+        M["shet_nseeds"] = words(h.seed.nunique())
+        for pr, kp in [("T1-benign-time", "t1"), ("T2-day", "t2")]:
+            g = h[h.protocol == pr].groupby("scheme")
+            M[f"shet_{kp}_nseeds"] = words(h[h.protocol == pr].seed.nunique())
+            for sc in ["global", "protocol", "skew4", "sync4"]:
+                x = g.get_group(sc)
+                M[f"shet_{kp}_{sc}_rec"] = f(x.recall.mean(), 3)
+                M[f"shet_{kp}_{sc}_load"] = f(x.load.mean(), 2)
+                M[f"shet_{kp}_{sc}_maxload"] = f(x.load_shard_max.max(), 2)
+                M[f"shet_{kp}_{sc}_minload"] = f(x.load_shard_min.min(), 2)
+        pr_ = h[h.scheme == "protocol"]
+        M["shet_proto_minshare"] = pct(pr_.size_share_min.min(), 1)
+        N["extra_shards_het"] = h.round(4).to_dict("records")
+
+
 def build():
     os_macros()
-    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros"):
+    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros"):
         fn = globals().get(mod)
         if fn:
             try:

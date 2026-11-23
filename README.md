@@ -27,7 +27,17 @@ cd ../manuscript && latexmk -pdf main.tex
 ```
 Run the two experiments one after the other; running them in parallel oversubscribes LightGBM threads and is dramatically slower.
 
-## Before submission (author TODO)
-- Fill in affiliations, e-mail, and check CRediT roles and acknowledgements (search for `TODO(author)`).
-- Code repository: https://github.com/osmancancet/nids-budgeted-triage (URL already in the manuscript).
-- Read and verify everything; adapt the generative-AI declaration to your actual use.
+## Revision analyses
+All revision scripts reuse the stored scores of `revision_dump.py` and write to `results/revision/`; `revision_macros.py` and `revision_tables.py` turn these files into the numbers and tables of the revised manuscript.
+- `revision_dump.py` - stores per-run detector and novelty scores; `revision_analysis.py` - budget rules, priorities, streams
+- `revision_extra.py` - temporal (T1, T2), tool-stable features, held-out groups, reference size, subsampling, cost
+- `revision_adapt.py`, `revision_adapt_ctrl.py` - adaptation to a new network, feedback loop and its controls (random labels, uncertainty sampling, label noise, unlabelled flows added as benign)
+- `revision_mixed.py` - held-out families arriving among known attacks; `revision_novalt.py` - alternative novelty scores
+- `revision_models_wf.py` - weighted Fisher priority for all four detectors; `revision_ties.py` - ties at the p-value floor
+- `revision_gamma.py` - step size of the online update; `revision_shards_het.py` - online budget on heterogeneous shards
+- `revision_stream.py` - streaming throughput, shards, retraining and index rebuild; `revision_stream_profile.py` - per-stage cost
+- `revision_summary*.py` - per-run summaries and paired tests
+
+Run the scripts one at a time on a 4-core machine; several LightGBM jobs at once oversubscribe the cores.
+
+Code repository: https://github.com/osmancancet/nids-budgeted-triage
