@@ -869,6 +869,36 @@ def round7_macros():
         M["lo_streams"] = str(int(d.streams.max()))
         M["lo_sd_within"] = f"{d.sd_within.min():.2f} to {d.sd_within.max():.2f}"
         M["lo_sd_between"] = f"{d.sd_between.min():.2f} to {d.sd_between.max():.2f}"
+    ow = os.path.join(RES, "os_warmup.csv")
+    if os.path.exists(ow):
+        w_ = pd.read_csv(ow)
+        w_ = w_[(w_.rule == "warmup") & (w_.budget == 0.01) & (w_.warmup == 0.2) & (w_.model == "LGBM")]
+        for pr_, k_ in [("fisher", "fis"), ("detector", "det")]:
+            x_ = w_[w_.priority == pr_]
+            M[f"lo_{k_}_mean"] = f(x_.load.mean())
+            M[f"lo_{k_}_med"] = f(x_.load.median())
+            bd = x_.groupby("dataset").load.median()
+            M[f"lo_{k_}_byds"] = "; ".join(f"{d} {v:.2f}" for d, v in bd.items())
+    tb_ = os.path.join(RES, "budget_ties.csv")
+    if os.path.exists(tb_):
+        o_ = pd.read_csv(tb_)
+        o_ = o_[(o_.regime == "Unseen family") & (o_.priority == "wfisher0.7")]
+        M["bound_os_ratio_med"] = f(((o_.range / o_.gamma).median() + 1) / (o_["T"].median() * 0.01))
+    # hierarchical bootstrap of the weighted Fisher gain (datasets, then families within datasets)
+    pp_ = os.path.join(RES, "os_priorities.csv")
+    if os.path.exists(pp_):
+        q_ = pd.read_csv(pp_)
+        q_ = q_[(q_.budget == 0.01) & (q_.model == "LGBM") & q_.priority.isin(["detector", "wfisher0.7"])]
+        fam_ = q_.groupby(["dataset", "held_out", "priority"]).recall.mean().unstack()
+        dif = (fam_["wfisher0.7"] - fam_["detector"]).dropna()
+        groups = [v.to_numpy() for _, v in dif.groupby(level="dataset")]
+        rb = np.random.default_rng(11)
+        bs = []
+        for _ in range(5000):
+            pick = rb.integers(0, len(groups), len(groups))
+            bs.append(np.concatenate([rb.choice(groups[i], len(groups[i])) for i in pick]).mean())
+        M["hb_wf_ci"] = f"{np.quantile(bs, .025):+.3f} to {np.quantile(bs, .975):+.3f}".replace("-0.000", "0.000")
+        M["hb_wf_mean"] = f"{dif.mean():+.3f}"
     bc = N.get("os_breakeven_ci", {}).get("fisher_b0.01")
     if bc:
         M["be_ci_lo"], M["be_ci_hi"] = f(bc["lo"], 2), f(bc["hi"], 2)

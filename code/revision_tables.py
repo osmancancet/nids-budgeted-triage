@@ -359,17 +359,29 @@ def t_extras():
     rf = r("extra_reference.csv")
     if rf is not None:
         fam = rf.groupby(["dataset", "held_out", "n_ref", "contamination"]).mean(numeric_only=True).reset_index()
+        import glob as _glob
+        wff = sorted(_glob.glob(os.path.join(REV, "extra_reference_wf_s*.csv")))
+        wfm = {}
+        if wff:
+            wd = pd.concat(pd.read_csv(f_) for f_ in wff)
+            wd = wd.groupby(["dataset", "held_out", "n_ref", "contamination"]).mean(numeric_only=True).reset_index()
+            wfm = {(n_, c_): g_.rec_wfisher.mean() for (n_, c_), g_ in wd.groupby(["n_ref", "contamination"]) if n_ == 20000}
         rows = []
         for (n, c), g in fam.groupby(["n_ref", "contamination"]):
+            w_ = wfm.get((n, c))
             rows.append([f"{int(n):,}", f"{100 * c:g}%", len(g), f"{g.auroc_nov.mean():.3f}", f"{g.rec_detector.mean():.3f}",
-                         f"{g.rec_fisher.mean():.3f}", f"{g.load_warmup.median():.2f}", f"{g.knn_us.median():.1f}"])
+                         f"{g.rec_fisher.mean():.3f}", "" if w_ is None else f"{w_:.3f}",
+                         f"{g.load_warmup.median():.2f}", f"{g.knn_us.median():.1f}"])
         T["A13"] = table("**Table A13.** Size and contamination of the benign novelty reference (Protocol OS, "
                          "LightGBM, seeds 0 to 2). Contamination replaces the stated share of the reference with "
                          "flows of the held-out family from the training period; families with too few such flows "
                          "are omitted at that level. Where a dataset has fewer benign training flows than the stated size, all of "
-                         "them form the reference, and the row gives that size.",
+                         "them form the reference, and the row gives that size. Weighted Fisher (w = 0.7) comes from a separate "
+                         "run with exact neighbour search on the same families and seeds and is given for the 20,000-flow "
+                         "reference and its contaminated versions.",
                          ["Reference size", "Contamination", "Families", "AUROC nov.", "Queue recall, detector",
-                          "Queue recall, Fisher", "Warm-up load", "kNN µs per flow"], rows, ["r"] * 8)
+                          "Queue recall, Fisher", "Queue recall, weighted Fisher", "Warm-up load", "kNN µs per flow"],
+                         rows, ["r"] * 9)
     v = r("xd_validity.csv")
     if v is not None:
         o = r("os_validity.csv").assign(regime="Unseen family")
@@ -570,7 +582,9 @@ def t_stream():
         T["A20"] = table("**Table A20.** Step size of the online update on the chronological streams (Fisher priority, "
                          "1% budget, LightGBM, mean over five seeds). The step is g times the spread between the median "
                          "and the 99.9th percentile of the warm-up priorities; the main experiments use g = 0.02. The "
-                         "range gives the lowest and highest load among the ten consecutive tenths of the stream.",
+                         "range gives the lowest and highest load among the ten consecutive tenths of the stream, averaged over "
+                         "seeds. The table comes from a separate run, so the g = 0.02 rows can differ from Table 7 in "
+                         "the second decimal.",
                          ["Protocol", "Update", "Load", "Load range over tenths", "Recall"], rows,
                          ["l", "l", "r", "r", "r"])
 
@@ -588,14 +602,20 @@ def t_stream():
                 rows.append([pr.split("-")[0] if sc == "global" else "", names[sc], str(v.seed.nunique()),
                              str(int(v.n_shards.iloc[0])), f"{v.load.mean():.2f}",
                              f"{v.load_shard_min.min():.2f} to {v.load_shard_max.max():.2f}",
-                             f"{v.recall.mean():.3f}", f"{v.precision.mean():.3f}"])
+                             f"{v.recall.mean():.3f}", f"{v.precision.mean():.3f}",
+                             f"{100 * (v.precision * v.load * 0.01 / v.recall).mean():.2f}%"])
         T["A21"] = table("**Table A21.** Online budget on heterogeneous shards of the chronological streams "
                          "(CSE-CIC-IDS2018, LightGBM, weighted Fisher priority, 1% budget). Each shard has its own "
                          "warm-up threshold and online update unless the threshold is shared; the shared threshold is "
                          "updated after every 4,096 flows of the merged stream. Load is the queue size divided by "
-                         "the budget; shard loads give the lowest and highest shard over all seeds.",
-                         ["Protocol", "Sharding", "Seeds", "Shards", "Load", "Shard loads", "Recall", "Precision"],
-                         rows, ["l", "l", "r", "r", "r", "r", "r", "r"])
+                         "the budget; shard loads give the lowest and highest shard over all seeds. Recall, precision and load are "
+                         "measured after the warm-up windows; because attacks cluster in time, the attack share of "
+                         "that part of the stream (last column, precision × load × budget / recall, mean over seeds) "
+                         "differs from the 1% of the whole stream, which is why precision and recall do not match "
+                         "as they would at 1% prevalence.",
+                         ["Protocol", "Sharding", "Seeds", "Shards", "Load", "Shard loads", "Recall", "Precision",
+                          "Attack share"],
+                         rows, ["l", "l", "r", "r", "r", "r", "r", "r", "r"])
 
 
 if __name__ == "__main__":
