@@ -1151,9 +1151,27 @@ def small_budget_macros():
     M["sb_rec_max"] = f"{sm.recall.max():.3f}"
 
 
+def sync_macros():
+    """Coordinator with workers that wait for the reply (dist/dist_bench.py --sync, cloud VM, 4 workers)."""
+    p = os.path.join(RES, "dist_sync_cloud.csv")
+    if not os.path.exists(p):
+        return
+    x = pd.read_csv(p)
+    x = x[x.step == "perworker"].groupby(["batch", "delay_ms"])[["flows_per_s", "load", "load_tenth_min",
+                                                              "load_tenth_max", "staleness"]].median()
+    for (bs, dl), v in x.iterrows():
+        M[f"dsync_{bs}_{dl}_fps"] = f"{v.flows_per_s:,.0f}"
+    lo_, hi_ = f"{x.load.min():.3f}", f"{x.load.max():.3f}"
+    M["dsync_load_rng"] = lo_ if lo_ == hi_ else f"{lo_} to {hi_}"
+    M["dsync_tenth_rng"] = f"{x.load_tenth_min.min():.2f} to {x.load_tenth_max.max():.2f}"
+    M["dsync_stale"] = f"{x.staleness.median():.1f}"
+    M["dsync_delays"] = ", ".join(str(int(d)) for d in sorted(x.index.get_level_values(1).unique())[:-1]) + \
+        f" and {int(x.index.get_level_values(1).max())}"
+
+
 def build():
     os_macros()
-    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros", "round7_macros", "dist_macros", "small_budget_macros"):
+    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros", "round7_macros", "dist_macros", "small_budget_macros", "sync_macros"):
         fn = globals().get(mod)
         if fn:
             try:

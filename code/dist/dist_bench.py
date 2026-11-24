@@ -12,6 +12,8 @@ stream in micro-batches with the weighted Fisher priority (w = 0.7, 1% budget, H
           network between nodes. The worker uses a reply when it arrives (asynchronous updates).
           The step is either the per-flow step g of the single-process update ("full") or g / P
           ("perworker"), which offsets the P - 1 updates a worker misses between two replies.
+  sync    as coord, but a worker waits for the reply to its update before flagging its next batch
+          (--sync); every batch then pays one round trip including the delay.
 
 Reported per run: throughput over the slowest worker (processing time after model loading and the
 warm-up), throughput including start-up, queue load of the union, load per tenth of the stream, and
@@ -132,7 +134,7 @@ def coordinator(port, nworkers, t0, delay_ms, q):
 
 
 def worker(args):
-    d, lo, hi, s, port, t_shared, g_shared = args
+    d, lo, hi, s, port, t_shared, g_shared, sync = args
     a0 = time.perf_counter()
     z = np.load(os.path.join(d, "bundle.npz"))
     X = z["X"][lo:hi]
@@ -153,6 +155,8 @@ def worker(args):
                 t, last_n = conn.recv()
             f = sc >= t
             conn.send((float(f.sum() - C * len(f)), g, last_n))
+            if sync:  # wait for the updated threshold before the next batch
+                t, last_n = conn.recv()
         fl.append(f)
     if port is not None:
         conn.send(None)
@@ -162,6 +166,9 @@ def worker(args):
 
 
 def run(d, n, P, s, mode, delay, port, step="full"):
+    sync = mode == "sync"
+    if sync:
+        mode = "coord"
     edges = np.linspace(0, n, P + 1).astype(int)
     ctx = mp.get_context("spawn")
     tsh = gsh = None
@@ -175,7 +182,7 @@ def run(d, n, P, s, mode, delay, port, step="full"):
         cp = ctx.Process(target=coordinator, args=(port, P, tsh, delay, q))
         cp.start()
         time.sleep(0.5)
-    jobs = [(d, edges[i], edges[i + 1], s, port if mode == "coord" else None, tsh, gsh) for i in range(P)]
+    jobs = [(d, edges[i], edges[i + 1], s, port if mode == "coord" else None, tsh, gsh, sync) for i in range(P)]
     a = time.perf_counter()
     with ctx.Pool(P) as pool:
         res = pool.map(worker, jobs)
@@ -203,6 +210,7 @@ def main():
     ap.add_argument("--batches", default="256,1024,4096")
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--sync", action="store_true", help="only synchronous coordinated runs")
     a = ap.parse_args()
     d = a.bundle
     n = len(np.load(os.path.join(d, "bundle.npz"))["y"])
@@ -215,6 +223,17 @@ def main():
                 system=platform.system(), cores=os.cpu_count())
     rows, port = [], 47000
     ws = [int(x) for x in a.workers.split(",")]
+    if a.sync:
+        for rep in range(a.reps):
+            for s in [int(x) for x in a.batches.split(",")]:
+                for dl in [int(x) for x in a.delays.split(",")]:
+                    for stp in ["full", "perworker"]:
+                        port += 1
+                        rows.append(dict(host, rep=rep, mode="sync", workers=max(ws), batch=s, delay_ms=dl,
+                                         step=stp, **run(d, n, max(ws), s, "sync", dl, port, stp)))
+                        print(rows[-1], flush=True)
+                        pd.DataFrame(rows).to_csv(a.out, index=False)
+        return
     for rep in range(a.reps):
         for P in ws:
             rows.append(dict(host, rep=rep, mode="indep", workers=P, batch=4096, delay_ms=0,
