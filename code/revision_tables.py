@@ -647,16 +647,24 @@ def t_stream():
         fx = os.path.join(REV, "extra_shards_fix.csv")
         if os.path.exists(fx):
             x = pd.concat([x, pd.read_csv(fx).query("scheme != 'global'")])
+        fc = os.path.join(REV, "extra_shards_coord.csv")
+        if os.path.exists(fc):
+            x = pd.concat([x, pd.read_csv(fc).query("scheme.str.endswith('perworker')", engine="python")])
         names = {"global": "One threshold", "protocol": "One shard per protocol",
                  "skew4": "Four shards, attacks on one", "sync4": "Four shards, shared batched threshold",
                  "protocol_sync256": "Per protocol, shared threshold every 256 flows",
                  "protocol_share": "Per protocol, budgets from warm-up share",
                  "skew4_sync256": "Attacks on one, shared threshold every 256 flows",
-                 "skew4_share": "Attacks on one, budgets from warm-up share"}
+                 "skew4_share": "Attacks on one, budgets from warm-up share",
+                 "protocol_coord256_perworker": "Per protocol, coordinator, 256-flow batches",
+                 "protocol_coord1024_perworker": "Per protocol, coordinator, 1,024-flow batches",
+                 "skew4_coord256_perworker": "Attacks on one, coordinator, 256-flow batches",
+                 "skew4_coord1024_perworker": "Attacks on one, coordinator, 1,024-flow batches"}
         rows = []
         for pr in ["T1-benign-time", "T2-day"]:
             for sc in ["global", "protocol", "skew4", "sync4", "protocol_sync256", "skew4_sync256",
-                       "protocol_share", "skew4_share"]:
+                       "protocol_share", "skew4_share", "protocol_coord256_perworker",
+                       "protocol_coord1024_perworker", "skew4_coord256_perworker", "skew4_coord1024_perworker"]:
                 v = x[(x.protocol == pr) & (x.scheme == sc)]
                 if v.empty:
                     continue
@@ -671,7 +679,9 @@ def t_stream():
                          "updated after every 4,096 flows of the merged stream, the other shared threshold after every "
                          "256 flows with the same per-flow step. With budgets from the warm-up share, one warm-up "
                          "threshold is taken over the merged stream, each shard's budget is the share of its own "
-                         "warm-up flows above it, and each shard then runs its own update with that budget. Load is the queue size divided by "
+                         "warm-up flows above it, and each shard then runs its own update with that budget. With the coordinator, "
+                         "each shard flags a batch with the threshold it received after its own previous batch and sends its "
+                         "excess to one shared threshold, with the step divided by the number of shards (Section 4.11). Load is the queue size divided by "
                          "the budget; shard loads give the lowest and highest shard over all seeds. Recall, precision and load are "
                          "measured after the warm-up windows; because attacks cluster in time, the attack share of "
                          "that part of the stream (last column, precision × load × budget / recall, mean over seeds) "
@@ -682,8 +692,81 @@ def t_stream():
                          rows, ["l", "l", "r", "r", "r", "r", "r", "r", "r"])
 
 
+# ---------------------------------------------------------------- Tables A24 and A25
+MACH = {"cloud": "Cloud VM, 4 cores", "mac": "Laptop, 10 cores"}
+
+
+def dist_frames():
+    out = []
+    for k in ["cloud", "mac"]:
+        d = r(f"dist_bench_{k}.csv")
+        if d is not None:
+            d = d.copy()
+            d["host"] = k
+            out.append(d)
+    return pd.concat(out, ignore_index=True) if out else None
+
+
+def t_dist():
+    d = dist_frames()
+    if d is None:
+        return
+    ind = d[d["mode"] == "indep"].groupby(["host", "workers"]).agg(
+        fps=("flows_per_s", "median"), load=("load", "median"), lo=("load_tenth_min", "median"),
+        hi=("load_tenth_max", "median"), wlo=("load_worker_min", "median"), whi=("load_worker_max", "median"),
+        reps=("rep", "nunique")).reset_index()
+    rows = []
+    for h in ["cloud", "mac"]:
+        g = ind[ind.host == h]
+        if not len(g):
+            continue
+        b = g[g.workers == 1].fps.iloc[0]
+        for x in g.itertuples():
+            rows.append([MACH[h], str(int(x.workers)), f"{x.fps:,.0f}", f"{x.fps / b:.2f}",
+                         f"{x.fps / b / x.workers:.2f}", f"{x.load:.3f}", f"{x.lo:.2f} to {x.hi:.2f}",
+                         f"{x.wlo:.2f} to {x.whi:.2f}"])
+    T["A24"] = table("**Table A24.** Independent workers on two machines (CSE-CIC-IDS2018 test stream of Table A22, "
+                     "LightGBM, HNSW reference, weighted Fisher priority, 1% budget, batches of 4,096 flows; median of "
+                     f"{int(ind.reps.max())} repetitions). Each worker is a separate process with its own models, "
+                     "warm-up and threshold. Throughput counts the time from the end of the warm-up to the last flow "
+                     "of the slowest worker. Efficiency is the speed-up divided by the number of workers.",
+                     ["Machine", "Workers", "Flows per s", "Speed-up", "Efficiency", "Load", "Load per tenth",
+                      "Worker loads"], rows, ["l", "r", "r", "r", "r", "r", "r", "r"])
+    c = d[d["mode"] == "coord"]
+    g = c.groupby(["host", "workers", "batch", "delay_ms", "step"]).agg(
+        fps=("flows_per_s", "median"), load=("load", "median"), lo=("load_tenth_min", "median"),
+        hi=("load_tenth_max", "median"), st=("staleness", "median"), up=("updates", "median"),
+        reps=("rep", "nunique")).reset_index()
+    rows = []
+    for h in ["cloud", "mac"]:
+        for (P, s), gg in g[g.host == h].groupby(["workers", "batch"]):
+            full_up = gg[(gg.delay_ms == 0)].up.max()
+            for dl in sorted(gg.delay_ms.unique()):
+                fu = gg[(gg.delay_ms == dl) & (gg.step == "full")]
+                pw = gg[(gg.delay_ms == dl) & (gg.step == "perworker")]
+                if not (len(fu) and len(pw)):
+                    continue
+                fu, pw = fu.iloc[0], pw.iloc[0]
+                rows.append([MACH[h], str(int(P)), f"{int(s):,}", str(int(dl)), f"{pw.st:.1f}",
+                             f"{100 * pw.up / full_up:.0f}", f"{fu.load:.2f}", f"{fu.lo:.2f} to {fu.hi:.2f}",
+                             f"{pw.load:.3f}", f"{pw.lo:.2f} to {pw.hi:.2f}", f"{pw.fps:,.0f}"])
+    T["A25"] = table("**Table A25.** One review threshold held by a coordinator process and shared by all workers "
+                     "over TCP (same stream and settings as Table A24; median of "
+                     f"{int(g.reps.max())} repetitions). After each batch a worker flags it with the last threshold it "
+                     "has received, sends its excess over the budget and goes on without waiting; the coordinator "
+                     "updates the threshold and answers each worker in order, holding every reply for the stated "
+                     "delay. Staleness is the mean number of updates applied by the coordinator between issuing a "
+                     "threshold and receiving the batch flagged with it; updates applied is the share of all batch "
+                     "updates the coordinator processed before the stream ended. The update uses either the per-flow "
+                     "step of a single process (full step) or that step divided by the number of workers (step/P); "
+                     "the last column is the throughput with step/P.",
+                     ["Machine", "Workers", "Batch", "Delay (ms)", "Staleness", "Updates applied (%)", "Load, full step",
+                      "Per tenth, full step", "Load, step/P", "Per tenth, step/P", "Flows per s"], rows,
+                     ["l", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"])
+
+
 if __name__ == "__main__":
-    for f in (t_data, t_xd, t_os, t_prio, t_allrules, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync):
+    for f in (t_data, t_xd, t_os, t_prio, t_allrules, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync, t_dist):
         try:
             f()
             print("ok", f.__name__)

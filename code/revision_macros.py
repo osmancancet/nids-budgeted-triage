@@ -1055,9 +1055,82 @@ def round7_macros():
         M["st_nseeds"] = words(pd.read_csv(st).seed.nunique())
 
 
+def dist_macros():
+    """Independent and coordinated workers on two machines (dist/dist_bench.py)."""
+    fr = []
+    for h in ["cloud", "mac"]:
+        p = os.path.join(RES, f"dist_bench_{h}.csv")
+        if os.path.exists(p):
+            d = pd.read_csv(p)
+            d["host"] = h
+            fr.append(d)
+    if not fr:
+        return
+    d = pd.concat(fr, ignore_index=True)
+    ind = d[d["mode"] == "indep"].groupby(["host", "workers"]).agg(
+        fps=("flows_per_s", "median"), load=("load", "median"), lo=("load_tenth_min", "median"),
+        hi=("load_tenth_max", "median")).reset_index()
+    for h in ["cloud", "mac"]:
+        g = ind[ind.host == h].set_index("workers")
+        if not len(g):
+            continue
+        b = g.fps.loc[1]
+        for P, x in g.iterrows():
+            M[f"dist_{h}_fps{P}"] = f"{x.fps:,.0f}"
+            M[f"dist_{h}_su{P}"] = f"{x.fps / b:.2f}"
+            M[f"dist_{h}_eff{P}"] = f"{x.fps / b / P:.2f}"
+        M[f"dist_{h}_pmax"] = str(int(g.index.max()))
+        M[f"dist_{h}_cores"] = str(int(d[d.host == h].cores.iloc[0]))
+    M["dist_ind_load_rng"] = f"{ind.load.min():.3f} to {ind.load.max():.3f}"
+    M["dist_ind_tenth_rng"] = f"{ind.lo.min():.2f} to {ind.hi.max():.2f}"
+    ck = os.path.join(RES, "dist_check.csv")
+    if os.path.exists(ck):
+        v = pd.read_csv(ck).set_index("host").max_abs_priority_difference
+        e = int(np.floor(np.log10(v.loc["mac"])))
+        M["dist_check_mac"] = f"{v.loc['mac'] / 10 ** e:.0f} × 10^−{-e}^"
+    c = d[d["mode"] == "coord"].groupby(["host", "workers", "batch", "delay_ms", "step"]).agg(
+        fps=("flows_per_s", "median"), load=("load", "median"), lo=("load_tenth_min", "median"),
+        hi=("load_tenth_max", "median"), st=("staleness", "median"), up=("updates", "median")).reset_index()
+    pw, fu = c[c.step == "perworker"], c[c.step == "full"]
+    M["dist_div_load_rng"] = f"{pw.load.min():.3f} to {pw.load.max():.3f}"
+    M["dist_div_tenth_rng"] = f"{pw.lo.min():.2f} to {pw.hi.max():.2f}"
+    M["dist_delays"] = ", ".join(str(int(x)) for x in sorted(c.delay_ms.unique())[:-1]) + \
+        f" and {int(c.delay_ms.max())}"
+    a = fu[(fu.batch == 256) & (fu.delay_ms <= 10)]
+    M["dist_full256_load_max"] = f"{a.load.max():.2f}"
+    M["dist_full256_tenth"] = f"{a.lo.min():.2f} to {a.hi.max():.2f}"
+    m = fu[fu.host == "mac"]
+    if len(m):
+        for bs in [1024, 4096]:
+            x = m[m.batch == bs]
+            M[f"dist_full{bs}_load_rng"] = f"{x.load.min():.1f} to {x.load.max():.1f}"
+        x = m[(m.batch == 256) & (m.delay_ms == m.delay_ms.max())].iloc[0]
+        M["dist_full256_d50_load"] = f"{x.load:.1f}"
+        mp = pw[pw.host == "mac"]
+        y = mp[(mp.batch == 256) & (mp.delay_ms == mp.delay_ms.max())].iloc[0]
+        y0 = mp[(mp.batch == 256) & (mp.delay_ms == 0)].iloc[0]
+        M["dist_d50_stale"] = f"{y.st:.0f}"
+        M["dist_d50_applied"] = pct(y.up / y0.up)
+        M["dist_mac_stale0"] = f"{y0.st:.1f}"
+        M["dist_div_fps_mac_rng"] = f"{mp.fps.min():,.0f} to {mp.fps.max():,.0f}"
+    cl = pw[(pw.host == "cloud") & (pw.batch == 256) & (pw.delay_ms == 0)]
+    if len(cl):
+        M["dist_cloud_stale0"] = f"{cl.st.iloc[0]:.1f}"
+    sc = os.path.join(RES, "extra_shards_coord.csv")
+    if os.path.exists(sc):
+        x = pd.read_csv(sc)
+        g = x.groupby(["protocol", "scheme"])[["recall", "load", "load_shard_min", "load_shard_max"]].mean()
+        M["shco_nseeds"] = words(x.seed.nunique())
+        for (pr, sch), v in g.iterrows():
+            k = f"shco_{pr[:2].lower()}_{sch}"
+            M[k + "_rec"] = f"{v.recall:.3f}"
+            M[k + "_load"] = f"{v.load:.2f}"
+            M[k + "_shrng"] = f"{v.load_shard_min:.2f} to {v.load_shard_max:.2f}"
+
+
 def build():
     os_macros()
-    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros", "round7_macros"):
+    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros", "round7_macros", "dist_macros"):
         fn = globals().get(mod)
         if fn:
             try:
