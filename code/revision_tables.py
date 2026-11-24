@@ -674,7 +674,8 @@ def t_stream():
                              f"{v.recall.mean():.3f}", f"{v.precision.mean():.3f}",
                              f"{100 * (v.precision * v.load * 0.01 / v.recall).mean():.2f}%"])
         T["A21"] = table("**Table A21.** Online budget on heterogeneous shards of the chronological streams "
-                         "(CSE-CIC-IDS2018, LightGBM, weighted Fisher priority, 1% budget). Each shard has its own "
+                         "(CSE-CIC-IDS2018, LightGBM, weighted Fisher priority, 1% budget). The shards are replayed in their merged "
+                         "arrival order within one process. Each shard has its own "
                          "warm-up threshold and online update unless the threshold is shared; the shared batched threshold is "
                          "updated after every 4,096 flows of the merged stream, the other shared threshold after every "
                          "256 flows with the same per-flow step. With budgets from the warm-up share, one warm-up "

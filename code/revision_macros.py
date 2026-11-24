@@ -957,7 +957,9 @@ def round7_macros():
             M[f"od_{prn}_diff_rng"] = f"{min(dl):+.3f} to {max(dl):+.3f}"
             M[f"od_{prn}_ci_rng"] = f"{min(lo_):+.3f} to {max(hi_):+.3f}"
             M[f"od_{prn}_obs_rng"] = f"{od.groupby('model')[f'load_{prn}'].mean().min():.2f} to {od.groupby('model')[f'load_{prn}'].mean().max():.2f}"
-            M[f"od_{prn}_exp_rng"] = f"{od.groupby('model')[f'load_{prn}_expected'].mean().min():.2f} to {od.groupby('model')[f'load_{prn}_expected'].mean().max():.2f}"
+            ex = od.groupby('model')[f'load_{prn}_expected'].mean()
+            lo_, hi_ = f"{ex.min():.2f}", f"{ex.max():.2f}"
+            M[f"od_{prn}_exp_rng"] = lo_ if lo_ == hi_ else f"{lo_} to {hi_}"
         M["od_nperm"] = "100"
         M["od_all_include0"] = "yes" if all(l <= 0 <= h for prn in out for l, h in zip(out[prn][1], out[prn][2])) else "no"
     # remedies for heterogeneous shards
