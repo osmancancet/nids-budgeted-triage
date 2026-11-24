@@ -1130,9 +1130,30 @@ def dist_macros():
             M[k + "_shrng"] = f"{v.load_shard_min:.2f} to {v.load_shard_max:.2f}"
 
 
+def small_budget_macros():
+    """Small budgets and weighted Fisher on the chronological streams (revision_small_budget.py)."""
+    p = os.path.join(RES, "extra_small_budget.csv")
+    if not os.path.exists(p):
+        return
+    x = pd.read_csv(p)
+    x = x[x.rule == "online"]
+    g = x.groupby(["protocol", "budget", "priority"])[["load", "load_min10", "load_max10", "recall", "r_warm"]].mean()
+    M["sb_nseeds"] = words(x.seed.nunique())
+    for (pr, c, name), v in g.iterrows():
+        k = f"sb_{pr[:2].lower()}_{name.replace('.', '')}_{int(round(c * 10000))}"
+        M[k + "_rec"] = f"{v.recall:.3f}"
+        M[k + "_load"] = f"{v.load:.2f}"
+        M[k + "_tenth"] = f"{v.load_min10:.2f} to {v.load_max10:.2f}"
+    sm = g.loc[[i for i in g.index if i[1] < 0.01]]
+    M["sb_load_rng"] = f"{sm.load.min():.2f} to {sm.load.max():.2f}"
+    M["sb_tenth_max"] = f"{sm.load_max10.max():.1f}"
+    M["sb_rwarm_rng"] = f"{sm.r_warm.min():.0f} to {sm.r_warm.max():.0f}"
+    M["sb_rec_max"] = f"{sm.recall.max():.3f}"
+
+
 def build():
     os_macros()
-    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros", "round7_macros", "dist_macros"):
+    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros", "round7_macros", "dist_macros", "small_budget_macros"):
         fn = globals().get(mod)
         if fn:
             try:

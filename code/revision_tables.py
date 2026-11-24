@@ -730,7 +730,10 @@ def t_dist():
                      "LightGBM, HNSW reference, weighted Fisher priority, 1% budget, batches of 4,096 flows; median of "
                      f"{int(ind.reps.max())} repetitions). Each worker is a separate process with its own models, "
                      "warm-up and threshold. Throughput counts the time from the end of the warm-up to the last flow "
-                     "of the slowest worker. Efficiency is the speed-up divided by the number of workers.",
+                     "of the slowest worker. Efficiency is the speed-up divided by the number of workers. This stand-alone "
+                     "implementation loads exported models and differs in code from the pipeline of Table A22, so the "
+                     "one-worker rate on the same machine differs from the one-shard rate there; we did not profile "
+                     "why efficiency falls with more workers on the laptop.",
                      ["Machine", "Workers", "Flows per s", "Speed-up", "Efficiency", "Load", "Load per tenth",
                       "Worker loads"], rows, ["l", "r", "r", "r", "r", "r", "r", "r"])
     c = d[d["mode"] == "coord"]
@@ -766,8 +769,28 @@ def t_dist():
                      ["l", "r", "r", "r", "r", "r", "r", "r", "r", "r", "r"])
 
 
+def t_small():
+    x = r("extra_small_budget.csv")
+    if x is None:
+        return
+    x = x[x.rule == "online"]
+    g = x.groupby(["protocol", "budget", "priority"])[["load", "load_min10", "load_max10", "recall", "precision", "r_warm"]].mean()
+    nm = {"detector": "Detector", "fisher": "Fisher", "wfisher0.7": "Weighted Fisher, w = 0.7"}
+    rows = []
+    for (pr, c, name), v in g.iterrows():
+        rows.append([pr.split("-")[0], f"{100 * c:g}%", nm[name], f"{v.r_warm:.0f}", f"{v.load:.2f}",
+                     f"{v.load_min10:.2f} to {v.load_max10:.2f}", f"{v.recall:.3f}", f"{v.precision:.3f}"])
+    T["A26"] = table("**Table A26.** Small review budgets on the chronological streams (CSE-CIC-IDS2018, LightGBM, "
+                     f"online update, mean over {x.seed.nunique()} seeds; same streams and seeds as Table 7). The warm-up "
+                     "column gives the expected number of warm-up flows above the threshold (budget times warm-up size), "
+                     "on which the variance of Proposition 1 depends; the range gives the lowest and highest load among "
+                     "the ten tenths of the stream.",
+                     ["Protocol", "Budget", "Priority", "Warm-up flows above", "Load", "Load range over tenths",
+                      "Recall", "Precision"], rows, ["l", "r", "l", "r", "r", "r", "r", "r"])
+
+
 if __name__ == "__main__":
-    for f in (t_data, t_xd, t_os, t_prio, t_allrules, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync, t_dist):
+    for f in (t_data, t_xd, t_os, t_prio, t_allrules, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync, t_dist, t_small):
         try:
             f()
             print("ok", f.__name__)
