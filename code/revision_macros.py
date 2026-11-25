@@ -290,8 +290,8 @@ def extra_macros():
         M["tmp_online_maxdev"] = pct(dev["online"])
         if best == "online":
             M["fig6_takeaway"] = (f"The online update is the only rule whose overall load stays within "
-                                  f"{pct(dev['online'])} of the plan on all four streams; every other rule misses it "
-                                  f"by at least {pct(others)} on one stream.")
+                                  f"{pct(dev['online'])} of the plan on all four streams; each other rule misses the "
+                                  f"plan by {pct(others)} or more on at least one stream.")
         else:
             M["fig6_takeaway"] = f"The rule closest to plan on all four streams is the {best} rule."
     fe = get("extra_features.csv")

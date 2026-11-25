@@ -680,7 +680,7 @@
  "t2_rolling_load": "1.14",
  "t2r_rolling_load": "1.31",
  "tmp_online_maxdev": "5%",
- "fig6_takeaway": "The online update is the only rule whose overall load stays within 5% of the plan on all four streams; every other rule misses it by at least 62% on one stream.",
+ "fig6_takeaway": "The online update is the only rule whose overall load stays within 5% of the plan on all four streams; each other rule misses the plan by 62% or more on at least one stream.",
  "feat_d_auroc": "+0.025 on average (95% CI -0.048 to +0.125, six pairs)",
  "feat_d_logfpr": "-0.36 (95% CI -0.50 to -0.18)",
  "dom_auc_rng": "1.000",
