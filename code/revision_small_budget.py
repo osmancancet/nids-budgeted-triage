@@ -8,6 +8,12 @@ priorities, the step of the main experiments). For each run the number of warm-u
 the threshold (r = budget x warm-up size) is recorded, since Proposition 1 makes the load
 variance depend on it.
 
+Besides flow-level recall, each run reports recall at the level of attack episodes, the unit an
+analyst investigates: an episode is the set of attack flows of one family within one 10-minute
+window (episode_recall) or within one capture day (campaign_recall), and it counts as found when at
+least one of its flows is in the queue. delay_min is the median, over campaigns found, of the minutes
+from the first attack flow of the campaign after the warm-up window to its first flow in the queue.
+
   python revision_small_budget.py   -> results/revision/extra_small_budget.csv
 """
 import os
@@ -21,6 +27,18 @@ from prepare import CIC_FEATURES
 
 BUDGETS = [0.0005, 0.001, 0.002, 0.01]
 PRIOS = ["detector", "fisher", "wfisher0.7"]
+
+
+def episodes(qa, ep10, camp, t):
+    """Episode-level recall for the flags qa of the attack flows (see module docstring)."""
+    e = np.bincount(ep10, weights=qa, minlength=ep10.max() + 1) > 0
+    c = np.bincount(camp, weights=qa, minlength=camp.max() + 1) > 0
+    delays = []
+    for k in np.flatnonzero(c):
+        m = camp == k
+        delays.append((t[m][qa[m]].min() - t[m].min()) / 60.0)
+    return dict(n_episodes=len(e), episode_recall=e.mean(), n_campaigns=len(c), campaign_recall=c.mean(),
+                delay_min=float(np.median(delays)) if delays else np.nan)
 
 
 def main():
@@ -71,6 +89,9 @@ def main():
             n_att = min(len(att), int(round(0.01 / 0.99 * len(ben))))
             sel = np.sort(np.r_[ben, rng.choice(att, n_att, replace=False)])
             ys = yt[sel]
+            fam_s = d.family.to_numpy()[te][sel]
+            ts_s = ts[te][sel]
+            day_s = d.day.to_numpy()[te][sel]
             if proto.endswith("random"):
                 continue  # drawn only to keep the generator in step with run_temporal
             F, ctx = fit_eval("LGBM", seed, X[part == 0], y[part == 0], X[part == 1], y[part == 1])
@@ -81,6 +102,10 @@ def main():
                     s = pr[name]
                     w = int(0.2 * len(s))
                     rest = slice(w, len(s))
+                    am = ys[rest] == 1
+                    fr, tr_, dr = fam_s[rest][am], ts_s[rest][am], day_s[rest][am]
+                    ep10 = pd.factorize(pd.Series(fr).astype(str) + "|" + pd.Series(tr_ // 600).astype(str))[0]
+                    camp = pd.factorize(pd.Series(fr).astype(str) + "|" + pd.Series(dr).astype(str))[0]
                     t_w = np.quantile(s[:w], 1 - c)
                     gam = 0.02 * (np.quantile(s[:w], .999) - np.quantile(s[:w], .5))
                     fl_on = online_quantile(s, c, t_w, gam)
@@ -92,7 +117,8 @@ def main():
                                          queue=int(q.sum()), planned=c * len(q),
                                          load=q.mean() / c, load_min10=min(loads), load_max10=max(loads),
                                          recall=q[ys[rest] == 1].mean(),
-                                         precision=(q & (ys[rest] == 1)).sum() / max(q.sum(), 1)))
+                                         precision=(q & (ys[rest] == 1)).sum() / max(q.sum(), 1),
+                                         **episodes(q[am], ep10, camp, tr_)))
             print(seed, proto, flush=True)
             pd.DataFrame(rows).to_csv(os.path.join(OUT, "extra_small_budget.csv"), index=False)
 

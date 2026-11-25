@@ -781,19 +781,26 @@ def t_small():
     if x is None:
         return
     x = x[x.rule == "online"]
-    g = x.groupby(["protocol", "budget", "priority"])[["load", "load_min10", "load_max10", "recall", "precision", "r_warm"]].mean()
+    g = x.groupby(["protocol", "budget", "priority"])[["load", "load_min10", "load_max10", "recall", "precision", "r_warm",
+                                                     "episode_recall", "campaign_recall", "delay_min"]].mean()
     nm = {"detector": "Detector", "fisher": "Fisher", "wfisher0.7": "Weighted Fisher, w = 0.7"}
     rows = []
     for (pr, c, name), v in g.iterrows():
         rows.append([pr.split("-")[0], f"{100 * c:g}%", nm[name], f"{v.r_warm:.0f}", f"{v.load:.2f}",
-                     f"{v.load_min10:.2f} to {v.load_max10:.2f}", f"{v.recall:.3f}", f"{v.precision:.3f}"])
+                     f"{v.load_min10:.2f} to {v.load_max10:.2f}", f"{v.recall:.3f}", f"{v.precision:.3f}",
+                     f"{v.episode_recall:.2f}", f"{v.campaign_recall:.2f}",
+                     "" if np.isnan(v.delay_min) else f"{v.delay_min:.0f}"])
     T["A26"] = table("**Table A26.** Small review budgets on the chronological streams (CSE-CIC-IDS2018, LightGBM, "
                      f"online update, mean over {x.seed.nunique()} seeds; same streams and seeds as Table 7). The warm-up "
                      "column gives the expected number of warm-up flows above the threshold (budget times warm-up size), "
                      "on which the variance of Proposition 1 depends; the range gives the lowest and highest load among "
-                     "the ten tenths of the stream.",
+                     "the ten tenths of the stream. Episode and campaign recall count the attack flows of one family in "
+                     "one 10-minute window or one capture day as one unit, found when at least one of its flows is in "
+                     "the queue; delay is the median time in minutes from the first flow of a campaign after the warm-up "
+                     "window to its first flow in the queue (mean over seeds, campaigns found only).",
                      ["Protocol", "Budget", "Priority", "Warm-up flows above", "Load", "Load range over tenths",
-                      "Recall", "Precision"], rows, ["l", "r", "l", "r", "r", "r", "r", "r"])
+                      "Recall", "Precision", "Episode recall", "Campaign recall", "Delay (min)"], rows,
+                     ["l", "r", "l", "r", "r", "r", "r", "r", "r", "r", "r"])
 
 
 def t_more():
@@ -840,8 +847,49 @@ def t_more():
                          ["r", "r", "l", "r", "r", "r", "r"])
 
 
+
+def t_ens():
+    x = r("os_ensemble.csv")
+    if x is None:
+        return
+    g = x.groupby(["budget", "priority"]).recall.mean().unstack()
+    nm = [("detector", "LightGBM detector"), ("wfisher0.7", "LightGBM weighted Fisher, w = 0.7"),
+          ("uncertainty", "LightGBM uncertainty (closeness to 0.5)"),
+          ("ens_mean", "Ensemble mean of detector evidence"), ("ens_disagree", "Ensemble disagreement"),
+          ("ens_mean_dis", "Ensemble mean plus disagreement rank")]
+    rows = [[lab] + [f"{g.loc[c, k]:.3f}" for c in sorted(g.index)] for k, lab in nm]
+    T["A30"] = table("**Table A30.** Ensemble baselines for unseen families (Protocol OS, 47 families, five seeds, exact "
+                     "top-b queue of the 1%-prevalence stream). The ensemble combines LightGBM, random forest, MLP and "
+                     "logistic regression trained on the same split: the mean over the four models of their conformal "
+                     "detector evidence, the standard deviation of their attack probabilities, and the mean with the "
+                     "disagreement rank added. Mean queue recall on the unseen family.",
+                     ["Priority"] + [f"{100 * c:g}% budget" for c in sorted(g.index)], rows, ["l", "r", "r", "r"])
+
+
+def t_tput():
+    """All throughput figures of the paper in one place (values from macros.json)."""
+    m = json.load(open(os.path.join(REV, "macros.json")))
+    spec = [("Main pipeline, one process, 4,096-flow micro-batches", "one core", "stream_fps_b4096", "A17"),
+            ("Main pipeline, one shard process", "one core", "sync_sh1_fps", "A22"),
+            ("Main pipeline, one process, one thread", "one core", "sync_thr1_fps", "A22"),
+            ("Stand-alone implementation, one worker", "one core, cloud VM", "dist_cloud_fps1", "A24"),
+            ("Stand-alone implementation, one worker", "one core, laptop", "dist_mac_fps1", "A24"),
+            ("Component timing on one large block (HNSW)", "four threads", "cost_flows_per_s_hnsw", "8"),
+            ("Main pipeline, one process", "four threads", "sync_thr4_fps", "A22"),
+            ("Main pipeline, independent shards", "four cores", "stream_fps_s4", "A22"),
+            ("Main pipeline, four shards, shared threshold (256-flow batches)", "four cores", "sync_shared256_fps", "A22"),
+            ("Stand-alone implementation, independent workers", "four cores, cloud VM", "dist_cloud_fps4", "A24"),
+            ("Stand-alone implementation, independent workers", "eight workers, laptop", "dist_mac_fps8", "A24"),
+            ("Coordinator, workers wait after 64-flow batches, 1 ms delay", "four workers, cloud VM", "dsync_64_1_fps", "A28")]
+    rows = [[a, b, m[k], t] for a, b, k, t in spec if k in m]
+    T["A29"] = table("**Table A29.** Throughput figures reported in this paper, in flows per second after model loading and "
+                     "warm-up, excluding feature extraction. Rows with one core differ because they come from the main "
+                     "pipeline or the stand-alone implementation and from separate runs; Table A22 gives the spread over "
+                     "repetitions of the same setting.",
+                     ["Setting", "Resources", "Flows per s", "Table"], rows, ["l", "l", "r", "r"])
+
 if __name__ == "__main__":
-    for f in (t_data, t_xd, t_os, t_prio, t_allrules, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync, t_dist, t_small, t_more):
+    for f in (t_data, t_xd, t_os, t_prio, t_allrules, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync, t_dist, t_small, t_more, t_tput, t_ens):
         try:
             f()
             print("ok", f.__name__)

@@ -1146,18 +1146,48 @@ def small_budget_macros():
         return
     x = pd.read_csv(p)
     x = x[x.rule == "online"]
-    g = x.groupby(["protocol", "budget", "priority"])[["load", "load_min10", "load_max10", "recall", "r_warm"]].mean()
+    g = x.groupby(["protocol", "budget", "priority"])[["load", "load_min10", "load_max10", "recall", "r_warm",
+                                                     "episode_recall", "campaign_recall", "delay_min",
+                                                     "n_episodes", "n_campaigns"]].mean()
     M["sb_nseeds"] = words(x.seed.nunique())
     for (pr, c, name), v in g.iterrows():
         k = f"sb_{pr[:2].lower()}_{name.replace('.', '')}_{int(round(c * 10000))}"
         M[k + "_rec"] = f"{v.recall:.3f}"
         M[k + "_load"] = f"{v.load:.2f}"
         M[k + "_tenth"] = f"{v.load_min10:.2f} to {v.load_max10:.2f}"
+        M[k + "_ep"] = f"{v.episode_recall:.2f}"
+        M[k + "_camp"] = f"{v.campaign_recall:.2f}"
+        M[k + "_delay"] = f"{v.delay_min:.0f}"
+    for pr in ["T1-benign-time", "T2-day"]:
+        v = g.loc[pr]
+        M[f"sb_{pr[:2].lower()}_nep"] = f"{v.n_episodes.iloc[0]:.0f}"
+        M[f"sb_{pr[:2].lower()}_ncamp"] = f"{v.n_campaigns.iloc[0]:.1f}"
+    b1 = g.loc[[i for i in g.index if i[1] == 0.01]]
+    M["sb_camp100_rng"] = f"{b1.campaign_recall.min():.2f} to {b1.campaign_recall.max():.2f}"
     sm = g.loc[[i for i in g.index if i[1] < 0.01]]
     M["sb_load_rng"] = f"{sm.load.min():.2f} to {sm.load.max():.2f}"
     M["sb_tenth_max"] = f"{sm.load_max10.max():.1f}"
     M["sb_rwarm_rng"] = f"{sm.r_warm.min():.0f} to {sm.r_warm.max():.0f}"
     M["sb_rec_max"] = f"{sm.recall.max():.3f}"
+
+
+def ensemble_macros():
+    """Ensemble baselines over the four detectors on Protocol OS (revision_ensemble.py)."""
+    p = os.path.join(RES, "os_ensemble.csv")
+    if not os.path.exists(p):
+        return
+    from scipy.stats import wilcoxon
+    x = pd.read_csv(p)
+    g = x.groupby(["budget", "priority"]).recall.mean()
+    for (c, name), v in g.items():
+        M[f"ens_{name.replace('.', '').replace('_', '')}_b{int(round(c * 100))}"] = f"{v:.3f}"
+    f = x[x.budget == 0.01].groupby(["dataset", "held_out", "priority"]).recall.mean().unstack()
+    for a, b in [("wfisher0.7", "ens_mean"), ("ens_mean", "detector")]:
+        d = f[a] - f[b]
+        k = f"ens_d_{a.replace('.', '').replace('_', '')}_{b.replace('_', '')}"
+        M[k] = f"{d.mean():+.3f}"
+        M[k + "_p"] = f"{wilcoxon(d).pvalue:.3f}"
+    M["ens_nfam"] = str(len(f))
 
 
 def sync_macros():
@@ -1183,7 +1213,7 @@ def sync_macros():
 
 def build():
     os_macros()
-    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros", "round7_macros", "dist_macros", "small_budget_macros", "sync_macros"):
+    for mod in ("xd_macros", "misc_macros", "extra_macros", "adapt_macros", "lowpi_macros", "ctrl_macros", "stream_macros", "check_macros", "round7_macros", "dist_macros", "small_budget_macros", "sync_macros", "ensemble_macros"):
         fn = globals().get(mod)
         if fn:
             try:
