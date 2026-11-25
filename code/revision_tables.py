@@ -353,7 +353,7 @@ def t_cost():
     T["cost"] = table("**Table 8.** Per-flow cost of each component of the triage layer on 50,000 CSE-CIC-IDS2018 "
                       "test flows (median of three repetitions for detectors). The last column is the share of "
                       "true five nearest neighbours returned by the approximate index; it depends on the sampled reference "
-                      "flows and is therefore not monotone in the reference size (Section 4.11).",
+                      "flows and is therefore not monotone in the reference size (Appendix B.4).",
                       ["Component", "Reference size", "µs per flow, 1 thread", "µs per flow, 4 threads",
                        "Neighbour recall"], rows, ["l", "r", "r", "r", "r"])
 
@@ -423,11 +423,13 @@ def t_extras():
         o = r("os_validity.csv").assign(regime="Unseen family")
         rows = []
         for (reg, m), g in pd.concat([v, o]).groupby(["regime", "model"]):
-            rows.append([reg, MN[m], f"{g.fpr_pdet.mean():.4f}", f"{g.fpr_pB.mean():.4f}", f"{g.fpr_pB.max():.4f}"])
+            rows.append([reg, MN[m], f"{g.fpr_pdet.mean():.4f}", f"{g.fpr_pB.mean():.4f}",
+                         f"{g.fpr_pB.quantile(0.9):.4f}", f"{g.fpr_pB.max():.4f}"])
         T["A8"] = table("**Table A8.** Share of benign flows flagged by the conformal rules at α = 1% "
                         "($p_{\\det} \\le 0.01$ and $p_B \\le 0.01$). The conformal guarantee bounds the expected "
                         "share by 0.01 under Assumption S.",
-                        ["Regime", "Model", "p_det, mean", "p_B, mean", "p_B, max"], rows, ["l", "l", "r", "r", "r"])
+                        ["Regime", "Model", "p_det, mean", "p_B, mean", "p_B, 90th pct.", "p_B, max"], rows,
+                        ["l", "l", "r", "r", "r", "r"])
     g = r("extra_group.csv")
     if g is not None:
         G = g.groupby(["dataset", "held_out_group"]).mean(numeric_only=True).reset_index()
@@ -682,7 +684,7 @@ def t_stream():
                          "threshold is taken over the merged stream, each shard's budget is the share of its own "
                          "warm-up flows above it, and each shard then runs its own update with that budget. With the coordinator, "
                          "each shard flags a batch with the threshold it received after its own previous batch and sends its "
-                         "excess to one shared threshold, with the step divided by the number of shards (Section 4.11). Load is the queue size divided by "
+                         "excess to one shared threshold, with the step divided by the number of shards (Appendix B.8). Load is the queue size divided by "
                          "the budget; shard loads give the lowest and highest shard over all seeds. Recall, precision and load are "
                          "measured after the warm-up windows; because attacks cluster in time, the attack share of "
                          "that part of the stream (last column, precision × load × budget / recall, mean over seeds) "
@@ -789,8 +791,49 @@ def t_small():
                       "Recall", "Precision"], rows, ["l", "r", "l", "r", "r", "r", "r", "r"])
 
 
+def t_more():
+    x = r("extra_temporal_shuffled.csv")
+    z = r("extra_temporal_stream.csv")
+    if x is not None and z is not None:
+        z = z[z.budget == 0.01]
+        lab = {"T1-benign-time": "T1, time order", "T1-random": "T1, random split", "T2-day": "T2, time order",
+               "T2-random": "T2, random split"}
+        parts = [z.assign(stream=z.protocol.map(lab)),
+                 x[x.budget == 0.01].assign(stream=x.protocol.str.split("-").str[0] + ", shuffled")]
+        a = pd.concat(parts)
+        order = ["T1, time order", "T1, shuffled", "T1, random split", "T2, time order", "T2, shuffled", "T2, random split"]
+        g = a.groupby(["stream", "priority", "rule"])[["load", "load_min10", "load_max10", "recall"]].mean()
+        nm = {"detector": "Detector", "fisher": "Fisher"}
+        rows = []
+        for st in order:
+            for (st_, p_, ru), v in g.loc[[st]].iterrows():
+                if ru != "online" and not (ru == "warmup" and "shuffled" in st_):
+                    continue
+                rows.append([st_, nm.get(p_, p_), "Warm-up" if ru == "warmup" else "Online", f"{v.load:.2f}",
+                             f"{v.load_min10:.2f} to {v.load_max10:.2f}", f"{v.recall:.3f}"])
+        T["A27"] = table("**Table A27.** Online update on the test streams of Protocols T1 and T2 in time order, with the same "
+                         "flows shuffled, and on the random-split counterparts, and the warm-up quantile on the shuffled "
+                         "streams (Table 7 gives it for the other streams; LightGBM, 1% budget, mean "
+                         f"over {x.seed.nunique()} seeds). The range gives the lowest and highest load among the ten tenths "
+                         "of the stream.",
+                         ["Stream", "Priority", "Rule", "Load", "Load range over tenths", "Recall"], rows,
+                         ["l", "l", "l", "r", "r", "r"])
+    y = r("dist_sync_cloud.csv")
+    if y is not None:
+        g = y.groupby(["batch", "delay_ms", "step"])[["flows_per_s", "load", "load_tenth_min", "load_tenth_max",
+                                                      "staleness"]].median()
+        rows = [[f"{bs:,}", str(dl), "step/P" if st == "perworker" else "full step", f"{v.flows_per_s:,.0f}",
+                 f"{v.load:.3f}", f"{v.load_tenth_min:.2f} to {v.load_tenth_max:.2f}", f"{v.staleness:.1f}"]
+                for (bs, dl, st), v in g.iterrows()]
+        T["A28"] = table("**Table A28.** Coordinator with workers that wait for the updated threshold before their next "
+                         f"batch (cloud VM, 4 workers, median of {int(y.rep.nunique())} repetitions; otherwise as Table A25). "
+                         "Staleness counts the updates of the other workers applied while a worker processed its batch.",
+                         ["Batch", "Delay (ms)", "Step", "Flows per s", "Load", "Load per tenth", "Staleness"], rows,
+                         ["r", "r", "l", "r", "r", "r", "r"])
+
+
 if __name__ == "__main__":
-    for f in (t_data, t_xd, t_os, t_prio, t_allrules, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync, t_dist, t_small):
+    for f in (t_data, t_xd, t_os, t_prio, t_allrules, t_budget, t_temporal, t_cost, t_extras, t_zero, t_adapt, t_ctrl, t_stream, t_sync, t_dist, t_small, t_more):
         try:
             f()
             print("ok", f.__name__)
