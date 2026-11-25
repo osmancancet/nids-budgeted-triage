@@ -1121,6 +1121,9 @@ def dist_macros():
     sc = os.path.join(RES, "extra_shards_coord.csv")
     if os.path.exists(sc):
         x = pd.read_csv(sc)
+        sc2 = os.path.join(RES, "extra_shards_coord_small.csv")
+        if os.path.exists(sc2):
+            x = pd.concat([x, pd.read_csv(sc2).query("scheme != 'global'")])
         g = x.groupby(["protocol", "scheme"])[["recall", "load", "load_shard_min", "load_shard_max"]].mean()
         M["shco_nseeds"] = words(x.seed.nunique())
         for (pr, sch), v in g.iterrows():
@@ -1128,6 +1131,12 @@ def dist_macros():
             M[k + "_rec"] = f"{v.recall:.3f}"
             M[k + "_load"] = f"{v.load:.2f}"
             M[k + "_shrng"] = f"{v.load_shard_min:.2f} to {v.load_shard_max:.2f}"
+        sm = g[g.index.get_level_values("scheme").str.contains("coord(?:16|64)_", regex=True)]
+        if len(sm):
+            t1 = sm.loc["T1-benign-time"]
+            t2 = sm.loc["T2-day"]
+            M["shco_small_t1_load_rng"] = f"{t1.load.min():.2f} to {t1.load.max():.2f}"
+            M["shco_small_t2_rec_rng"] = f"{t2.recall.min():.3f} to {t2.recall.max():.3f}"
 
 
 def small_budget_macros():
@@ -1157,6 +1166,9 @@ def sync_macros():
     if not os.path.exists(p):
         return
     x = pd.read_csv(p)
+    p64 = os.path.join(RES, "dist_sync64_cloud.csv")
+    if os.path.exists(p64):
+        x = pd.concat([x, pd.read_csv(p64)])
     x = x[x.step == "perworker"].groupby(["batch", "delay_ms"])[["flows_per_s", "load", "load_tenth_min",
                                                               "load_tenth_max", "staleness"]].median()
     for (bs, dl), v in x.iterrows():

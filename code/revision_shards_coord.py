@@ -8,15 +8,21 @@ shards keep using older values until their own next batch, as in the asynchronou
 dist/dist_bench.py with no network delay. The step is the per-flow step of a single process (full) or
 that step divided by the number of shards (perworker).
 
-  python revision_shards_coord.py   -> results/revision/extra_shards_coord.csv
+  python revision_shards_coord.py            -> results/revision/extra_shards_coord.csv (batches 256, 1024)
+  python revision_shards_coord.py small      -> results/revision/extra_shards_coord_small.csv (batches 16, 64)
 """
 import os
+import sys
 import numpy as np
 import pandas as pd
 
 import run_experiments as R
 from revision_analysis import priorities, online_quantile
 from revision_extra import fit_eval, OUT, SEEDS
+
+SMALL = len(sys.argv) > 1 and sys.argv[1] == "small"
+BATCHES = [16, 64] if SMALL else [256, 1024]
+OUTFILE = "extra_shards_coord_small.csv" if SMALL else "extra_shards_coord.csv"
 from prepare import CIC_FEATURES
 from revision_shards_fix import C, warm
 
@@ -100,7 +106,7 @@ def main():
             schemes["skew4"] = sk
             runs = [("global", schemes["global"])]
             for base in ["protocol", "skew4"]:
-                for bs in [256, 1024]:
+                for bs in BATCHES:
                     for stp in ["full", "perworker"]:
                         runs.append((f"{base}_coord{bs}_{stp}", schemes[base]))
             for name, shard in runs:
@@ -119,7 +125,7 @@ def main():
                                  recall=fl[post & (ys == 1)].mean(),
                                  precision=(fl[post] & (ys[post] == 1)).sum() / max(fl[post].sum(), 1)))
                 print(rows[-1], flush=True)
-            pd.DataFrame(rows).to_csv(os.path.join(OUT, "extra_shards_coord.csv"), index=False)
+            pd.DataFrame(rows).to_csv(os.path.join(OUT, OUTFILE), index=False)
 
 
 

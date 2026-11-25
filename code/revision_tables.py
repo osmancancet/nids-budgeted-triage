@@ -652,12 +652,17 @@ def t_stream():
         fc = os.path.join(REV, "extra_shards_coord.csv")
         if os.path.exists(fc):
             x = pd.concat([x, pd.read_csv(fc).query("scheme.str.endswith('perworker')", engine="python")])
+        fc2 = os.path.join(REV, "extra_shards_coord_small.csv")
+        if os.path.exists(fc2):
+            x = pd.concat([x, pd.read_csv(fc2).query("scheme in ['protocol_coord64_perworker', 'skew4_coord64_perworker']")])
         names = {"global": "One threshold", "protocol": "One shard per protocol",
                  "skew4": "Four shards, attacks on one", "sync4": "Four shards, shared batched threshold",
                  "protocol_sync256": "Per protocol, shared threshold every 256 flows",
                  "protocol_share": "Per protocol, budgets from warm-up share",
                  "skew4_sync256": "Attacks on one, shared threshold every 256 flows",
                  "skew4_share": "Attacks on one, budgets from warm-up share",
+                 "protocol_coord64_perworker": "Per protocol, coordinator, 64-flow batches",
+                 "skew4_coord64_perworker": "Attacks on one, coordinator, 64-flow batches",
                  "protocol_coord256_perworker": "Per protocol, coordinator, 256-flow batches",
                  "protocol_coord1024_perworker": "Per protocol, coordinator, 1,024-flow batches",
                  "skew4_coord256_perworker": "Attacks on one, coordinator, 256-flow batches",
@@ -665,7 +670,7 @@ def t_stream():
         rows = []
         for pr in ["T1-benign-time", "T2-day"]:
             for sc in ["global", "protocol", "skew4", "sync4", "protocol_sync256", "skew4_sync256",
-                       "protocol_share", "skew4_share", "protocol_coord256_perworker",
+                       "protocol_share", "skew4_share", "protocol_coord64_perworker", "skew4_coord64_perworker", "protocol_coord256_perworker",
                        "protocol_coord1024_perworker", "skew4_coord256_perworker", "skew4_coord1024_perworker"]:
                 v = x[(x.protocol == pr) & (x.scheme == sc)]
                 if v.empty:
@@ -820,6 +825,9 @@ def t_more():
                          ["l", "l", "l", "r", "r", "r"])
     y = r("dist_sync_cloud.csv")
     if y is not None:
+        y64 = r("dist_sync64_cloud.csv")
+        if y64 is not None:
+            y = pd.concat([y, y64])
         g = y.groupby(["batch", "delay_ms", "step"])[["flows_per_s", "load", "load_tenth_min", "load_tenth_max",
                                                       "staleness"]].median()
         rows = [[f"{bs:,}", str(dl), "step/P" if st == "perworker" else "full step", f"{v.flows_per_s:,.0f}",
