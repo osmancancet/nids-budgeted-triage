@@ -452,9 +452,9 @@ def t_zero():
     from revision_extra import ROBUST
     zf = sorted(set(sum(z.values(), [])))
     feats = zf + [f for f in ROBUST if f not in zf]
-    rows = [[f] + ["✓" if f in z[d] else "" for d in CIC] + ["✓" if f in ROBUST else ""] for f in feats]
+    rows = [[f] + ["+" if f in z[d] else "" for d in CIC] + ["+" if f in ROBUST else ""] for f in feats]
     T["A5"] = table("**Table A5.** Features that are identically zero in the benign flows of each CICFlowMeter "
-                    "dataset (✓), and the 24 tool-stable features used in Section 4.7 (last column).",
+                    "dataset (+), and the 24 tool-stable features used in Section 4.7 (last column).",
                     ["Feature"] + CIC + ["Tool-stable"], rows, ["l", "l", "l", "l", "l"])
 
 
